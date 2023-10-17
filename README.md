@@ -1,3 +1,3 @@
-## Payment server for Atol system
+## MAK-4
 
-I'll add description later I promise
+---
