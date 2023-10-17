@@ -10,6 +10,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt6 6.5 REQUIRED COMPONENTS Quick Network HttpServer SVG Widgets)
 
+add_subdirectory(sources)
+
 qt_standard_project_setup()
 qt_add_executable(MAK-4
     ${SOURCES}
@@ -36,6 +38,13 @@ target_link_libraries(MAK-4
     PRIVATE Qt6::Network
     PRIVATE Qt6::HttpServer
     PRIVATE Qt6::Widgets
+    PRIVATE Configs
+)
+
+target_include_directories(
+    MAK-4 PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/sources/core
+    ${CMAKE_CURRENT_SOURCE_DIR}/sources/configs
 )
 
 set(CPACK_GENERATOR "DragNDrop")
