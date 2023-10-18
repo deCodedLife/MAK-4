@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt6 6.5 REQUIRED COMPONENTS Quick Network HttpServer SVG Widgets)
+add_subdirectory(sources)
 
 qt_standard_project_setup()
 qt_add_executable(MAK-4
@@ -31,11 +32,40 @@ set_target_properties(MAK-4 PROPERTIES
     MACOSX_BUNDLE TRUE
 )
 
+target_include_directories(
+    MAK-4 PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/sources/core
+    ${CMAKE_CURRENT_SOURCE_DIR}/sources/configs
+)
+set( LIBS_FOLDER ${CMAKE_CURRENT_SOURCE_DIR}/libs )
+
+if ( APPLE )
+    set( LIBS_FOLDER ${LIBS_FOLDER}/mac_os )
+    set(
+        SNMP_LIBS
+        ${LIBS_FOLDER}/libnetsnmp.a
+        ${LIBS_FOLDER}/libnetsnmpagent.a
+        ${LIBS_FOLDER}/libnetsnmphelpers.a
+        ${LIBS_FOLDER}/libnetsnmpmibs.a
+        ${LIBS_FOLDER}/libnetsnmptrapd.a
+    )
+
+    set(
+        SSL_LIBS
+        ${LIBS_FOLDER}/libssl.a
+        ${LIBS_FOLDER}/libcrypto.a
+    )
+endif()
+
 target_link_libraries(MAK-4
     PRIVATE Qt6::Quick
     PRIVATE Qt6::Network
     PRIVATE Qt6::HttpServer
     PRIVATE Qt6::Widgets
+    PRIVATE Configs
+    ${SNMP_LIBS}
+    ${SSL_LIBS}
 )
 
 set(CPACK_GENERATOR "DragNDrop")
