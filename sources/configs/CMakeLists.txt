@@ -1,8 +1,5 @@
-set (
-    CONFIGS_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/configs.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/configs.cpp
-)
+FILE ( GLOB CONFIGS_SOURCES *.cpp *.h )
+LIST ( SORT CONFIGS_SOURCES )
 
 add_library(
     Configs STATIC

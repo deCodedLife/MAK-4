@@ -1,6 +1,6 @@
 #pragma once
 
-#define CONFIG_FILE "cfg.dat"
+#define CONFIG_FILE "config.m4ss"
 
 #define mak_ip ""
 
