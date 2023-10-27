@@ -93,11 +93,11 @@ QJsonObject Configs::Default()
     mainSettings[ "authMethod" ] = Field::ToJSON( { FieldCombobox, AUTH_METHOD, "Уровень", { "authPriv", "authNoPriv" } } );
     mainSettings[ "authProtocol" ] = Field::ToJSON( { FieldCombobox, AUTH_PROTOCOL, "Протокол аутентификации", { "SHA1", "MD5" } } );
     mainSettings[ "privProtocol" ] = Field::ToJSON( { FieldCombobox, PRIV_PROTOCOL, "Протокол приватноси", { "DES", "AES" } } );
-    mainSettings[ "authPassword" ] = Field::ToJSON( { FieldInput, AUTH_PASSWORD, "Пароль аутентификации" } );
-    mainSettings[ "privPassword" ] = Field::ToJSON( { FieldInput, PRIV_PASSWORD, "Пароль приватности" } );
+    mainSettings[ "authPassword" ] = Field::ToJSON( { FieldPassword, AUTH_PASSWORD, "Пароль аутентификации" } );
+    mainSettings[ "privPassword" ] = Field::ToJSON( { FieldPassword, PRIV_PASSWORD, "Пароль приватности" } );
 
-    mainSettings[ "v2_read" ] = Field::ToJSON( { FieldInput, V2_READ, "Для чтения" } );
-    mainSettings[ "v2_write" ] = Field::ToJSON( { FieldInput, V2_WRITE, "Для записи" } );
+    mainSettings[ "v2_read" ] = Field::ToJSON( { FieldPassword, V2_READ, "Для чтения" } );
+    mainSettings[ "v2_write" ] = Field::ToJSON( { FieldPassword, V2_WRITE, "Для записи" } );
 
     mainSettings[ "updateDelay" ] = Field::ToJSON( { FieldInput, UPDATE_DELAY, "Период опроса" } );
 

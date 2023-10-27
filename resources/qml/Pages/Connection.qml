@@ -11,94 +11,81 @@ Page
     property var configuration: Config.current[ "main" ]
 
     function updateConfiguration() {
-        configuration[ "host" ] = `udp:${host}:${port}`
-        configuration[ "updateDelay" ] = parseInt( delay )
-        console.log( JSON.stringify( configuration ) )
     }
 
-    Flickable {
+    contentHeight: pageContent.implicitHeight + 40
+
+    ColumnLayout {
+        id: pageContent
+
         anchors.fill: parent
-        interactive: height < contentHeight
-        contentHeight: pageContent.implicitHeight + 40
-        boundsMovement: Flickable.StopAtBounds
+        anchors.topMargin: 10
+        anchors.bottomMargin: 10
+        anchors.leftMargin: 20
+        anchors.rightMargin: 20
 
-        ColumnLayout {
-            id: pageContent
+        spacing: 10
 
-            anchors.fill: parent
-            anchors.margins: {
-                top: 10
-                bottom: 10
-                left: 20
-                right: 20
-            }
+        RowLayout {
+            Layout.maximumWidth: 1200
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
             spacing: 10
 
-            RowLayout {
-                Layout.maximumWidth: 1200
-                Layout.alignment: Qt.AlignHCenter
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                spacing: 10
-
-                CardComponent
-                {
-                    fields: [
-                        configuration[ "host" ],
-                        configuration[ "port" ],
-                        configuration[ "snmpVersion" ],
-                        configuration[ "updateDelay" ],
-                    ]
-
-                    buttons: [
-                        { highlited: true, color: Globals.accentColor, text: "Соединить", callback: () => { console.log( "test" ) } },
-                        { highlited: true, color: Globals.errorColor, text: "Отключить", callback: () => { console.log( "test2" ) } }
-                    ]
-
-
+            CardComponent {
+                property list<string> indexes: [ "host", "port", "snmpVersion", "updateDelay" ]
+                fields: [
+                    configuration[ "host" ],
+                    configuration[ "port" ],
+                    configuration[ "snmpVersion" ],
+                    configuration[ "updateDelay" ],
+                ]
+                buttons: [
+                    { highlited: true, color: Globals.accentColor, text: "Соединить", callback: () => { SNMP.updateConnection() } },
+                    { highlited: true, color: Globals.errorColor, text: "Отключить", callback: () => { SNMP.dropConnection() } }
+                ]
+                onFieldUpdated: ( index, value ) => {
+                    let newConfig = Config.current
+                    configuration[ indexes[ index ] ][ "value" ] = value
+                    newConfig[ "main" ] = configuration
+                    Config.current = newConfig
                 }
-
-                Item{ Layout.fillWidth: true }
-
             }
 
-            RowLayout {
-                Layout.maximumWidth: 1200
-                Layout.alignment: Qt.AlignHCenter
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+            Item{ Layout.fillWidth: true }
 
-                spacing: 10
+        }
 
-                CardComponent
-                {
-                    header: "SNMP v2C (Community)"
+        RowLayout {
+            Layout.maximumWidth: 1200
+            Layout.alignment: Qt.AlignHCenter| Qt.AlignTop
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-                    fields: [
-                        configuration[ "v2_write" ],
-                        configuration[ "v2_write" ],
-                    ]
+            spacing: 10
 
-                }
-
-                CardComponent
-                {
-                    header: "SNMP v3"
-
-                    fields: [
-                        configuration[ "user" ],
-                        configuration[ "authMethod" ],
-                        configuration[ "authPassword" ],
-                        configuration[ "authProtocol" ],
-                        configuration[ "privPassword" ],
-                        configuration[ "privProtocol" ],
-                    ]
-                }
-
+            CardComponent {
+                header: "SNMP v2C (Community)"
+                fields: [
+                    configuration[ "v2_write" ],
+                    configuration[ "v2_write" ],
+                ]
             }
 
-            Item{ Layout.fillHeight: true }
+            CardComponent {
+                header: "SNMP v3"
+                // TODO find value from array in combobox
+                fields: [
+                    configuration[ "user" ],
+                    configuration[ "authMethod" ],
+                    configuration[ "authPassword" ],
+                    configuration[ "authProtocol" ],
+                    configuration[ "privPassword" ],
+                    configuration[ "privProtocol" ],
+                ]
+            }
         }
     }
 }

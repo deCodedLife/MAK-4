@@ -5,18 +5,18 @@ import QtQuick.Controls.Material
 
 Rectangle
 {
-    color: "white"
-    radius: 10
-
     property string header: ""
+    property var fields: []
+    property var buttons: []
+
+    signal fieldUpdated( index: int, value: string )
 
     Layout.alignment: Qt.AlignTop
     Layout.fillWidth: true
-//    Layout.fillHeight: true
-    height: contentColumn.implicitHeight + 20
 
-    property var fields: []
-    property var buttons: []
+    color: "white"
+    radius: 10
+    height: contentColumn.implicitHeight + 20
 
     ColumnLayout
     {
@@ -79,19 +79,23 @@ Rectangle
                     CustomField {
                         id: textfield
                         anchors.fill: parent
-                        visible: modelData[ "type" ] === 0
+                        visible: modelData[ "type" ] === 0 || modelData[ "type" ] === 1
                         placeholderText: modelData[ "description" ]
                         value: modelData[ "value" ]
+                        onEditingFinished: fieldUpdated( index, value )
+                        echoMode: modelData[ "type" ] === 1 ? TextField.Password : TextField.Normal
                     }
 
                     CustomDropDown {
                         anchors.fill: parent
-                        visible: modelData[ "type" ] === 1
+                        visible: modelData[ "type" ] === 2
                         displayText: `${modelData[ "description" ]}: ${modelData[ "model" ][ currentIndex ]}`
-                        preSelected: parseInt( modelData[ "value" ] )
+                        value: modelData[ "value" ]
                         model: modelData[ "model" ]
                         onCurrentIndexChanged: {
-                            modelData[ "value" ] = currentIndex
+                            if ( preSelected === currentIndex ) return
+                            preSelected = currentIndex
+                            fieldUpdated( index, currentIndex )
                         }
                     }
                 }

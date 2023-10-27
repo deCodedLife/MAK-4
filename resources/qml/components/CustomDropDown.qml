@@ -11,24 +11,27 @@ ComboBox
     property MaterialTextContainer pComboBack: background
     property T.TextField pTextItem: contentItem
 
+    property var value: null
     property int preSelected: -1
-    currentIndex: preSelected
+    currentIndex: -1
 
     Material.accent: Globals.accentColor
 
-//    function find() {
-//        for ( let index = 0; index < model.length; index++ ) {
-//            if ( model[ index ] === value ) {
-//                preSelected = index
-//                break
-//            }
-//        }
-//    }
+    function find() {
+        if ( model.length === 0 ) return
+        for ( let index = 0; index < model.length; index++ ) {
+            if ( model[ index ] === value ) {
+                preSelected = index
+                currentIndex = index
+                break
+            }
+        }
+    }
 
     Component.onCompleted: {
-        pTextItem.color = "#8D8D8D"
+        pTextItem.color = Globals.textColor
         pComboBack.filled = true
-        pComboBack.fillColor = "#F5F8FA"
-//        find()
+        pComboBack.fillColor = Globals.backgroundColor
+        find()
     }
 }

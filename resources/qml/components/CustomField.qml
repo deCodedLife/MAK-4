@@ -14,13 +14,13 @@ TextField
     Material.containerStyle: Material.Filled
     Material.accent: Globals.accentColor
 
-    color: "#8D8D8D"
+    color: Globals.textColor
     text: value
 
     onTextChanged: {
         if ( text == "" ) focus = false
     }
 
-    onEditingFinished: control.value = text
+    onEditingFinished: value = text
     Component.onCompleted: pBackground.fillColor = Globals.backgroundColor
 }

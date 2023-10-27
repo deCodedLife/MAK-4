@@ -2,21 +2,30 @@ import QtQuick
 
 import "../Globals"
 
-Item
+Flickable
 {
     id: page
     anchors.fill: parent
     clip: true
 
+    interactive: height < contentHeight
+    boundsMovement: Flickable.StopAtBounds
+
     Rectangle {
-        anchors.fill: page
-        anchors.leftMargin: 20
+        width: page.width - 20
+        height: page.height
+        parent: page.parent
+        x: 20
         color: Globals.backgroundColor
+        z: -1
     }
 
     Rectangle {
-        anchors.fill: page
+        width: page.width
+        height: page.height
+        parent: page.parent
         radius: 10
         color: Globals.backgroundColor
+        z: -1
     }
 }
