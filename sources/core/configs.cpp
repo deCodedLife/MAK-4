@@ -8,6 +8,16 @@ Configs::Configs( QString fileName, QObject *parent )
     connect( this, &Configs::error_occured, this, &Configs::closeFile );
 }
 
+Configs::~Configs()
+{
+    closeFile();
+}
+
+QJsonObject Configs::get()
+{
+    return config;
+}
+
 void Configs::Read( QJsonObject *configs )
 {
     m_file = new QFile( m_fileName );
@@ -36,11 +46,12 @@ void Configs::Read( QJsonObject *configs )
     }
 
     *configs = QJsonDocument::fromJson( decodedContent ).object();
+    config = *configs;
 
     m_file->close();
 }
 
-void Configs::Write( QJsonObject configs )
+void Configs::write( QJsonObject configs )
 {
     m_file = new QFile( m_fileName );
 
@@ -62,6 +73,9 @@ void Configs::Write( QJsonObject configs )
                                   .toJson( QJsonDocument::Compact )
                                   .toHex();
 
+    config = configs;
+    emit updated( configs );
+
     // Write configuration
     m_file->write( configsHexed );
     m_file->close();
@@ -70,7 +84,19 @@ void Configs::Write( QJsonObject configs )
 QJsonObject Configs::Default()
 {
     QJsonObject data;
-    data[ "test" ] = "data";
+    data[ "snmpVersion" ] = SNMP_VERSION;
+    data[ "host" ] = HOST;
+    data[ "user" ] = USER;
+    data[ "authMethod" ] = AUTH_METHOD;
+    data[ "authProtocol" ] = AUTH_PROTOCOL;
+    data[ "privProtocol" ] = PRIV_PROTOCOL;
+    data[ "authPassword" ] = AUTH_PASSWORD;
+    data[ "privPassword" ] = PRIV_PASSWORD;
+
+    data[ "v2_read" ] = V2_READ;
+    data[ "v2_write" ] = V2_WRITE;
+
+    data[ "updateDelay" ] = UPDATE_DELAY;
     return data;
 }
 

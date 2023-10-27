@@ -35,14 +35,6 @@ MibParser::MibParser(QString file_path, QObject *parent)
     netsnmp_init_mib_internals();
 
     read_all_mibs();
-
-    oid anOID[MAX_OID_LEN];
-    size_t requestOidLength = MAX_OID_LEN;
-
-    read_objid( "psSNMPSettings", anOID, &requestOidLength );
-    print_objid( anOID, requestOidLength );
-
-    qDebug() << *anOID;
 }
 
 MibParser::~MibParser()
