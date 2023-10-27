@@ -12,15 +12,23 @@ ComboBox
     property T.TextField pTextItem: contentItem
 
     property int preSelected: -1
-
-    onActivated: preSelected = currentIndex
     currentIndex: preSelected
 
     Material.accent: Globals.accentColor
+
+//    function find() {
+//        for ( let index = 0; index < model.length; index++ ) {
+//            if ( model[ index ] === value ) {
+//                preSelected = index
+//                break
+//            }
+//        }
+//    }
 
     Component.onCompleted: {
         pTextItem.color = "#8D8D8D"
         pComboBack.filled = true
         pComboBack.fillColor = "#F5F8FA"
+//        find()
     }
 }
