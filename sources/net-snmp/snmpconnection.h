@@ -5,6 +5,9 @@
 
 #include <SNMPpp/Session.hpp>
 #include <SNMPpp/Get.hpp>
+#include <SNMPpp/Set.hpp>
+
+#include "mibparser.h"
 
 enum States {
     Disconnected,
@@ -27,7 +30,7 @@ public:
     Q_INVOKABLE States state();
     Q_INVOKABLE void setState( States );
 
-    Q_INVOKABLE void getOID( QString, QString** );
+    Q_INVOKABLE QVariant getOID( QString );
     Q_INVOKABLE void setOID( QString, QVariant );
 
 public slots:
@@ -35,7 +38,13 @@ public slots:
     Q_INVOKABLE void dropConnection();
 
 private:
+    void initFields();
+    QVariant getFieldValue( QString );
+
+private:
     SNMPpp::SessionHandle pHandle;
     Configs *pConfigs;
     States _state;
+    MibParser parser;
+
 };

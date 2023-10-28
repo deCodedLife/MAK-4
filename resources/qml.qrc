@@ -54,5 +54,7 @@
         <file>qml/Components/CardItem.qml</file>
         <file>qml/Components/DynamicLoader.qml</file>
         <file>qml/Components/CustomDropDown.qml</file>
+        <file>qml/Components/TableComponent.qml</file>
+        <file>qml/Pages/DeviceInfo.qml</file>
     </qresource>
 </RCC>

@@ -8,7 +8,7 @@ import "../Globals"
 
 Page
 {
-    property var configuration: Config.current[ "main" ]
+    property var configuration: Config[ "main" ]
 
     function updateConfiguration() {
     }
@@ -50,7 +50,7 @@ Page
                     let newConfig = Config.current
                     configuration[ indexes[ index ] ][ "value" ] = value
                     newConfig[ "main" ] = configuration
-                    Config.current = newConfig
+                    ConfigManager.current = newConfig
                 }
             }
 
