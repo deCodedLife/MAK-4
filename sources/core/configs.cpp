@@ -101,6 +101,11 @@ QJsonObject Configs::Default()
 
     mainSettings[ "updateDelay" ] = Field::ToJSON( { FieldInput, UPDATE_DELAY, "Период опроса" } );
 
+    for ( QString field : mainSettings.keys() ) {
+        QJsonObject fieldObj = mainSettings[ field ].toObject();
+        fieldObj[ "field" ] = field;
+        mainSettings[ field ] = fieldObj;
+    }
     data[ "main" ] = mainSettings;
 
     return data;

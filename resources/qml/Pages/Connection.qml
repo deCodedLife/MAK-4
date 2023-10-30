@@ -13,7 +13,7 @@ Page
     function updateConfiguration() {
     }
 
-    contentHeight: pageContent.implicitHeight + 40
+    contentHeight: pageContent.implicitHeight + 20
 
     ColumnLayout {
         id: pageContent
@@ -50,7 +50,7 @@ Page
                     let newConfig = Config.current
                     configuration[ indexes[ index ] ][ "value" ] = value
                     newConfig[ "main" ] = configuration
-                    ConfigManager.current = newConfig
+                    Config.current = newConfig
                 }
             }
 
