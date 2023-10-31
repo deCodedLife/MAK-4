@@ -47,6 +47,5 @@ ApplicationWindow
                 Layout.fillHeight: true
             }
         }
-
     }
 }

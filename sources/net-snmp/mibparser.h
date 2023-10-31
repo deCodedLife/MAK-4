@@ -24,6 +24,7 @@ public:
     ~MibParser();
     Q_INVOKABLE QJsonObject getObject( QString );
     QMap<QString, oid_object> MIB_OBJECTS;
+    QMap<SNMPpp::OID, QString> OID_TOSTR;
 
 private:
     void parseTree( const tree *mib, SNMPpp::OID oid );

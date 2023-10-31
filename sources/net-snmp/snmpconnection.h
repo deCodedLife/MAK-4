@@ -32,10 +32,13 @@ public:
     Q_INVOKABLE void setState( States );
 
     Q_INVOKABLE QList<QString> getOIDs( QList<QString> );
+    Q_INVOKABLE QList<QString> getBulk( QString oid );
     Q_INVOKABLE void setOID( QString, QVariant );
 
     Q_INVOKABLE QString dateToReadable( QString );
     Q_INVOKABLE QJsonArray getGroup( QString );
+
+    QMap< int, QString > errors;
 
 public slots:
     Q_INVOKABLE void updateConnection();
@@ -43,6 +46,7 @@ public slots:
 
 private:
     void initFields();
+    void parseBulk( variable_list *vars, SNMPpp::OID root, QJsonArray *items );
     QVariant getFieldValue( QString );
 
 private:

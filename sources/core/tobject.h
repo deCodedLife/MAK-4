@@ -3,10 +3,12 @@
 #include <QFile>
 #include <QDateTime>
 #include <QObject>
+#include <QDir>
 
 #include "callback.h"
 
 #define LOG_FILE "_log.txt"
+#define LOG_DIR  "logs"
 
 class TObject : public QObject
 {

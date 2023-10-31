@@ -40,6 +40,6 @@ Page
             ]
         }
 
-        Component.onCompleted: console.log( JSON.stringify( configuration[ "psAlarm1Event" ] ) )
+        Component.onCompleted: console.log( JSON.stringify( SNMP.getBulk( "psAlarm1Event" ) ) )
     }
 }
