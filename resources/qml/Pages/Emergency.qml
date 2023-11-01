@@ -6,7 +6,6 @@ import "../Globals"
 
 Page
 {
-    property var configuration: Config[ "fields" ]
     contentHeight: content.implicitHeight
 
     function addWrapper( config, wrapper ) {
@@ -23,23 +22,57 @@ Page
         anchors.leftMargin: 20
         anchors.rightMargin: 20
 
-        TableComponent {
+        RowLayout {
+
             Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
             Layout.maximumWidth: 1200
+            spacing: 10
 
-            header: "Таблица аварий 1-й степени"
+            TableComponent {
+                Layout.alignment: Qt.AlignTop
 
-            headers: [
-                { "title": "Номер", "expand": false },
-                { "title": "Название аварии 1 степени", "expand": true }
-            ]
+                header: "Таблица аварий 1-й степени"
 
-            content: [
-                configuration[ "psAlarm1Event" ], // psAlarm1Entry
-                configuration[ "psAlarm1Event" ] // psAlarm1Entry
-            ]
+                headers: [
+                    { "title": "Номер", "expand": false },
+                    { "title": "Название аварии 1 степени", "expand": true }
+                ]
+
+                content: {
+                    let objects = SNMP.getBulk( "psAlarm1Entry" )
+                    let fields = []
+                    let middle = objects.length / 2
+
+                    for ( let index = 0; index < middle; index++ ) {
+                        fields.push( { type: 5, value: objects[ index ] } )
+                        fields.push( { type: 5, value: Config[ "errors" ][ objects[ middle + index ] ] } )
+                    }
+                    return fields
+                }
+            }
+
+            TableComponent {
+                Layout.alignment: Qt.AlignTop
+                header: "Таблица аварий 2-й степени"
+
+                headers: [
+                    { "title": "Номер", "expand": false },
+                    { "title": "Название аварии 2 степени", "expand": true }
+                ]
+
+                content: {
+                    let objects = SNMP.getBulk( "psAlarm2Entry" )
+                    let fields = []
+                    let middle = objects.length / 2
+
+                    for ( let index = 0; index < middle; index++ ) {
+                        fields.push( { type: 5, value: objects[ index ] } )
+                        fields.push( { type: 5, value: Config[ "errors" ][ objects[ middle + index ] ] } )
+                    }
+                    return fields
+                }
+            }
+
         }
-
-        Component.onCompleted: console.log( JSON.stringify( SNMP.getBulk( "psAlarm1Event" ) ) )
     }
 }

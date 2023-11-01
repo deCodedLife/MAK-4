@@ -58,5 +58,6 @@
         <file>qml/Pages/DeviceInfo.qml</file>
         <file>qml/Components/CroppedLine.qml</file>
         <file>qml/Pages/Emergency.qml</file>
+        <file>qml/Pages/SignalRelays.qml</file>
     </qresource>
 </RCC>

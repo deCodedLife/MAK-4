@@ -77,7 +77,7 @@ QList<QString> SNMPConnection::getBulk( QString object )
     oid_object oid_object = parser.MIB_OBJECTS[ object ];
     SNMPpp::OID oid( oid_object.oid.toStdString() );
     SNMPpp::PDU pdu( SNMPpp::PDU::kGetNext );
-    QList<QString> objects;
+    QStringList objects;
 
     try
     {
@@ -86,15 +86,11 @@ QList<QString> SNMPConnection::getBulk( QString object )
         while ( true )
         {
             pdu = SNMPpp::getNext( pHandle, currentOID );
-            SNMPpp::MapOidVarList test = pdu.varlist().getMap();
             currentOID = pdu.firstOID();
 
             if ( !oid.isParentOf( currentOID ) ) break;
-            QString value = QString::number( *pdu.varlist().valueAt( currentOID ).integer );
-            objects << value;
+            objects.append( QString::number( *pdu.varlist().valueAt( currentOID ).integer ) );
         }
-
-        pdu.free();
     }
     catch ( const std::exception &e )
     {
@@ -252,20 +248,15 @@ void SNMPConnection::initFields()
     fields[ "deviceInfo3" ] = Field::ToJSON( { FieldDescription, "Текущее время MAK-4 UTC", "" } );
     fields[ "psTime" ] = Field::ToJSON( { FieldText, getFieldValue( "psTime" ), "Текущее время MAK-4 UTC" } );
 
-    fields[ "psAlarm1Event" ] = Field::ToJSON( { FieldText, getFieldValue( "psAlarm1Event" ), "", {}, true } );
-
-
     for ( QString field : fields.keys() ) {
         QJsonObject fieldObj = fields[ field ].toObject();
         fieldObj[ "field" ] = field;
         fields[ field ] = fieldObj;
     }
 
-    QJsonObject newConfig;
-    newConfig[ "main" ] = pConfigs->get()[ "main" ].toObject();
-    newConfig[ "fields" ] = fields;
-
-    pConfigs->write( newConfig );
+    QJsonObject mainConfig = pConfigs->get();
+    mainConfig[ "fields" ] = fields;
+    pConfigs->write( mainConfig );
 }
 
 QJsonArray SNMPConnection::getGroup( QString group_name )
