@@ -26,19 +26,19 @@ Page
             Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
             Layout.maximumWidth: 1200
 
-            header: "Таблица аварий 1-й степени"
-
             headers: [
                 { "title": "Номер реле", "expand": false },
                 { "title": "Количество событий", "expand": true }
             ]
 
             content: {
-                let objects = SNMP.getBulk( "psAlarm1Event" )
+                let objects = SNMP.getBulk( " psSignalRelayEntry" )
                 let fields = []
-                for ( let index = 0; index < objects.length; index ++ ) {
-                    fields.push( { type: 5, value: index + 1 } )
-                    fields.push( { type: 5, value: Config[ "errors" ][ objects[ index ] ] } )
+                let middle = objects.length / 2
+
+                for ( let index = 0; index < middle; index++ ) {
+                    fields.push( { type: 5, value: objects[ index ] } )
+                    fields.push( { type: 5, value: objects[ middle + index ] } )
                 }
                 return fields
             }
