@@ -6,7 +6,7 @@ import "../Globals"
 
 Page
 {
-    contentHeight: content.implicitHeight
+    contentHeight: content.implicitHeight + 20
 
     function addWrapper( config, wrapper ) {
         config[ "wrapper" ] = wrapper

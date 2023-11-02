@@ -46,10 +46,10 @@ Page
                 } ),
 
                 { type: 5, value: "Текущее время MAK-4 UTC" },
-                addWrapper( { type: 4, field: "psTime" }, ( value ) => {
-                               let dateTime = SNMP.dateToReadable( value ).split( " " )
-                               return `${dateTime[0]}\n${dateTime[1]}`
-                           } )
+                addWrapper( { type: 4, field: "psTime" }, value => {
+                    let dateTime = SNMP.dateToReadable( value ).split( " " )
+                    return `${dateTime[0]}\n${dateTime[1]}`
+                } )
             ]
         }
     }

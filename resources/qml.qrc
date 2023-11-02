@@ -62,5 +62,9 @@
         <file>qml/Pages/Journal.qml</file>
         <file>qml/Pages/Load.qml</file>
         <file>qml/Pages/BatteryInfo.qml</file>
+        <file>qml/Pages/UPKB.qml</file>
+        <file>qml/Pages/BatteryTest.qml</file>
+        <file>qml/Pages/BatteryTestShort.qml</file>
+        <file>qml/Pages/BatteryCharging.qml</file>
     </qresource>
 </RCC>

@@ -15,7 +15,7 @@ QtObject
         MenuItemM { icon: "contract.svg"; title: "Журнал событий"; page: "Pages/Journal.qml" },
         MenuItemM { icon: "electric_bolt.svg"; title: "Нагрузка"; page: "Pages/Load.qml" },
         MenuItemM { icon: "battery_unknown.svg"; title: "Батарея"; page: "Pages/BatteryInfo.qml" },
-        MenuItemM { icon: "lan.svg"; title: "УПКБ"; page: "Pages/UPKV.qml" },
+        MenuItemM { icon: "lan.svg"; title: "УПКБ"; page: "Pages/UPKB.qml" },
         MenuItemM { icon: "battery_checked.svg"; title: "Тесты батареи"; page: "Pages/BatteryTest.qml" },
         MenuItemM { icon: "battery_checked.svg"; title: "Короткий тест батареи"; page: "Pages/BatteryTestShort.qml" },
         MenuItemM { icon: "battery.svg"; title: "Разряды батареи"; page: "Pages/BatteryCharging.qml" },

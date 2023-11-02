@@ -6,7 +6,7 @@ import "../Globals"
 
 Page
 {
-    contentHeight: content.implicitHeight
+    contentHeight: content.implicitHeight + 20
 
     function addWrapper( config, wrapper ) {
         config[ "wrapper" ] = wrapper
@@ -32,7 +32,7 @@ Page
             ]
 
             content: {
-                let objects = SNMP.getBulk( " psSignalRelayEntry" )
+                let objects = SNMP.getBulk( "psSignalRelayEntry" )
                 let fields = []
                 let middle = objects.length / 2
 
