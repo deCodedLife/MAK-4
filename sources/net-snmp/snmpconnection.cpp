@@ -103,14 +103,15 @@ QList<QString> SNMPConnection::getBulk( QString object )
             pdu = SNMPpp::getBulk( pHandle, lastOID );
             SNMPpp::MapOidVarList list = pdu.varlist().getMap();
 
-            for ( SNMPpp::MapOidVarList::iterator itemIterator = list.begin(); itemIterator != list.end(); itemIterator++ ) {
-                if ( !oid.isParentOf( itemIterator->first ) ) {
+            for ( SNMPpp::MapOidVarList::iterator itemIterator = list.begin(); itemIterator != list.end(); itemIterator++ )
+            {
+                if ( !oid.isParentOf( itemIterator->first ) )
+                {
                     shouldBreak = true;
                     break;
                 };
                 if ( itemIterator->second->type == ASN_INTEGER ) objects.append( QString::number( *itemIterator->second->val.integer ) );
                 else objects.append( QString::fromStdString( pdu.varlist().asString( itemIterator->first ) ) );
-//                objects.append( QString::number( *itemIterator->second->val.integer ) );
                 lastOID = itemIterator->first;
             }
 
@@ -126,35 +127,36 @@ QList<QString> SNMPConnection::getBulk( QString object )
     return objects;
 }
 
-void SNMPConnection::setOID( QString oid, QVariant data )
+void SNMPConnection::setOID( QString objectName, QVariant data )
 {
-    SNMPpp::PDU pdu( SNMPpp::PDU::kGet );
-    oid_object obj = parser.MIB_OBJECTS[ oid ];
+    SNMPpp::PDU pdu( SNMPpp::PDU::kSet );
+    oid_object obj = parser.MIB_OBJECTS[ objectName ];
+    SNMPpp::OID oid( obj.oid.toStdString() + ".0" );
 
     switch ( obj.type ) {
     case TYPE_INTEGER:
-        pdu.addIntegerVar( SNMPpp::OID( obj.oid.toStdString() ), data.toInt() );
+        pdu.addIntegerVar( oid, data.toInt() );
+        qDebug() << pdu.varlist().asString();
         break;
     case TYPE_GAUGE:
-        pdu.addGaugeVar( SNMPpp::OID( obj.oid.toStdString() ), data.toUInt() );
+        pdu.addGaugeVar( oid, data.toUInt() );
         break;
     case TYPE_NULL:
-        pdu.addNullVar( SNMPpp::OID( obj.oid.toStdString() ) );
+        pdu.addNullVar( oid );
         break;
     case TYPE_OCTETSTR:
         pdu.addOctetStringVar(
-            SNMPpp::OID( obj.oid.toStdString() ),
+            oid,
             (unsigned char *) data.toString().toStdString().c_str(),
             data.toString().toStdString().size() );
         break;
     default:
-        pdu.addNullVar( SNMPpp::OID( obj.oid.toStdString() ) );
+        pdu.addNullVar( oid );
         break;
     }
 
     try
     {
-        pdu.addNullVar( SNMPpp::OID( obj.oid.toStdString() + ".0" ) );
         pdu = SNMPpp::set( pHandle, pdu );
     }
     catch( const std::exception &e )

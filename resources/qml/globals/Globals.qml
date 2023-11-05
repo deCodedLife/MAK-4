@@ -12,4 +12,5 @@ QtObject
     property string succsessColor: "#45CC52"
 
     property string textColor: "#8D8D8D"
+    property string grayScale: "#D9D9D9"
 }

@@ -6,11 +6,46 @@ import "../Globals"
 
 Page
 {
+    id: root
     contentHeight: content.implicitHeight
 
     function addWrapper( config, wrapper ) {
         config[ "wrapper" ] = wrapper
         return config
+    }
+
+    state: {
+        let oid = SNMP.getOIDs( [ "psShortTestControl" ] )
+        if ( parseInt( oid ) === 1 ) return "started"
+        else return "stopped"
+    }
+    states: [
+        State {
+            name: "stopped"
+            PropertyChanges {
+                target: root
+                actionButtonIcon: "qrc:/images/icons/start.svg"
+                actionButtonTitle: "Начать тест"
+            }
+        },
+        State {
+            name: "started"
+            PropertyChanges {
+                target: root
+                actionButtonIcon: "qrc:/images/icons/stop.svg"
+                actionButtonTitle: "Закончить тест"
+            }
+        }
+    ]
+
+    onActionButtonTriggered: {
+        if ( state === "stopped" ) {
+            state = "started"
+            SNMP.setOID( "psShortTestControl", 1 )
+            return
+        }
+        SNMP.setOID( "psShortTestControl", 2 )
+        state = "stopped"
     }
 
     ColumnLayout {

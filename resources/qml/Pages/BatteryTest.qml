@@ -15,7 +15,11 @@ Page
         return config
     }
 
-    state: "stopped"
+    state: {
+        let oid = SNMP.getOIDs( [ "psTestControl" ] )
+        if ( parseInt( oid ) === 1 ) return "started"
+        else return "stopped"
+    }
     states: [
         State {
             name: "stopped"
@@ -38,8 +42,10 @@ Page
     onActionButtonTriggered: {
         if ( state === "stopped" ) {
             state = "started"
+            SNMP.setOID( "psTestControl", 1 )
             return
         }
+        SNMP.setOID( "psTestControl", 2 )
         state = "stopped"
     }
 

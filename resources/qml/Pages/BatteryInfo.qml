@@ -6,11 +6,46 @@ import "../Globals"
 
 Page
 {
+    id: root
     contentHeight: content.implicitHeight
 
     function addWrapper( config, wrapper ) {
         config[ "wrapper" ] = wrapper
         return config
+    }
+
+    state: {
+        let oid = SNMP.getOIDs( [ "psEqChargeControl" ] )
+        if ( parseInt( oid ) === 1 ) return "started"
+        else return "stopped"
+    }
+    states: [
+        State {
+            name: "stopped"
+            PropertyChanges {
+                target: root
+                actionButtonIcon: "qrc:/images/icons/start.svg"
+                actionButtonTitle: "Начать ВЗ"
+            }
+        },
+        State {
+            name: "started"
+            PropertyChanges {
+                target: root
+                actionButtonIcon: "qrc:/images/icons/stop.svg"
+                actionButtonTitle: "Закончить ВЗ"
+            }
+        }
+    ]
+
+    onActionButtonTriggered: {
+        if ( state === "stopped" ) {
+            state = "started"
+            SNMP.setOID( "psEqChargeControl", 1 )
+            return
+        }
+        SNMP.setOID( "psEqChargeControl", 2 )
+        state = "stopped"
     }
 
     ColumnLayout {

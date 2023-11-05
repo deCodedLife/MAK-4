@@ -71,5 +71,7 @@
         <file>qml/Pages/Temprerature.qml</file>
         <file>qml/Pages/DryContacts.qml</file>
         <file>qml/Pages/BMS.qml</file>
+        <file>qml/Pages/Contactors.qml</file>
+        <file>qml/Components/CustomSwitch.qml</file>
     </qresource>
 </RCC>
