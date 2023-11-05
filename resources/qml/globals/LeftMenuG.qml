@@ -24,7 +24,7 @@ QtObject
         MenuItemM { icon: "power.svg"; title: "Сеть"; page: "Pages/ElectricalNetwork.qml" },
         MenuItemM { icon: "thermostat.svg"; title: "Температура"; page: "Pages/Temprerature.qml" },
         MenuItemM { icon: "dry_connectors.svg"; title: "Сухие контакты"; page: "Pages/DryContacts.qml" },
-        MenuItemM { icon: "memory.svg"; title: "BMS"; page: "Pages/BMS" },
+        MenuItemM { icon: "memory.svg"; title: "BMS"; page: "Pages/BMS.qml" },
         MenuItemM { icon: "settings.svg"; title: "Настройки"; page: "Pages/Settings.qml" }
     ]
 }

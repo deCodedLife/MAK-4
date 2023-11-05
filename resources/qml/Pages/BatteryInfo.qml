@@ -58,9 +58,9 @@ Page
                 Layout.alignment: Qt.AlignTop
 
                 headers: [
-                    { "title": "№ группы", "expand": false },
-                    { "title": "Напряжение, В", "expand": false },
-                    { "title": "Ток, А", "expand": false },
+                    { "title": "№ группы", "expand": true },
+                    { "title": "Напряжение, В", "expand": true },
+                    { "title": "Ток, А", "expand": true },
                     { "title": "Состояние группы", "expand": true },
                     { "title": "Состояние аппарата защиты", "expand": true }
                 ]

@@ -70,15 +70,31 @@ Page
         anchors.leftMargin: 20
         anchors.rightMargin: 20
 
-        RowLayout {
+        GridLayout {
+            id: grid
 
             Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
             Layout.maximumWidth: 1200
-            spacing: 10
+            rowSpacing: 10
+            columnSpacing: 10
+            width: content.width
+            height: contentHeight
+
+            rows: 1
+            columns: 4
+
+            onWidthChanged: calcRows()
+
+            function calcRows() {
+                grid.rows = width >= 1000 ? 2 : 1
+                grid.columns = width >= 1000 ? 4 : 2
+            }
+
+            Component.onCompleted: calcRows()
 
             Repeater {
 
-                model: groupsFields.length
+                model: 4
 
                 TableComponent {
                     Layout.alignment: Qt.AlignTop

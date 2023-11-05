@@ -12,7 +12,7 @@ ApplicationWindow
     width: 1024
     height: 860
 
-    minimumWidth: 850
+    minimumWidth: 800
     minimumHeight: 400
 
     visible: true

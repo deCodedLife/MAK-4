@@ -66,5 +66,10 @@
         <file>qml/Pages/BatteryTest.qml</file>
         <file>qml/Pages/BatteryTestShort.qml</file>
         <file>qml/Pages/BatteryCharging.qml</file>
+        <file>qml/Pages/Rectifiers.qml</file>
+        <file>qml/Pages/ElectricalNetwork.qml</file>
+        <file>qml/Pages/Temprerature.qml</file>
+        <file>qml/Pages/DryContacts.qml</file>
+        <file>qml/Pages/BMS.qml</file>
     </qresource>
 </RCC>
