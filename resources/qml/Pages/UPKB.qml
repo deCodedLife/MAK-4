@@ -20,7 +20,7 @@ Page
         { "title": "Номер", "expand": false },
         { "title": "U, В", "expand": false },
         { "title": "t, °C", "expand": false },
-        { "title": "Состояние", "expand": true }
+        { "title": "Состояние", "expand": false }
     ]
 
 
@@ -31,9 +31,10 @@ Page
         let temperature = SNMP.getBulk( "psBlockTemperature" )
         let statuses = SNMP.getBulk( "psBlockStatus" )
 
-        let groupIndexCount = [ 0, 0, 0, 0]
+        let groupIndexCount = [ 0, 0, 0, 0 ]
 
-        for ( let index = 0; index < groups.length; index++ ) {
+        for ( let index = 0; index < groups.length; index++ )
+        {
             if ( parseInt( groups[ index ] ) === 1 ) groupIndexCount[0]++
             if ( parseInt( groups[ index ] ) === 2 ) groupIndexCount[1]++
             if ( parseInt( groups[ index ] ) === 3 ) groupIndexCount[2]++
