@@ -85,51 +85,88 @@ QList<QString> SNMPConnection::getOIDs( QList<QString> objects )
     return reply;
 }
 
-QList<QString> SNMPConnection::getBulk( QString object )
+void SNMPConnection::getRows( QString objectName )
 {
-    oid_object oid_object = parser.MIB_OBJECTS[ object ];
-    SNMPpp::OID oid( oid_object.oid.toStdString() );
-    SNMPpp::PDU pdu( SNMPpp::PDU::kGetBulk );
-    QStringList objects;
+    oid_object object = parser.MIB_OBJECTS[ objectName ];
+    SNMPpp::OID start( object.oid.toStdString() );
+
+    AsyncSNMP *request = new AsyncSNMP();
+    request->setOIDs( pHandle, start );
+
+    connect( request, &AsyncSNMP::rows, this, [&]( SNMPpp::OID root, QMap<SNMPpp::OID, QJsonObject> rows ) {
+        QJsonObject fields;
+        for ( SNMPpp::OID oid : rows.keys() )
+        {
+            QJsonArray data;
+            QString oidName = parser.OID_TOSTR[ oid.parent() ];
+
+            if ( fields.contains( oidName ) ) data = fields[ oidName ].toArray();
+            rows[ oid ][ "field" ] = oidName;
+
+            data.append( rows[ oid ] );
+            fields[ oidName ] = data;
+        }
+        emit gotRowsContent( parser.OID_TOSTR[ root ], fields  );
+    } );
+
+    QThreadPool::globalInstance()->start( request );
+}
+
+void SNMPConnection::getTable( QString objectName )
+{
+    oid_object object = parser.MIB_OBJECTS[ objectName ];
+    SNMPpp::OID start( object.oid.toStdString() );
+    QJsonObject fields;
 
     try
     {
-        SNMPpp::OID lastOID = oid;
+        SNMPpp::OID currentOID = start;
 
-        while (true)
+        while( true )
         {
-            bool shouldBreak {false};
-
-            pdu = SNMPpp::getBulk( pHandle, lastOID );
-            SNMPpp::MapOidVarList list = pdu.varlist().getMap();
+            SNMPpp::PDU pdu = SNMPpp::getBulk( pHandle, currentOID );
 
             if ( pdu.empty() ) break;
-            if ( list.empty() ) break;
+            bool shouldBreak {false};
 
-            for ( SNMPpp::MapOidVarList::iterator itemIterator = list.begin(); itemIterator != list.end(); itemIterator++ )
+            SNMPpp::MapOidVarList list = pdu.varlist().getMap();
+            SNMPpp::MapOidVarList::iterator iter;
+
+            for ( iter = list.begin(); iter != list.end(); iter++ )
             {
-                if ( !oid.isParentOf( itemIterator->first ) )
+                currentOID = iter->first;
+
+                if ( !start.isParentOf( currentOID ) )
                 {
                     shouldBreak = true;
                     break;
-                };
-                if ( itemIterator->second->type == ASN_INTEGER ) objects.append( QString::number( *itemIterator->second->val.integer ) );
-                else objects.append( QString::fromStdString( pdu.varlist().asString( itemIterator->first ) ) );
-                lastOID = itemIterator->first;
+                }
+
+                QJsonArray data;
+                QJsonObject field;
+
+                if ( fields.contains( parser.OID_TOSTR[ currentOID.parent() ] ) )
+                {
+                    data = fields[ parser.OID_TOSTR[ currentOID.parent() ] ].toArray();
+                }
+
+                field[ "str" ] = QString::fromStdString( pdu.varlist().asString( currentOID ) );
+                field[ "num" ] = (qint64) *iter->second->val.integer;
+
+                data.append( field );
+                fields[ parser.OID_TOSTR[ currentOID.parent() ] ] = data;
             }
 
-            if ( list.size() < 2 ) break;
-
             if ( shouldBreak ) break;
+            if ( list.size() < 2 ) break;
         }
     }
-    catch ( const std::exception &e )
+    catch( std::exception &e )
     {
-        emit error_occured( Callback::New( e.what(), Callback::Warning ) );
+        error_occured( Callback::New( e.what(), Callback::Warning ) );
     }
 
-    pdu.free();
-    return objects;
+    emit gotRowsContent( objectName, fields );
 }
 
 void SNMPConnection::setOID( QString objectName, QVariant data )

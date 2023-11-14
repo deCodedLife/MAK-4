@@ -45,7 +45,8 @@ Rectangle
         spacing: 20
 
         Image {
-            source: LeftMenuG.iconsLocation + context.icon
+            visible: context.icon
+            source: context.icon ? LeftMenuG.iconsLocation + context.icon : ""
         }
 
         Text {
@@ -74,7 +75,8 @@ Rectangle
 
         onClicked: {
             if ( context.page == PageLoaderG.currentPage ) return
-            PageLoaderG.currentPage = context.page
+            if ( context.page ) PageLoaderG.currentPage = context.page
+            if ( context.callback ) context.callback()
         }
     }
 

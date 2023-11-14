@@ -4,10 +4,6 @@
 -- OOO Promsviazdiazain
 -- All Rights Reserved.
 --
---
--- Last Edit: 05.10.2022 by Maxim Krakovskiy
--- Last Edit: 28.09.2023 by Anton Bachurin
---
 
 PROMSD-MAK4 DEFINITIONS ::= BEGIN
 
@@ -16,7 +12,7 @@ PROMSD-MAK4 DEFINITIONS ::= BEGIN
 		TEXTUAL-CONVENTION							FROM SNMPv2-TC;
 
 	promSD  MODULE-IDENTITY
-		LAST-UPDATED  "202309130000Z"
+		LAST-UPDATED  "202310250000Z"
 		
 		ORGANIZATION  "OOO Promsviazdizain"
 		CONTACT-INFO  "Maxim Krakovskiy
@@ -27,6 +23,12 @@ PROMSD-MAK4 DEFINITIONS ::= BEGIN
 
 
 	DESCRIPTION   "MIB module of PROMSD PDU with controller MAK-4v2. Only for build MAK-4 4-4.1.3 or higher"
+
+    REVISION    "202310250000Z"
+    DESCRIPTION "Added Amperemeter"
+
+    REVISION    "202309280000Z"
+    DESCRIPTION "Added BMS"
 
     REVISION     "202309130000Z"
 	DESCRIPTION "Fixed Syntax"
@@ -737,10 +739,10 @@ PROMSD-MAK4 DEFINITIONS ::= BEGIN
 
     psAmperemeterCurrent OBJECT-TYPE
 	SYNTAX			INTEGER
-	UNITS			"0.001A"
+	UNITS			"1A"
 	MAX-ACCESS		read-only
 	STATUS			current
-	DESCRIPTION		"Amperemeter current"
+	DESCRIPTION		"Amperemeter current, 1A"
 	::= {psAmperemeterEntry 2}
 
     psAmperemeterStatus OBJECT-TYPE
@@ -14672,7 +14674,7 @@ psBMSIntTemperature OBJECT-TYPE
 	UNITS			"0.1degC"
 	MAX-ACCESS		read-only
 	STATUS			current
-	DESCRIPTION		"BMS internal temperature sensor, 0.1dgC."
+	DESCRIPTION		"BMS internal temperature sensor, 1dgC."
 	::= {psBMSEntry 6}
 
 psBMSExtTemperature OBJECT-TYPE
@@ -14680,7 +14682,7 @@ psBMSExtTemperature OBJECT-TYPE
 	UNITS			"0.1degC"
 	MAX-ACCESS		read-only
 	STATUS			current
-	DESCRIPTION		"BMS external temperature sensor, 0.1dgC."
+	DESCRIPTION		"BMS external temperature sensor, 1dgC."
 	::= {psBMSEntry 7}      
 
 psBMSCap OBJECT-TYPE
@@ -14867,9 +14869,6 @@ psBMSCell16Voltage OBJECT-TYPE
 
 
 ----------------------------------------------------------------------------
-
--- добавлены маски r4BatteryLiIonAlarm и r4BatteryBMSComFail (a1, a2, r1, r2, r3, r4)
--- добавлена ветка psBMS
 
 END
 

@@ -16,8 +16,8 @@ Page
 
     property list<var> tables: []
     property list<var> headers: [
+        { "title": "Параметр", "expand": false },
         { "title": "Значение", "expand": false },
-        { "title": "Параметр", "expand": false }
     ]
 
     Component.onCompleted: {
@@ -27,8 +27,6 @@ Page
 
         for ( let index = 0; index < middle; index++ ) {
             let table = []
-            table.push( { type: 5, value: "BMS №" } )
-            table.push( { type: 5, value: objects[ index ] } )
             table.push( { type: 5, value: "Напряжение, В" } )
             table.push( { type: 5, value: parseFloat( parseInt( objects[ middle * 1 + index  ] ) / 100 ) } )
             table.push( { type: 5, value: "Ток, А" } )
@@ -48,9 +46,9 @@ Page
                 return value
             } ) )
             table.push( { type: 5, value: "Температура 1, °C" } )
-            table.push( { type: 5, value: parseFloat( parseInt( objects[ middle * 5 + index  ] ) / 10 ) } )
+            table.push( { type: 5, value: parseInt( objects[ middle * 5 + index  ] ) } )
             table.push( { type: 5, value: "Температура 2, °C" } )
-            table.push( { type: 5, value: parseFloat( parseInt( objects[ middle * 6 + index  ] ) / 10 ) } )
+            table.push( { type: 5, value: parseInt( objects[ middle * 6 + index  ] ) } )
 
             table.push( { type: 5, value: "Емкость, Ач" } )
             table.push( { type: 5, value: parseFloat( parseInt( objects[ middle * 7 + index  ] ) / 100 ) } )
