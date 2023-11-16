@@ -3,6 +3,9 @@ import QtQuick.Layouts
 
 import "../Components"
 import "../Globals"
+import "../Models"
+
+import "../wrappers.mjs" as Wrappers
 
 Page
 {
@@ -28,55 +31,50 @@ Page
             Layout.maximumWidth: 1200
             spacing: 10
 
-            TableComponent {
+            FieldsTable {
+                id: infoTable
                 Layout.alignment: Qt.AlignTop
 
                 headers: [
-                    { "title": "Напряжение нагрузки, В", "expand": true },
-                    { "title": "Ток нагрузки, А", "expand": true },
-                    { "title": "Состояние нагрузки", "expand": true }
+                    TableHeaderM {
+                        title: "Напряжение нагрузки, В"
+                        expand: true
+                    },
+                    TableHeaderM {
+                        title: "Ток нагрузки, А"
+                        expand: true
+                    },
+                    TableHeaderM {
+                        title: "Состояние нагрузки"
+                        expand: true
+                    }
                 ]
 
-                content: [
-                    addWrapper( { type: 4, field: "psLoadVoltage" }, (value) => { return parseFloat( value ) / 100 } ),
-                    addWrapper( { type: 4, field: "psLoadCurrent" }, (value) => { return parseFloat( value ) / 1000 } ),
-                    addWrapper( { type: 4, field: "psLoadStatus" }, (value) => {
-                        if ( parseInt(value) === 0 ) return "Норма"
-                        if ( parseInt(value) === 1 ) return "Термокомпенсация"
-                        if ( parseInt(value) === 2 ) return "Пониженное напряжение"
-                        if ( parseInt(value) === 3 ) return "Повышенное напряжение"
-                        if ( parseInt(value) === 4 ) return "Ошибка"
-                        return value
-                    } )
+                fields: [
+                    new Wrappers.ContentItem( "psLoadVoltage", "", Wrappers.RowTypes.TEXT, "num", Wrappers.divideByHundred ),
+                    new Wrappers.ContentItem( "psLoadCurrent", "", Wrappers.RowTypes.TEXT, "num", Wrappers.divideByThousand ),
+                    new Wrappers.ContentItem( "psLoadStatus", "", Wrappers.RowTypes.TEXT, "str", Wrappers.parseErrors )
                 ]
-
             }
 
             TableComponent {
                 Layout.alignment: Qt.AlignTop
+                tableOID: "psLoadFuseEntry"
 
                 headers: [
-                    { "title": "№ АЗН", "expand": true },
-                    { "title": "Состояние АЗН", "expand": true }
+                    TableHeaderM {
+                        title: "№ АЗН"
+                        expand: true
+                    },
+                    TableHeaderM {
+                        title: "Состояние АЗН"
+                        expand: true
+                    }
                 ]
 
-                content: {
-                    let objects = SNMP.getBulk( "psLoadFuseEntry" )
-                    let fields = []
-                    let middle = objects.length / 2
-
-                    for ( let index = 0; index < middle; index++ ) {
-                        fields.push( { type: 5, value: objects[ index ] } )
-                        fields.push( addWrapper( { type: 5, value: objects[ middle + index ] }, ( value ) => {
-                            if ( parseInt(value) === 0 ) return "Включено"
-                            if ( parseInt(value) === 1 ) return "Выключено"
-                            if ( parseInt(value) === 2 ) return "Неизвестно"
-                            if ( parseInt(value) === 3 ) return "Ошибка"
-                            return value
-
-                        } ) )
-                    }
-                    return fields
+                rows: {
+                    "psLoadFuseNumber": new Wrappers.RowItem(),
+                    "psLoadFuseStatus": new Wrappers.RowItem( Wrappers.RowTypes.DESCRIPTION, Wrappers.parseErrors, "str" )
                 }
             }
 

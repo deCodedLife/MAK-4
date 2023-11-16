@@ -44,7 +44,6 @@
         <file>qml/Globals/qmldir</file>
         <file>qml/Components/StatusText.qml</file>
         <file>qml/Globals/LeftMenuG.qml</file>
-        <file>qml/Globals/MenuItemM.qml</file>
         <file>qml/Main.qml</file>
         <file>qml/Components/LeftMenuItem.qml</file>
         <file>fonts/Roboto.ttf</file>
@@ -83,8 +82,10 @@
         <file>qml/Pages/Settings.Network.qml</file>
         <file>qml/Pages/Settings.Security.qml</file>
         <file>qml/Pages/Settings.SNMP.qml</file>
-        <file>qml/Components/wrappers.mjs</file>
-        <file>qml/Components/TableHeaderM.qml</file>
-        <file>qml/Components/TableRowM.qml</file>
+        <file>qml/Components/FieldsTable.qml</file>
+        <file>qml/Models/MenuItemM.qml</file>
+        <file>qml/Models/TableHeaderM.qml</file>
+        <file>qml/Models/TableRowM.qml</file>
+        <file>qml/wrappers.mjs</file>
     </qresource>
 </RCC>

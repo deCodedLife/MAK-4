@@ -3,6 +3,9 @@ import QtQuick.Layouts
 
 import "../Components"
 import "../Globals"
+import "../Models"
+
+import "../wrappers.mjs" as Wrappers
 
 Page
 {
@@ -29,46 +32,47 @@ Page
             spacing: 10
 
             TableComponent {
+                id: firstTable
                 Layout.alignment: Qt.AlignTop
                 header: "Таблица аварий 1-й степени"
+                tableOID: "psAlarm1Entry"
 
                 headers: [
-                    { "title": "Номер", "expand": false },
-                    { "title": "Название аварии 1 степени", "expand": true }
+                    TableHeaderM {
+                        title: "Номер"
+                        expand: false
+                    },
+                    TableHeaderM {
+                        title: "Название аварии 1 степени"
+                        expand: true
+                    }
                 ]
 
-                content: {
-                    let objects = SNMP.getBulk( "psAlarm1Entry" )
-                    let fields = []
-                    let middle = objects.length / 2
-
-                    for ( let index = 0; index < middle; index++ ) {
-                        fields.push( { type: 5, value: objects[ index ] } )
-                        fields.push( { type: 5, value: Config[ "errors" ][ objects[ middle + index ] ] } )
-                    }
-                    return fields
+                rows: {
+                    "psAlarm1Number": new Wrappers.RowItem(),
+                    "psAlarm1Event": new Wrappers.RowItem( Wrappers.RowTypes.DESCRIPTION, (value) => Config[ "errors" ][ value ] )
                 }
             }
 
             TableComponent {
                 Layout.alignment: Qt.AlignTop
                 header: "Таблица аварий 2-й степени"
+                tableOID: "psAlarm2Entry"
 
                 headers: [
-                    { "title": "Номер", "expand": false },
-                    { "title": "Название аварии 2 степени", "expand": true }
+                    TableHeaderM {
+                        title: "Номер"
+                        expand: false
+                    },
+                    TableHeaderM {
+                        title: "Название аварии 2 степени"
+                        expand: true
+                    }
                 ]
 
-                content: {
-                    let objects = SNMP.getBulk( "psAlarm2Entry" )
-                    let fields = []
-                    let middle = objects.length / 2
-
-                    for ( let index = 0; index < middle; index++ ) {
-                        fields.push( { type: 5, value: objects[ index ] } )
-                        fields.push( { type: 5, value: Config[ "errors" ][ objects[ middle + index ] ] } )
-                    }
-                    return fields
+                rows: {
+                    "psAlarm2Number": new Wrappers.RowItem(),
+                    "psAlarm2Event": new Wrappers.RowItem( Wrappers.RowTypes.DESCRIPTION, (value) => Config[ "errors" ][ value ] )
                 }
             }
 

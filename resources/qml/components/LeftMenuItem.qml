@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 
 import "../Globals"
+import "../Models"
 
 Rectangle
 {
