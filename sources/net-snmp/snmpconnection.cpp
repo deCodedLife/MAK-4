@@ -118,9 +118,15 @@ void SNMPConnection::handleSNMPRequest( QString root, QMap<SNMPpp::OID, QJsonObj
 
 void SNMPConnection::getTable( QString objectName )
 {
-    oid_object object = parser.MIB_OBJECTS[ objectName ];
-    SNMPpp::OID start( object.oid.toStdString() );
+    QList<QString> combinedName = objectName.split( "." );
+    QList<QString> combined = objectName.split( combinedName.first() );
+    if ( combined.length() != 1 ) combined.removeFirst();
 
+    oid_object object = parser.MIB_OBJECTS[ combinedName.first() ];
+    SNMPpp::OID start(
+        object.oid.toStdString() +
+        combined.first().toStdString()
+    );
     AsyncSNMP *request = new AsyncSNMP( pHandle, SNMPpp::PDU::kGetBulk );
     request->setBounds( start );
     request->setUID( objectName );
