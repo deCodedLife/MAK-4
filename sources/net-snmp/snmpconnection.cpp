@@ -109,7 +109,7 @@ void SNMPConnection::handleSNMPRequest( QString root, QMap<SNMPpp::OID, QJsonObj
         fields[ oidName ] = row;
     }
 
-    emit gotRowsContent( root, fields  );
+    emit gotRowsContent( root, fields );
 
     if ( requests.empty() ) return;
     proceed( requests.first() );

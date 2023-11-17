@@ -18,11 +18,14 @@ Rectangle
     property string tableOID
     property string header: ""
 
-    property bool loaded
     property bool contentTable: !tableOID
+    property bool external
+    property bool reversed
+    property bool loaded
 
     property int columnsCount: headers.length
     property int rowsCount
+    property int column
 
     property list<Item> headers
 
@@ -39,25 +42,37 @@ Rectangle
         let _rowsCount = data[ Object.keys( rows )[ 0 ] ].length
         let _rowsNames = Object.keys( rows )
 
-        for ( let columnIndex  = 0; columnIndex < _rowsCount; columnIndex++ )
-        {
+        let from = column ? column - 1 : 0
+        let to = column ? column : _rowsCount
 
+        for ( from; from < to; from++ )
+        {
             for ( let rowIndex = 0; rowIndex < _rowsNames.length; rowIndex++ )
             {
                 let rowName = _rowsNames[ rowIndex ]
 
-                let row = data[ rowName ][ columnIndex ]
+                let row = data[ rowName ][ from ]
+                if ( !row ) continue
+
                 let rowData = row[ rows[ rowName ].key ]
                 let rowDataWrapper = rows[ rowName ].wrapper
 
                 row[ "type" ] = rows[ rowName ].type
                 row[ "value" ] = rowDataWrapper( rowData )
+
+                if ( rows[ rowName ].description )
+                {
+                    let descriptionRow = JSON.parse( JSON.stringify( row ) )
+                    descriptionRow[ "value" ] = rows[ rowName ].description
+                    content[ rowName ].push( descriptionRow )
+                }
+
                 content[ rowName ].push( row )
             }
 
         }
 
-        rowsCount = _rowsCount
+        rowsCount = reversed ? Object.keys( rows ).length : _rowsCount
         loaded = true
     }
 
@@ -166,8 +181,8 @@ Rectangle
                         Layout.leftMargin: index === 0 ? 20 : 0
                         Layout.rightMargin: index === headers.length - 1 ? 20 : 0
 
-                        Layout.fillWidth: modelData[ "expand" ]
-                        text: modelData[ "title" ]
+                        Layout.fillWidth: headers[ index ][ "expand" ]
+                        text: headers[ index ][ "title" ]
 
                         color: Globals.textColor
 
@@ -220,7 +235,13 @@ Rectangle
                             Layout.leftMargin: index === 0 ? 20 : 0
                             Layout.rightMargin: (index === headers.length - 1) ? 20 : 0
 
-                            property var currentVar: content[ Object.keys( rows )[ index ] ][ row.currentRow ]
+                            property var currentVar: {
+                                let key = reversed ? row.currentRow : index
+                                let column = reversed ? index : row.currentRow
+                                let value = content[ Object.keys( rows )[ key ] ][ column ]
+                                return value ? value : {}
+                            }
+
                             property var type: {
                                 if ( typeof( item.currentVar[ "type" ] ) == "undefined" ) return 5
                                 return item.currentVar[ "type" ]
@@ -294,6 +315,7 @@ Rectangle
         running: tableOID
         interval: 20 * 1000
         onTriggered: {
+            if ( external ) return
             if ( tableOID ) SNMP.getTable( tableOID )
         }
     }

@@ -5,6 +5,9 @@ import QtQuick.Controls.Material
 
 import "../Components"
 import "../Globals"
+import "../Models"
+
+import "../wrappers.mjs" as Wrappers
 
 Page
 {
@@ -27,27 +30,22 @@ Page
         TableComponent {
             Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
             Layout.maximumWidth: 1200
+            tableOID: "psSwitchEntry"
 
             headers: [
-                { "title": "№ сухого\nконтакта", "expand": true },
-                { "title": "Состояние", "expand": true }
+                TableHeaderM {
+                    title: "№ сухого\nконтакта"
+                    expand: true
+                },
+                TableHeaderM {
+                    title: "Состояние"
+                    expand: true
+                }
             ]
 
-            content: {
-                let objects = SNMP.getBulk( "psSwitchEntry" )
-                let fields = []
-                let middle = objects.length / 2
-
-                for ( let index = 0; index < middle; index++ ) {
-                    fields.push( { type: 5, value: objects[ index ] } )
-                    fields.push( addWrapper( { type: 5, value: objects[ middle * 1 + index  ] }, value => {
-                        if ( parseInt( value ) === 0 ) return "Норма"
-                        if ( parseInt( value ) === 1 ) return "Авария"
-                        if ( parseInt( value ) === 2 ) return "Ошибка"
-                        return value
-                    } ) )
-                }
-                return fields
+            rows: {
+                "psSwitchNumber": new Wrappers.RowItem(),
+                "psSwitchStatus": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.parseErrors, "str" )
             }
         }
     }

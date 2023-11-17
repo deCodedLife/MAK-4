@@ -67,7 +67,7 @@ void AsyncSNMP::run()
 
                 QJsonObject field;
                 field[ "oid" ] = QString::fromStdString( currentOID.to_str() );
-                field[ "num" ] = (qint64) *iter->second->val.integer;
+                field[ "num" ] = (qint64) (iter->second->val.integer ? *iter->second->val.integer : 0);
                 field[ "str" ] = QString::fromStdString( pdu.varlist().asString( currentOID ) );
 
                 fields[ currentOID ] = field;

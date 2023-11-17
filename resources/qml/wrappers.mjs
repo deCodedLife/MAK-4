@@ -15,11 +15,13 @@ export class RowItem
     constructor(
         type = RowTypes.DESCRIPTION,
         wrapper = (v) => v,
-        key = "num"
+        key = "num",
+        description = null
     ) {
         this.type = type
         this.wrapper = wrapper
         this.key = key
+        this.description = description
     }
 }
 
@@ -30,13 +32,15 @@ export class ContentItem
         description = "",
         type = RowTypes.DESCRIPTION,
         key = "num",
-        wrapper = (v) => v
+        wrapper = (v) => v,
+        action = (v) => v
     ) {
         this.oid = oid
         this.description = description
         this.type = type
         this.key = key
         this.wrapper = wrapper
+        this.action = action
     }
 }
 
@@ -75,6 +79,23 @@ export function parseErrors ( value ) {
     if ( value.split( "timeout" ).length === 2 ) return "Таймаут"
     if ( value.split( "mesure-error" ).length === 2 ) return "Ошибка\nизмерения"
     if ( value.split( "empty" ).length === 2 ) return "Пусто"
+
+    if ( value.split( "charge" ).length === 2 ) return "Заряжается"
+    if ( value.split( "floating" ).length === 2 ) return "Плавает"
+    if ( value.split( "fast-charge" ).length === 2 ) return "Быстрая зарядка"
+    if ( value.split( "equalizing-charge" ).length === 2 ) return "Зарядка эквалайзер"
+    if ( value.split( "discharge" ).length === 2 ) return "Разрядка"
+    if ( value.split( "low" ).length === 2 ) return "Низкий заряд"
+    if ( value.split( "test" ).length === 2 ) return "Тестирование"
+
+    if ( value.split( "value-normal" ).length === 2 ) return "Норма"
+    if ( value.split( "undervoltage" ).length === 2 ) return "Пониженная"
+    if ( value.split( "overvoltage" ).length === 2 ) return "Повышенная"
+    if ( value.split( "value-error" ).length === 2 ) return "Ошибка"
+    if ( value.split( "threshold-normal" ).length === 2 ) return "Отключено"
+    if ( value.split( "threshold-alarm" ).length === 2 ) return "Ошибка"
+
+    if ( value.split( "stand-by" ).length === 2 ) return "Поддержка"
 
     return value
 }

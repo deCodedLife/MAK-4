@@ -13,11 +13,6 @@ Page
     id: root
     contentHeight: content.implicitHeight
 
-    function addWrapper( config, wrapper ) {
-        config[ "wrapper" ] = wrapper
-        return config
-    }
-
     actionButtonIcon: "qrc:/images/icons/save.svg"
     actionButtonTitle: "Экспортировать"
 
@@ -73,58 +68,6 @@ Page
                     "psDischargeGroup4": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.parseErrors, "str" )
                 }
             }
-
-//            TableComponent {
-//                Layout.alignment: Qt.AlignTop
-
-//                headers: [
-//                    { "title": "№ разряда", "expand": false },
-//                    { "title": "Время начала", "expand": false },
-//                    { "title": "Результат теста", "expand": false },
-//                    { "title": "", "expand": false },
-//                    { "title": "", "expand": false },
-//                    { "title": "", "expand": false },
-//                    { "title": "", "expand": false },
-//                    { "title": "группа2", "expand": false },
-//                    { "title": "группа3", "expand": false },
-//                    { "title": "группа4", "expand": false },
-//                ]
-
-//                content: {
-//                    let objects = SNMP.getBulk( "" )
-//                    let fields = []
-//                    let middle = objects.length / 14
-
-//                    for ( let index = 0; index < middle; index++ ) {
-//                        fields.push( addWrapper( { type: 5, value: objects[ middle * 5 + index ] }, value => {
-//                            if ( parseInt(value) === 0 ) return "Подключено"
-//                            if ( parseInt(value) === 1 ) return "Отключено"
-//                            return value
-
-//                        } ) )
-//                        fields.push( addWrapper( { type: 5, value: objects[ middle * 6 + index ] }, value => {
-//                            if ( parseInt(value) === 0 ) return "Подключено"
-//                            if ( parseInt(value) === 1 ) return "Отключено"
-//                            return value
-
-//                        } ) )
-//                        fields.push( addWrapper( { type: 5, value: objects[ middle * 7 + index ] }, value => {
-//                            if ( parseInt(value) === 0 ) return "Подключено"
-//                            if ( parseInt(value) === 1 ) return "Отключено"
-//                            return value
-
-//                        } ) )
-//                        fields.push( addWrapper( { type: 5, value: objects[ middle * 8 + index ] }, value => {
-//                            if ( parseInt(value) === 0 ) return "Подключено"
-//                            if ( parseInt(value) === 1 ) return "Отключено"
-//                            return value
-
-//                        } ) )
-//                    }
-//                    return fields
-//                }
-//            }
-
         }
     }
 }
