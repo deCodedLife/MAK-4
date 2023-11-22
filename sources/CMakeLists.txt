@@ -3,7 +3,7 @@ set( INCLUDES ${CMAKE_SOURCE_DIR}/include )
 
 if ( APPLE )
     set( LIBS_FOLDER ${LIBS_FOLDER}/mac_os )
-    set( INCLUDE_PATH ${INCLUDE_PATH}/mac )
+    set( INCLUDES ${INCLUDES}/mac )
 elseif( UNIX )
     set( LIBS_FOLDER ${LIBS_FOLDER}/unix )
     set( INCLUDE_FOLDER ${INCLUDE_PATH}/unix )

@@ -13,6 +13,7 @@ Page
     function updateConfiguration() {
     }
 
+
     contentHeight: pageContent.implicitHeight + 20
 
     ColumnLayout {
