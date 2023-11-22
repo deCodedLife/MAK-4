@@ -3,6 +3,9 @@ import QtQuick.Layouts
 
 import "../Components"
 import "../Globals"
+import "../Models"
+
+import "../wrappers.mjs" as Wrappers
 
 Page
 {
@@ -23,30 +26,32 @@ Page
         anchors.leftMargin: 20
         anchors.rightMargin: 20
 
-        TableComponent {
+        FieldsTable {
             Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
             Layout.maximumWidth: 1200
 
             headers: [
-                { "title": "Название", "expand": true },
-                { "title": "Значение", "expand": false }
+                TableHeaderM {
+                    title: "Название"
+                    expand: true
+                },
+                TableHeaderM {
+                    title: "Значение"
+                    expand: false
+                }
             ]
 
-            content: [
-                { type: 5, value: "Серийный номер источника питания" },
-                { type: 4, field: "psSerial" },
+            fields: [
+                new Wrappers.ContentItem( null, "Серийный номер источника питания" ),
+                new Wrappers.ContentItem( null, "Описание источника питания" ),
+                new Wrappers.ContentItem( null, "Версия ПО контроллера" ),
+                new Wrappers.ContentItem( null, "Время" ),
 
-                { type: 5, value: "Описание источника питания" },
-                { type: 4, field: "psDescription" },
-
-                { type: 5, value: "Версия ПО контроллера" },
-                addWrapper( { type: 4, field: "psFWRevision" }, ( value ) => {
-                                let stringVal = value.toString()
-                                return `${stringVal[0]}.${stringVal[1]}.${stringVal[2]}`
-                } ),
-
-                { type: 5, value: "Текущее время MAK-4 UTC" },
-                addWrapper( { type: 4, field: "psTime" }, value => {
+                new Wrappers.ContentItem( "psSerial", "", Wrappers.RowTypes.TEXT, "str" ),
+                new Wrappers.ContentItem( "psDescription", "", Wrappers.RowTypes.TEXT, "str" ),
+                new Wrappers.ContentItem( "psFWRevision", "", Wrappers.RowTypes.TEXT, "num", Wrappers.parseVersion ),
+                new Wrappers.ContentItem( "psTime", "", Wrappers.RowTypes.TEXT, "str", (value) =>
+                {
                     let dateTime = SNMP.dateToReadable( value ).split( " " )
                     return `${dateTime[0]}\n${dateTime[1]}`
                 } )

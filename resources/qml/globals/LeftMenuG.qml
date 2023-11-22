@@ -3,11 +3,13 @@ pragma Singleton
 import QtQuick
 import QtQuick.Controls.Material
 
+import "../Models"
+
 QtObject
 {
     property string iconsLocation: "qrc:/images/icons/"
 
-    property list<Item> mainList: [
+    property list<Item> mainMenu: [
         MenuItemM { icon: "lan.svg"; title: "Соединение"; page: "Pages/Connection.qml" },
         MenuItemM { icon: "info.svg"; title: "Об устройстве"; page: "Pages/DeviceInfo.qml" },
         MenuItemM { icon: "emergency.svg"; title: "Аварии"; page: "Pages/Emergency.qml" },
@@ -24,7 +26,31 @@ QtObject
         MenuItemM { icon: "power.svg"; title: "Сеть"; page: "Pages/ElectricalNetwork.qml" },
         MenuItemM { icon: "thermostat.svg"; title: "Температура"; page: "Pages/Temprerature.qml" },
         MenuItemM { icon: "dry_connectors.svg"; title: "Сухие контакты"; page: "Pages/DryContacts.qml" },
-        MenuItemM { icon: "memory.svg"; title: "BMS"; page: "Pages/BMS" },
-        MenuItemM { icon: "settings.svg"; title: "Настройки"; page: "Pages/Settings.qml" }
+        MenuItemM { icon: "memory.svg"; title: "BMS"; page: "Pages/BMS.qml" },
+        MenuItemM { icon: "settings.svg"; title: "Настройки"; callback: () => { loadMenu( settingsMenu ); menuButtons = settingsButtons } }
     ]
+
+    property list<Item> settingsMenu: [
+        MenuItemM { icon: "back.svg"; title: "Меню"; callback: () => loadMenu( mainMenu ) },
+        MenuItemM { title: "Маски аварий"; page: "Pages/Settings.Masks.qml" },
+        MenuItemM { title: "Общее"; page: "Pages/Settings.Overall.qml" },
+        MenuItemM { title: "Батарея"; page: "Pages/Settings.Battery.qml" },
+        MenuItemM { title: "Контакторы"; page: "Pages/Settings.Contactors.qml" },
+        MenuItemM { title: "Сеть"; page: "Pages/Settings.Power.qml" },
+        MenuItemM { title: "Температура"; page: "Pages/Settings.Temperature.qml" },
+        MenuItemM { title: "Конфигурация"; page: "Pages/Settings.Configuration.qml" },
+        MenuItemM { title: "Сетевые настройки"; page: "Pages/Settings.Network.qml" },
+        MenuItemM { title: "Безопасность"; page: "Pages/Settings.Security.qml" },
+        MenuItemM { title: "SNMP"; page: "Pages/Settings.SNMP.qml" }
+    ]
+
+    property list<Item> settingsButtons: [
+        MenuItemM { icon: "open.svg"; title: "Считать из файла"; callback: () => {} },
+        MenuItemM { icon: "save.svg"; title: "Сохранить в файл"; callback: () => {} }
+    ]
+
+    property list<Item> currentMenu: mainMenu
+    property list<Item> menuButtons: []
+
+    function loadMenu( items: list<Item> ) { currentMenu = items; menuButtons = [] }
 }

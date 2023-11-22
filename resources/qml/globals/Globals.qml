@@ -10,6 +10,8 @@ QtObject
     property string backgroundColor: "#F5F8FA"
     property string errorColor: "#ED1921"
     property string succsessColor: "#45CC52"
+    property string yellow: "#F1DD23"
 
     property string textColor: "#8D8D8D"
+    property string grayScale: "#D9D9D9"
 }

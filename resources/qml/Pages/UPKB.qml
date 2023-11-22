@@ -3,6 +3,9 @@ import QtQuick.Layouts
 
 import "../Components"
 import "../Globals"
+import "../Models"
+
+import "../wrappers.mjs" as Wrappers
 
 Page
 {
@@ -10,54 +13,31 @@ Page
 
     contentHeight: content.implicitHeight + 20
 
-    function addWrapper( config, wrapper ) {
-        config[ "wrapper" ] = wrapper
-        return config
+    property string columnOID: "psBlockGroup.1"
+    property string tableName: "PSBlockEntry"
+    property int tablesCount: 0
+
+    Timer
+    {
+        interval: 20 * 1000
+        triggeredOnStart: true
+        running: true
+        repeat: true
+        onTriggered: {
+            SNMP.getTable( columnOID )
+            SNMP.getTable( tableName )
+        }
     }
 
-    property list<var> groupsFields: []
-    property list<var> headers: [
-        { "title": "Номер", "expand": false },
-        { "title": "U, В", "expand": false },
-        { "title": "t, °C", "expand": false },
-        { "title": "Состояние", "expand": true }
-    ]
+    Connections
+    {
+        target: SNMP
 
-
-    Component.onCompleted: {
-        let groups = SNMP.getBulk( "psBlockGroup" )
-        let numbers = SNMP.getBulk( "psBlockNumber" )
-        let voltage = SNMP.getBulk( "psBlockVoltage" )
-        let temperature = SNMP.getBulk( "psBlockTemperature" )
-        let statuses = SNMP.getBulk( "psBlockStatus" )
-
-        let groupIndexCount = [ 0, 0, 0, 0]
-
-        for ( let index = 0; index < groups.length; index++ ) {
-            if ( parseInt( groups[ index ] ) === 1 ) groupIndexCount[0]++
-            if ( parseInt( groups[ index ] ) === 2 ) groupIndexCount[1]++
-            if ( parseInt( groups[ index ] ) === 3 ) groupIndexCount[2]++
-            if ( parseInt( groups[ index ] ) === 4 ) groupIndexCount[3]++
-        }
-
-        for ( let groupIndex = 0; groupIndex < 4; groupIndex++ ) {
-            let itemsCount = groupIndexCount[ groupIndex ]
-            let fields = []
-            for ( let index2 = 0; index2 < itemsCount; index2++ ) {
-                let currentValue = index2 + (groupIndex * itemsCount)
-                fields.push( { type: 5, value: numbers[ currentValue ] } )
-                fields.push( { type: 5, value: parseFloat( voltage[ currentValue ] ) / 100 } )
-                fields.push( { type: 5, value: parseFloat( temperature[ currentValue ] ) / 100 } )
-                fields.push( addWrapper( { type: 5, value: statuses[ currentValue ] }, value => {
-                    if ( parseInt(value) === 0 ) return "Норма"
-                    if ( parseInt(value) === 1 ) return "Пониженное напряжение"
-                    if ( parseInt(value) === 2 ) return "Повышенное напряжение"
-                    if ( parseInt(value) === 3 ) return "Перегрев"
-                    if ( parseInt(value) === 4 ) return "Ошибка"
-                    return value
-                } ) )
-            }
-            groupsFields.push( fields )
+        function onGotRowsContent( root: string, data: object )
+        {
+            if ( root !== columnOID ) return
+            console.log( JSON.stringify( data ) )
+            tablesCount = Object.keys( data[ columnOID ] ).length
         }
     }
 
@@ -70,22 +50,53 @@ Page
         anchors.leftMargin: 20
         anchors.rightMargin: 20
 
-        RowLayout {
+        GridLayout {
+            id: grid
 
             Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
             Layout.maximumWidth: 1200
-            spacing: 10
+            rowSpacing: 10
+            columnSpacing: 10
+            width: content.width
+            height: contentHeight
+
+            rows: 1
+            columns: tablesCount
+
+            onWidthChanged: calcRows()
+
+            function calcRows() {
+                grid.rows = width >= 1000 ? 2 : 1
+                grid.columns = width >= 1000 ? tablesCount : 2
+            }
+
+            Component.onCompleted: calcRows()
 
             Repeater {
 
-                model: groupsFields.length
+                model: tablesCount
 
                 TableComponent {
                     Layout.alignment: Qt.AlignTop
                     header: "УПКБ" + (index + 1)
+                    tableOID: "PSBlockEntry"
+                    reversed: true
+                    external: true
+                    column: index + 1
 
-                    headers: root.headers
-                    content: groupsFields[ index ]
+                    headers: [
+                        TableHeaderM { title: "Номер"; expand: false },
+                        TableHeaderM { title: "U, В"; expand: false },
+                        TableHeaderM { title: "t, °C"; expand: false },
+                        TableHeaderM { title: "Состояние"; expand: false }
+                    ]
+
+                    rows: {
+                        "psBlockNumber": new Wrappers.RowItem( Wrappers.RowTypes.TEXT ),
+                        "psBlockVoltage": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByHundred, "num" ),
+                        "psBlockTemperature": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByHundred, "num" ),
+                        "psBlockStatus": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.parseErrors, "str" )
+                    }
                 }
             }
         }

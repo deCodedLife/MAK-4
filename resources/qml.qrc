@@ -44,7 +44,6 @@
         <file>qml/Globals/qmldir</file>
         <file>qml/Components/StatusText.qml</file>
         <file>qml/Globals/LeftMenuG.qml</file>
-        <file>qml/Globals/MenuItemM.qml</file>
         <file>qml/Main.qml</file>
         <file>qml/Components/LeftMenuItem.qml</file>
         <file>fonts/Roboto.ttf</file>
@@ -66,5 +65,27 @@
         <file>qml/Pages/BatteryTest.qml</file>
         <file>qml/Pages/BatteryTestShort.qml</file>
         <file>qml/Pages/BatteryCharging.qml</file>
+        <file>qml/Pages/Rectifiers.qml</file>
+        <file>qml/Pages/ElectricalNetwork.qml</file>
+        <file>qml/Pages/Temprerature.qml</file>
+        <file>qml/Pages/DryContacts.qml</file>
+        <file>qml/Pages/BMS.qml</file>
+        <file>qml/Pages/Contactors.qml</file>
+        <file>qml/Components/CustomSwitch.qml</file>
+        <file>qml/Pages/Settings.Masks.qml</file>
+        <file>qml/Pages/Settings.Overall.qml</file>
+        <file>qml/Pages/Settings.Battery.qml</file>
+        <file>qml/Pages/Settings.Contactors.qml</file>
+        <file>qml/Pages/Settings.Power.qml</file>
+        <file>qml/Pages/Settings.Temperature.qml</file>
+        <file>qml/Pages/Settings.Configuration.qml</file>
+        <file>qml/Pages/Settings.Network.qml</file>
+        <file>qml/Pages/Settings.Security.qml</file>
+        <file>qml/Pages/Settings.SNMP.qml</file>
+        <file>qml/Components/FieldsTable.qml</file>
+        <file>qml/Models/MenuItemM.qml</file>
+        <file>qml/Models/TableHeaderM.qml</file>
+        <file>qml/Models/TableRowM.qml</file>
+        <file>qml/wrappers.mjs</file>
     </qresource>
 </RCC>

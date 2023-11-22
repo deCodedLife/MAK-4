@@ -3,11 +3,11 @@
 SNMPConnection::SNMPConnection(QObject *parent)
     : TObject{parent},
     pHandle(NULL),
-    _state( Disconnected )
+    _state( Disconnected ),
+    isBusy(false),
+    requests({})
 {
     m_sender = "SNMP Agent";
-
-
 }
 
 SNMPConnection::~SNMPConnection()
@@ -37,124 +37,134 @@ void SNMPConnection::setState( States state )
     emit stateChanged( state );
 }
 
-QList<QString> SNMPConnection::getOIDs( QList<QString> objects )
+void SNMPConnection::proceed( AsyncSNMP* request )
 {
-    SNMPpp::PDU pdu( SNMPpp::PDU::kGet );
-    QList<QString> reply;
-
-    if ( objects.length() == 0 )
+    if ( request == nullptr ) return;
+    if ( isBusy )
     {
-        return reply;
+        requests.append( request );
+        return;
     }
+    else isBusy = true;
 
-    try
-    {
-        for ( QString objectName : objects )
-        {
-            if ( !parser.MIB_OBJECTS.contains( objectName ) ) continue;
-            oid_object object = parser.MIB_OBJECTS[ objectName ];
-            SNMPpp::OID o( object.oid.toStdString() );
-            o += 0;
-            pdu.addNullVar( o );
-        }
-
-        pdu = SNMPpp::get( pHandle, pdu );
-
-        for ( QString objectName : objects )
-        {
-            if ( !parser.MIB_OBJECTS.contains( objectName ) ) {
-                reply.append( "" );
-                continue;
-            }
-            oid_object object = parser.MIB_OBJECTS[ objectName ];
-            SNMPpp::OID o( object.oid.toStdString() );
-            o += 0;
-            QString value;
-
-            if ( pdu.varlist().asnType( o ) == ASN_INTEGER ) value = QString::number( *pdu.varlist().valueAt( o ).integer );
-            else value = QString::fromStdString( pdu.varlist().asString( o ) );
-            reply.append( value );
-        }
-    }
-    catch( const std::exception &e )
-    {
-        emit error_occured( Callback::New( e.what(), Callback::Warning ) );
-    }
-
-    pdu.free();
-    return reply;
+    QThreadPool::globalInstance()->start( request );
 }
 
-QList<QString> SNMPConnection::getBulk( QString object )
+void SNMPConnection::getOIDs( QString uid, QList<QString> objects )
 {
-    oid_object oid_object = parser.MIB_OBJECTS[ object ];
-    SNMPpp::OID oid( oid_object.oid.toStdString() );
-    SNMPpp::PDU pdu( SNMPpp::PDU::kGetBulk );
-    QStringList objects;
+    QList< SNMPpp::OID > oids;
+    AsyncSNMP *request = new AsyncSNMP( pHandle, SNMPpp::PDU::kGet );
 
-    try
+    for ( QString objectName : objects )
     {
-        SNMPpp::OID lastOID = oid;
+        oid_object object = parser.MIB_OBJECTS[ objectName ];
+        SNMPpp::OID oid( object.oid.toStdString() );
+        oid += 0;
 
-        while (true)
-        {
-            bool shouldBreak {false};
-
-            pdu = SNMPpp::getBulk( pHandle, lastOID );
-            SNMPpp::MapOidVarList list = pdu.varlist().getMap();
-
-            for ( SNMPpp::MapOidVarList::iterator itemIterator = list.begin(); itemIterator != list.end(); itemIterator++ ) {
-                if ( !oid.isParentOf( itemIterator->first ) ) {
-                    shouldBreak = true;
-                    break;
-                };
-                if ( itemIterator->second->type == ASN_INTEGER ) objects.append( QString::number( *itemIterator->second->val.integer ) );
-                else objects.append( QString::fromStdString( pdu.varlist().asString( itemIterator->first ) ) );
-//                objects.append( QString::number( *itemIterator->second->val.integer ) );
-                lastOID = itemIterator->first;
-            }
-
-            if ( shouldBreak ) break;
-        }
-    }
-    catch ( const std::exception &e )
-    {
-        emit error_occured( Callback::New( e.what(), Callback::Warning ) );
+        oids.append( oid );
     }
 
-    pdu.free();
-    return objects;
+    request->setUID( uid );
+    request->setOIDs( oids );
+
+    connect( request, &AsyncSNMP::rows, this, &SNMPConnection::handleSNMPRequest);
+    proceed( request );
 }
 
-void SNMPConnection::setOID( QString oid, QVariant data )
+void SNMPConnection::handleSNMPRequest( QString root, QMap<SNMPpp::OID, QJsonObject> rows )
 {
-    SNMPpp::PDU pdu( SNMPpp::PDU::kGet );
-    oid_object obj = parser.MIB_OBJECTS[ oid ];
+    isBusy = false;
+
+    _state = Connected;
+    emit stateChanged( _state );
+
+    QJsonObject fields;
+
+    for ( SNMPpp::OID oid : rows.keys() )
+    {
+        QString oidName = parser.OID_TOSTR[ oid.parent() ];
+
+        QJsonArray data;
+        QJsonObject row = rows[ oid ];
+
+        row[ "field" ] = oidName;
+
+        if ( fields.contains( oidName ) )
+        {
+            if ( fields[ oidName ].isArray() )
+            {
+                data = fields[ oidName ].toArray();
+            }
+            else
+            {
+                data.append( fields[ oidName ].toObject() );
+            }
+
+            data.append( row );
+
+            fields[ oidName ] = data;
+            continue;
+        }
+
+        fields[ oidName ] = row;
+    }
+
+    emit gotRowsContent( root, fields );
+
+    if ( requests.empty() ) return;
+    proceed( requests.first() );
+    requests.removeFirst();
+}
+
+void SNMPConnection::getTable( QString objectName )
+{
+    QList<QString> combinedName = objectName.split( "." );
+    QList<QString> combined = objectName.split( combinedName.first() );
+    if ( combined.length() != 1 ) combined.removeFirst();
+
+    oid_object object = parser.MIB_OBJECTS[ combinedName.first() ];
+    SNMPpp::OID start(
+        object.oid.toStdString() +
+        combined.first().toStdString()
+    );
+    AsyncSNMP *request = new AsyncSNMP( pHandle, SNMPpp::PDU::kGetBulk );
+    request->setBounds( start );
+    request->setUID( objectName );
+
+    connect( request, &AsyncSNMP::rows, this, &SNMPConnection::handleSNMPRequest );
+    proceed( request );
+}
+
+void SNMPConnection::setOID( QString objectName, QVariant data )
+{
+    SNMPpp::PDU pdu( SNMPpp::PDU::kSet );
+    oid_object obj = parser.MIB_OBJECTS[ objectName ];
+    SNMPpp::OID oid( obj.oid.toStdString() + ".0" );
 
     switch ( obj.type ) {
     case TYPE_INTEGER:
-        pdu.addIntegerVar( SNMPpp::OID( obj.oid.toStdString() ), data.toInt() );
+        pdu.addIntegerVar( oid, data.toInt() );
+        qDebug() << pdu.varlist().asString();
         break;
     case TYPE_GAUGE:
-        pdu.addGaugeVar( SNMPpp::OID( obj.oid.toStdString() ), data.toUInt() );
+        pdu.addGaugeVar( oid, data.toUInt() );
         break;
     case TYPE_NULL:
-        pdu.addNullVar( SNMPpp::OID( obj.oid.toStdString() ) );
+        pdu.addNullVar( oid );
         break;
     case TYPE_OCTETSTR:
         pdu.addOctetStringVar(
-            SNMPpp::OID( obj.oid.toStdString() ),
+            oid,
             (unsigned char *) data.toString().toStdString().c_str(),
             data.toString().toStdString().size() );
         break;
     default:
-        pdu.addNullVar( SNMPpp::OID( obj.oid.toStdString() ) );
+        pdu.addNullVar( oid );
         break;
     }
 
     try
     {
-        pdu.addNullVar( SNMPpp::OID( obj.oid.toStdString() + ".0" ) );
         pdu = SNMPpp::set( pHandle, pdu );
     }
     catch( const std::exception &e )
@@ -173,6 +183,8 @@ QString SNMPConnection::dateToReadable( QString date )
 
 void SNMPConnection::updateConnection()
 {
+    SOCK_STARTUP;
+
     QJsonObject configs = pConfigs->get()[ "main" ].toObject();
     SNMPpp::closeSession( pHandle );
 
@@ -223,17 +235,7 @@ void SNMPConnection::updateConnection()
             return;
         }
 
-        QList<QString> reply = getOIDs( { "stSNMPVersion" } );
-
-        if ( reply.empty() ) {
-            _state = Disconnected;
-            emit stateChanged( _state );
-            emit error_occured( Callback::New( "Не удалось получить данные с устройства", Callback::Warning ) );
-            return;
-        }
-
-        _state = Connected;
-        emit stateChanged( _state );
+        getOIDs( "", { "stSNMPVersion" } );
     }
     catch ( const std::exception &e )
     {
@@ -245,6 +247,7 @@ void SNMPConnection::updateConnection()
 
 void SNMPConnection::dropConnection()
 {
+    SOCK_CLEANUP;
     _state = Disconnected;
     emit stateChanged( _state );
     SNMPpp::closeSession( pHandle );

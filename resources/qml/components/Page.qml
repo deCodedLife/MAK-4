@@ -1,4 +1,6 @@
 import QtQuick
+import QtQuick.Controls
+import QtQuick.Controls.Material
 
 import "../Globals"
 
@@ -10,6 +12,12 @@ Flickable
 
     interactive: height < contentHeight
     boundsMovement: Flickable.StopAtBounds
+
+    signal actionButtonTriggered
+
+    property string actionButtonIcon
+    property string actionButtonTitle
+    property string actionButtonState
 
     Rectangle {
         width: page.width - 20
@@ -27,5 +35,54 @@ Flickable
         radius: 10
         color: Globals.backgroundColor
         z: -1
+    }
+
+    Popup {
+        id: popup
+
+        x: page.parent.width - (width + 10)
+        y: page.parent.height - (height + 30 + fab.height)
+
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+        contentItem: Text {
+            id: popupText
+            anchors.centerIn: parent
+            text: actionButtonTitle
+            font.pointSize: 12
+            font.bold: true
+            color: Globals.textColor
+        }
+    }
+
+    RoundButton {
+        id: fab
+        parent: page.parent
+
+        width: 72
+        height: 72
+        radius: 20
+
+        display: Button.IconOnly
+        Material.accent: Globals.accentColor
+
+        x: page.parent.width - (width + 20)
+        y: page.parent.height - (height + 20)
+
+        visible: actionButtonIcon != ""
+        highlighted: true
+
+        icon.name: actionButtonIcon
+        icon.source: actionButtonIcon
+        icon.color: "white"
+        icon.width: 28
+        icon.height: 28
+
+        MouseArea {
+            anchors.fill: parent
+            hoverEnabled: true
+            onClicked: actionButtonTriggered()
+            onHoveredChanged: containsMouse ? popup.open() : popup.close()
+        }
     }
 }
