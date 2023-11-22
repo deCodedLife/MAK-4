@@ -8,7 +8,8 @@ import "../Globals"
 
 Page
 {
-    property var configuration: Config[ "main" ]
+    property var configuration: ConfigManager.get()[ "main" ]
+
     contentHeight: pageContent.implicitHeight + 20
 
     ColumnLayout {
