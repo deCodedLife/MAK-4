@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 
 project(MAK-4 VERSION 0.2 LANGUAGES CXX)
+set( PROJECT_NAME MAK-4 )
 
 macro(configure_files srcDir destDir)
     message(STATUS "Configuring directory ${destDir}")
@@ -25,7 +26,16 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 6.5 REQUIRED COMPONENTS Quick Network HttpServer SVG Widgets)
+find_package(
+    Qt6 6.5
+    REQUIRED
+    COMPONENTS
+    Quick
+    Network
+    HttpServer
+    SVG
+    Widgets
+)
 add_subdirectory(sources)
 
 qt_standard_project_setup()
@@ -40,66 +50,39 @@ qt_add_qml_module(MAK-4
     VERSION 1.0
 )
 
-set( PROJECT_NAME MAK-4 )
-
-set_target_properties(MAK-4 PROPERTIES
-    MACOSX_BUNDLE_GUI_IDENTIFIER org.promsd.mak4
-    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-    MACOSX_BUNDLE TRUE
-)
-
-target_include_directories(
-    MAK-4 PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/sources/core
-    ${CMAKE_CURRENT_SOURCE_DIR}/sources/net-snmp
-)
-
-
-
-set(
-    SNMP_LIBS
-    ""
-)
-
-set(
-    SSL_LIBS
-    ""
-)
-
 if ( APPLE )
 
-    set(
-        SNMP_LIBS
-#        ${LIBS_FOLDER}/libnetsnmp.a
-#        ${LIBS_FOLDER}/libnetsnmpagent.a
-#        ${LIBS_FOLDER}/libnetsnmphelpers.a
-#        ${LIBS_FOLDER}/libnetsnmpmibs.a
-#        ${LIBS_FOLDER}/libnetsnmptrapd.a
+    set_target_properties(MAK-4 PROPERTIES
+        MACOSX_BUNDLE_GUI_IDENTIFIER org.promsd.mak4
+        MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+        MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+        MACOSX_BUNDLE TRUE
     )
-#    set(
-#        SSL_LIBS
-#        ${LIBS_FOLDER}/libssl.a
-#        ${LIBS_FOLDER}/libcrypto.a
-#    )
-
     set(CPACK_GENERATOR "DragNDrop")
     include(CPack)
+
+else ( WIN32 )
+
+    set_target_properties( MAK-4 PROPERTIES WIN32_EXECUTABLE TRUE )
+
 endif()
 
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/mibs)
-configure_files( ${CMAKE_CURRENT_SOURCE_DIR}/mibs ${CMAKE_BINARY_DIR}/mibs )
-
-target_link_libraries(MAK-4
+target_link_libraries(
+    MAK-4
     PRIVATE Qt6::Quick
     PRIVATE Qt6::Network
     PRIVATE Qt6::HttpServer
     PRIVATE Qt6::Widgets
     PRIVATE Qt6::Svg
     PRIVATE Snmp
-#    ${SNMP_LIBS}
-#    ${SSL_LIBS}
 )
 
+target_include_directories(
+    MAK-4 PRIVATE
+    ${INCLUDE_FOLDER}
+    ${CMAKE_CURRENT_SOURCE_DIR}/sources/core
+    ${CMAKE_CURRENT_SOURCE_DIR}/sources/net-snmp
+)
 
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/mibs)
+configure_files( ${CMAKE_CURRENT_SOURCE_DIR}/mibs ${CMAKE_BINARY_DIR}/mibs )
