@@ -18,9 +18,8 @@ TextField
     text: value
 
     onTextChanged: {
-        if ( text == "" ) focus = false
+        if ( value === "" ) focus = false
     }
 
-    onEditingFinished: value = text
     Component.onCompleted: pBackground.fillColor = Globals.backgroundColor
 }
