@@ -52,6 +52,8 @@ void SNMPConnection::proceed( AsyncSNMP* request )
 
 void SNMPConnection::getOIDs( QString uid, QList<QString> objects )
 {
+    if ( pHandle == NULL ) return;
+
     QList< SNMPpp::OID > oids;
     AsyncSNMP *request = new AsyncSNMP( pHandle, SNMPpp::PDU::kGet );
 
@@ -68,13 +70,13 @@ void SNMPConnection::getOIDs( QString uid, QList<QString> objects )
     request->setOIDs( oids );
 
     connect( request, &AsyncSNMP::rows, this, &SNMPConnection::handleSNMPRequest);
+    connect( request, &AsyncSNMP::finished, this, &SNMPConnection::handleSNMPFinished );
+
     proceed( request );
 }
 
 void SNMPConnection::handleSNMPRequest( QString root, QMap<SNMPpp::OID, QJsonObject> rows )
 {
-    isBusy = false;
-
     _state = Connected;
     emit stateChanged( _state );
 
@@ -110,6 +112,15 @@ void SNMPConnection::handleSNMPRequest( QString root, QMap<SNMPpp::OID, QJsonObj
     }
 
     emit gotRowsContent( root, fields );
+}
+
+void SNMPConnection::handleSNMPFinished( int code )
+{
+    if ( code != 0 ) {
+        pHandle = NULL;
+        dropConnection();
+    }
+    isBusy = false;
 
     if ( requests.empty() ) return;
     proceed( requests.first() );
@@ -118,6 +129,8 @@ void SNMPConnection::handleSNMPRequest( QString root, QMap<SNMPpp::OID, QJsonObj
 
 void SNMPConnection::getTable( QString objectName )
 {
+    if ( pHandle == NULL ) return;
+
     QList<QString> combinedName = objectName.split( "." );
     QList<QString> combined = objectName.split( combinedName.first() );
     if ( combined.length() != 1 ) combined.removeFirst();
@@ -132,6 +145,8 @@ void SNMPConnection::getTable( QString objectName )
     request->setUID( objectName );
 
     connect( request, &AsyncSNMP::rows, this, &SNMPConnection::handleSNMPRequest );
+    connect( request, &AsyncSNMP::finished, this, &SNMPConnection::handleSNMPFinished );
+
     proceed( request );
 }
 
@@ -239,6 +254,9 @@ void SNMPConnection::updateConnection()
     }
     catch ( const std::exception &e )
     {
+        SOCK_CLEANUP;
+        SNMPpp::closeSession( pHandle );
+
         _state = Disconnected;
         emit stateChanged( _state );
         emit error_occured( Callback::New( e.what(), Callback::Error ) );

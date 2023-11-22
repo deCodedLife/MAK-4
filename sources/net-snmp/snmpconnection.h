@@ -58,6 +58,7 @@ public slots:
     Q_INVOKABLE void dropConnection();
     void proceed( AsyncSNMP* );
     void handleSNMPRequest( QString, QMap<SNMPpp::OID, QJsonObject> );
+    void handleSNMPFinished( int );
 
 private:
     void initFields();

@@ -9,10 +9,6 @@ import "../Globals"
 Page
 {
     property var configuration: Config[ "main" ]
-
-    function updateConfiguration() {
-    }
-
     contentHeight: pageContent.implicitHeight + 20
 
     ColumnLayout {
@@ -47,10 +43,10 @@ Page
                     { highlited: true, color: Globals.errorColor, text: "Отключить", callback: () => { SNMP.dropConnection() } }
                 ]
                 onFieldUpdated: ( index, value ) => {
-                    let newConfig = Config.current
+                    let newConfig = ConfigManager.current
                     configuration[ indexes[ index ] ][ "value" ] = value
                     newConfig[ "main" ] = configuration
-                    Config.current = newConfig
+                    ConfigManager.current = newConfig
                 }
             }
 

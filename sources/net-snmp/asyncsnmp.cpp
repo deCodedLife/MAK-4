@@ -82,7 +82,31 @@ void AsyncSNMP::run()
     }
     catch( std::exception &e )
     {
+        int errorCode {0};
+
         qDebug() << e.what();
+        QStringList paresedError = QString::fromStdString( e.what() ).split( QRegularExpression( "\[.*\]" ) );
+
+        if ( paresedError.length() != 2 )
+        {
+            emit finished( errorCode );
+            return;
+        }
+
+        paresedError = paresedError.last().split( "," );
+
+        for ( QString error : paresedError )
+        {
+
+            QStringList errorDetails = error.split( "snmperrno=" );
+            QString strCode = errorDetails.last();
+
+            if ( errorDetails.length() != 2 ) continue;
+            errorCode = std::stoi( strCode.toStdString() );
+        }
+
+        emit finished( errorCode );
+        return;
     }
 
     emit rows( uid, fields );
