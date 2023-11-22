@@ -3,6 +3,8 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
+import "../Globals"
+
 Rectangle
 {
     property string header: ""
@@ -37,7 +39,7 @@ Rectangle
 
             Text {
                 text: header
-                font.pointSize: 16
+                font.pointSize: Globals.h4
                 font.bold: true
                 Layout.fillWidth: true
                 Layout.margins: 20

@@ -42,7 +42,7 @@ Item
 
             horizontalAlignment: Text.AlignLeft
             font.bold: true
-            font.pointSize: 12
+            font.pointSize: Globals.h6
         }
     }
 }
