@@ -112,10 +112,6 @@ void SNMPConnection::handleSNMPRequest( QString root, QMap<SNMPpp::OID, QJsonObj
     }
 
     emit gotRowsContent( root, fields );
-
-    if ( requests.empty() ) return;
-    proceed( requests.first() );
-    requests.removeFirst();
 }
 
 void SNMPConnection::handleSNMPFinished( int code )
@@ -125,6 +121,10 @@ void SNMPConnection::handleSNMPFinished( int code )
         dropConnection();
     }
     isBusy = false;
+
+    if ( requests.empty() ) return;
+    proceed( requests.first() );
+    requests.removeFirst();
 }
 
 void SNMPConnection::getTable( QString objectName )
@@ -145,6 +145,8 @@ void SNMPConnection::getTable( QString objectName )
     request->setUID( objectName );
 
     connect( request, &AsyncSNMP::rows, this, &SNMPConnection::handleSNMPRequest );
+    connect( request, &AsyncSNMP::finished, this, &SNMPConnection::handleSNMPFinished );
+
     proceed( request );
 }
 
