@@ -84,7 +84,7 @@ Rectangle
                         visible: modelData[ "type" ] === 0 || modelData[ "type" ] === 1
                         placeholderText: modelData[ "description" ]
                         value: modelData[ "value" ]
-                        onTextChanged: fieldUpdated( index, text )
+                        onChanged: fieldUpdated( index, text )
                         echoMode: modelData[ "type" ] === 1 ? TextField.Password : TextField.Normal
                     }
 

@@ -10,7 +10,10 @@ TextField
     id: control
 
     property MaterialTextContainer pBackground: background
-    property var value: null
+    property var value
+
+    signal changed( string value )
+
     Material.containerStyle: Material.Filled
     Material.accent: Globals.accentColor
 
@@ -18,7 +21,10 @@ TextField
     text: value
 
     onTextChanged: {
-        if ( value === "" ) focus = false
+        if ( text === "" ) focus = false
+        if ( text === "" ) return
+        if ( text === value ) return
+        changed( text )
     }
 
     Component.onCompleted: pBackground.fillColor = Globals.backgroundColor
