@@ -83,7 +83,7 @@ Page
                 tableOID: "psShortTestEntry"
 
                 headers: [
-                    TableHeaderM { title: "№ разряда"; expand: false },
+                    TableHeaderM { title: "№ Теста"; expand: false },
                     TableHeaderM { title: "Время теста"; expand: false },
                     TableHeaderM { title: "Результат теста"; expand: false },
                     TableHeaderM { title: "Длительность\n(мин)"; expand: false },
