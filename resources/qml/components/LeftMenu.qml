@@ -34,18 +34,17 @@ Item
             interactive: list.height < list.contentHeight
         }
 
-//        Flickable
-//        {
-//            anchors.fill: parent
-//            contentHeight: content.implicitHeight
-//            interactive: contentHeight > height
+        Flickable
+        {
+            anchors.fill: parent
+            contentHeight: content.implicitHeight
+            interactive: contentHeight > height
 
-//            ColumnLayout {
-//                id: content
+            ColumnLayout {
+                id: content
 
-//                anchors.fill: parent
-//                anchors.margins: 10
-
+                anchors.fill: parent
+                anchors.margins: 10
 
 
 
@@ -67,7 +66,7 @@ Item
 
 //                    interactive: list.height < list.contentHeight
 //                }
-//            }
-//        }
+            }
+        }
     }
 }

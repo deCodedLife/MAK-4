@@ -67,7 +67,9 @@ private:
     QVariant getFieldValue( QString );
 
 private:
-    SNMPpp::SessionHandle pHandle;
+    SNMPpp::SessionHandle readSession;
+    SNMPpp::SessionHandle writeSession;
+
     Configs *pConfigs;
     States _state;
     MibParser parser;
