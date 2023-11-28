@@ -14,6 +14,11 @@
 #define PRIV_PASSWORD "0000000011"
 #define UPDATE_DELAY 3
 
+// SNMP SETTINGS
+#define ST_SNMP_VERSION "snmpV3"
+#define ST_SNMP_AUTH_ALGO "MD5"
+#define ST_SNMP_PRIV_ALGO "AES128"
+
 #define V2_READ  "public"
 #define V2_WRITE "changeit"
 
@@ -22,18 +27,20 @@
 #include <QObject>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <QJsonArray>
 #include <QStringList>
 
 #include "tobject.h"
 
 enum FieldTypes
 {
+    FieldText,
+    FieldDescription,
     FieldInput,
     FieldPassword,
     FieldCombobox,
     FieldCheckbox,
-    FieldText,
-    FieldDescription
+    FieldCounter
 };
 
 struct Field
@@ -41,8 +48,11 @@ struct Field
     FieldTypes type;
     QVariant value;
     QString description;
-    QStringList model;
-    bool isBulk;
+    QJsonObject model;
+
+    int min {-1};
+    int max {-1};
+
     QString field;
 
     static QJsonObject ToJSON( Field f )
@@ -51,9 +61,10 @@ struct Field
         field[ "type" ] = f.type;
         field[ "value" ] = QJsonValue::fromVariant( f.value );
         field[ "description" ] = f.description;
-        field[ "model" ] = QJsonValue::fromVariant( f.model );
-        field[ "isBulk" ] = f.isBulk;
+        field[ "model" ] = f.model;
         field[ "filed" ] = f.field;
+        field[ "min" ] = f.min;
+        field[ "max" ] = f.max;
         return field;
     };
     static Field FromJSON( QJsonObject obj )
@@ -62,9 +73,10 @@ struct Field
         f.type = (FieldTypes) obj[ "type" ].toInt();
         f.value = obj[ "value" ].toVariant();
         f.description = obj[ "description" ].toString();
-        f.model = obj[ "model" ].toVariant().toStringList();
-        f.isBulk = obj[ "isBulk" ].toBool();
+        f.model = obj[ "model" ].toObject();
         f.field = obj[ "field" ].toString();
+        f.min = obj[ "min" ].toInt();
+        f.max = obj[ "max" ].toInt();
         return f;
     }
 };
