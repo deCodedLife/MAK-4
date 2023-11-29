@@ -115,12 +115,12 @@ QJsonObject Configs::Default()
     snmpSettings[ "stSNMPAdministratorPrivPassword" ] = Field::ToJSON( { FieldPassword, "*****", "Приватный пароль администратора" } );
 
     snmpSettings[ "stSNMPEngineerName" ] = Field::ToJSON( { FieldInput, "Engineer", "Имя инженера" } );
-    snmpSettings[ "stSNMPEngineerAuthPassword" ] = Field::ToJSON( { FieldInput, "*****", "Пароль аутентификации инженера" } );
-    snmpSettings[ "stSNMPEngineerPrivPassword" ] = Field::ToJSON( { FieldInput, "*****", "Приватный пароль инженера" } );
+    snmpSettings[ "stSNMPEngineerAuthPassword" ] = Field::ToJSON( { FieldPassword, "*****", "Пароль аутентификации инженера" } );
+    snmpSettings[ "stSNMPEngineerPrivPassword" ] = Field::ToJSON( { FieldPassword, "*****", "Приватный пароль инженера" } );
 
     snmpSettings[ "stSNMPOperatorName" ] = Field::ToJSON( { FieldInput, "Operator", "Имя оператора" } );
-    snmpSettings[ "stSNMPOperatorAuthPassword" ] = Field::ToJSON( { FieldInput, "*****", "Пароль аутентификации оператора" } );
-    snmpSettings[ "stSNMPOperatorPrivPassword" ] = Field::ToJSON( { FieldInput, "*****", "Приватный пароль оператора" } );
+    snmpSettings[ "stSNMPOperatorAuthPassword" ] = Field::ToJSON( { FieldPassword, "*****", "Пароль аутентификации оператора" } );
+    snmpSettings[ "stSNMPOperatorPrivPassword" ] = Field::ToJSON( { FieldPassword, "*****", "Приватный пароль оператора" } );
 
     snmpSettings[ "stSNMPSAuthAlgo" ] = Field::ToJSON( { FieldCombobox, ST_SNMP_AUTH_ALGO, "Способ защиты данных", { { "Нет", 0 }, { "MD5", 1 }, { "SHA1", 2 } } } );
     snmpSettings[ "stSNMPSPrivAlgo" ] = Field::ToJSON( { FieldCombobox, ST_SNMP_PRIV_ALGO, "Способ шифрования", { { "Нет", 0 }, { "DES", 1 }, { "AES128", 2 } } } );
@@ -210,8 +210,8 @@ QJsonObject Configs::Default()
      * @brief securitySettings
      */
     QJsonObject securitySettings;
-    securitySettings[ "stMonitoringPassword" ] = Field::ToJSON( { FieldInput, "", "Пароль для просмотра данных по Modbus, USB, RS485" } );
-    securitySettings[ "stEnableRemouteChangeSetting" ] = Field::ToJSON( { FieldCheckbox, 0, "Разрешить изменения удалённо" } );
+    securitySettings[ "stMonitoringPassword" ] = Field::ToJSON( { FieldPassword, "********", "Пароль для просмотра данных по Modbus, USB, RS485" } );
+    securitySettings[ "stEnableRemouteChangeSetting" ] = Field::ToJSON( { FieldCheckbox, 1, "Разрешить изменения удалённо" } );
     securitySettings[ "stEnableRemouteUpdateFirmware" ] = Field::ToJSON( { FieldCheckbox, 0, "Разрешить прошивку удалённо" } );
 
 
