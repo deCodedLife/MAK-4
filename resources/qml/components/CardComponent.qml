@@ -3,13 +3,18 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
+import "../Globals"
+import "../wrappers.mjs" as Wrappers
+
 Rectangle
 {
+    id: root
+
     property string header: ""
     property var fields: []
     property var buttons: []
 
-    signal fieldUpdated( index: int, value: string )
+    signal fieldUpdated( index: string, value: string )
 
     Layout.alignment: Qt.AlignTop
     Layout.fillWidth: true
@@ -37,7 +42,7 @@ Rectangle
 
             Text {
                 text: header
-                font.pointSize: 16
+                font.pointSize: Globals.h4
                 font.bold: true
                 Layout.fillWidth: true
                 Layout.margins: 20
@@ -77,26 +82,50 @@ Rectangle
                     height: textfield.implicitHeight
 
                     CustomField {
+                        property var counterValidator: IntValidator {
+                            bottom: modelData[ "min" ] === -1 ? -2147483648 : modelData[ "min" ]
+                            top: modelData[ "max" ] === -1 ? 2147483647 : modelData[ "max" ]
+                        }
+
                         id: textfield
                         anchors.fill: parent
-                        visible: modelData[ "type" ] === 0 || modelData[ "type" ] === 1
+                        visible: modelData[ "type" ] === 2 || modelData[ "type" ] === 3 || modelData[ "type" ] === 6
                         placeholderText: modelData[ "description" ]
                         value: modelData[ "value" ]
-                        onEditingFinished: fieldUpdated( index, value )
-                        echoMode: modelData[ "type" ] === 1 ? TextField.Password : TextField.Normal
+                        onChanged: {
+                            if ( !acceptableInput ) return
+                            if ( Wrappers.getFieldValue( modelData, text ) === modelData[ "value" ] ) return
+                            fieldUpdated( modelData[ "field" ], text )
+                        }
+                        echoMode: modelData[ "type" ] === 3 ? TextField.Password : TextField.Normal
+                        validator: modelData[ "type" ] === 6 ? counterValidator : null
+                        color: modelData[ "type" ] === 6 ? acceptableInput ? Globals.textColor : Globals.errorColor : Globals.textColor
                     }
 
                     CustomDropDown {
                         anchors.fill: parent
-                        visible: modelData[ "type" ] === 2
-                        displayText: `${modelData[ "description" ]}: ${modelData[ "model" ][ currentIndex ]}`
+                        visible: modelData[ "type" ] === 4
+                        displayText: `${modelData[ "description" ]}: ` + Object.keys( modelData[ "model" ] )[ currentIndex ]
                         value: modelData[ "value" ]
-                        model: modelData[ "model" ]
+                        model: Object.keys( modelData[ "model" ] )
                         onCurrentIndexChanged: {
                             if ( preSelected === currentIndex ) return
                             preSelected = currentIndex
-                            fieldUpdated( index, currentIndex )
+                            fieldUpdated( modelData[ "field" ], Object.keys( modelData[ "model" ] )[ currentIndex ] )
                         }
+                    }
+
+                    CustomSwitch {
+                        id: customSwitch
+                        anchors.fill: parent
+                        visible: modelData[ "type" ] === 5
+                        text: modelData[ "description" ]
+                        toggled: modelData[ "value" ] === 1
+                        dobbled: true
+                        onContentChanged: value => {
+                                              if ( Wrappers.getFieldValue( modelData, toggled === 1 ) === modelData[ "value" ] ) return
+                                              fieldUpdated( modelData[ "field" ], value )
+                                          }
                     }
                 }
             }
@@ -118,11 +147,27 @@ Rectangle
                     text: modelData[ "text" ]
                     highlighted: modelData[ "highlited" ]
                     Material.accent: modelData[ "color" ]
-                    onClicked: modelData[ "callback" ]()
+                    onClicked: {
+                        modelData[ "callback" ]()
+                        delay.start()
+                    }
+                    enabled: !delay.running
+
+                    Timer
+                    {
+                        id: delay
+                        interval: 3000
+                    }
                 }
             }
         }
     }
 
-
+    Rectangle {
+        anchors.fill: parent
+        color: Globals.grayScale
+        radius: 10
+        opacity: .6
+        visible: !root.enabled
+    }
 }

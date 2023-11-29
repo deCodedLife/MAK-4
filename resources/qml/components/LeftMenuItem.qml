@@ -60,7 +60,7 @@ Rectangle
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
 
             font.bold: false
-            font.pointSize: 12
+            font.pointSize: Globals.h6
         }
     }
 

@@ -9,6 +9,7 @@ Item
 
     property string text
     property bool toggled: false
+    property bool dobbled: false
 
     signal contentChanged( int value )
     state: toggled ? "enabled" : "disabled"
@@ -19,6 +20,8 @@ Item
     RowLayout {
         id: content
         anchors.fill: parent
+
+        spacing: dobbled ? 10 : 5
 
         Rectangle {
             id: background
@@ -92,7 +95,7 @@ Item
             color: Globals.textColor
 
             font.bold: true
-            font.pointSize: 12
+            font.pointSize: dobbled ? Globals.h5 : Globals.h6
         }
     }
 

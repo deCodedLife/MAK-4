@@ -51,11 +51,11 @@ Page
                 ]
 
                 fields: [
-                    new Wrappers.ContentItem( null, "psContactorSycnro" ),
-                    new Wrappers.ContentItem( null, "psContactorBLVDState" ),
-                    new Wrappers.ContentItem( null, "psContactorL1VDState" ),
-                    new Wrappers.ContentItem( null, "psContactorL2VDState" ),
-                    new Wrappers.ContentItem( null, "psContactorL3VDState" ),
+                    new Wrappers.ContentItem( null, "Синхронизация положения" ),
+                    new Wrappers.ContentItem( null, "Батарейный (BLVD)" ),
+                    new Wrappers.ContentItem( null, "Нагрузочный 1 (LLVD 1)" ),
+                    new Wrappers.ContentItem( null, "Нагрузочный 2 (LLVD 2)" ),
+                    new Wrappers.ContentItem( null, "Нагрузочный 2 (LLVD 3)" ),
 
                     new Wrappers.ContentItem( "psContactorSycnro", "", Wrappers.RowTypes.CHECHBOX, "num" ),
                     new Wrappers.ContentItem( "psContactorBLVDState", "", Wrappers.RowTypes.CHECHBOX, "num" ),

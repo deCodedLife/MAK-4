@@ -49,7 +49,7 @@ Flickable
             id: popupText
             anchors.centerIn: parent
             text: actionButtonTitle
-            font.pointSize: 12
+            font.pointSize: Globals.h6
             font.bold: true
             color: Globals.textColor
         }

@@ -72,16 +72,16 @@
         <file>qml/Pages/BMS.qml</file>
         <file>qml/Pages/Contactors.qml</file>
         <file>qml/Components/CustomSwitch.qml</file>
-        <file>qml/Pages/Settings.Masks.qml</file>
-        <file>qml/Pages/Settings.Overall.qml</file>
-        <file>qml/Pages/Settings.Battery.qml</file>
-        <file>qml/Pages/Settings.Contactors.qml</file>
-        <file>qml/Pages/Settings.Power.qml</file>
-        <file>qml/Pages/Settings.Temperature.qml</file>
-        <file>qml/Pages/Settings.Configuration.qml</file>
-        <file>qml/Pages/Settings.Network.qml</file>
-        <file>qml/Pages/Settings.Security.qml</file>
-        <file>qml/Pages/Settings.SNMP.qml</file>
+        <file>qml/Pages/Settings_Masks.qml</file>
+        <file>qml/Pages/Settings_Overall.qml</file>
+        <file>qml/Pages/Settings_Battery.qml</file>
+        <file>qml/Pages/Settings_Contactors.qml</file>
+        <file>qml/Pages/Settings_Power.qml</file>
+        <file>qml/Pages/Settings_Temperature.qml</file>
+        <file>qml/Pages/Settings_Configuration.qml</file>
+        <file>qml/Pages/Settings_Network.qml</file>
+        <file>qml/Pages/Settings_Security.qml</file>
+        <file>qml/Pages/Settings_SNMP.qml</file>
         <file>qml/Components/FieldsTable.qml</file>
         <file>qml/Models/MenuItemM.qml</file>
         <file>qml/Models/TableHeaderM.qml</file>

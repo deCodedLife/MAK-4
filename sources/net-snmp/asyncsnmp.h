@@ -10,6 +10,8 @@
 #include <QJsonArray>
 #include <QJsonObject>
 
+#include <string.h>
+
 class AsyncSNMP : public QObject, public QRunnable
 {
     Q_OBJECT

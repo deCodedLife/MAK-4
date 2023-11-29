@@ -39,6 +39,11 @@ Rectangle
 
         Object.keys( rows ).forEach( key => content[ key ] = [] )
 
+        Object.keys( rows ).forEach( key => {
+            if ( typeof( data[ key ] ) === "undefined" ) return;
+            if ( !Array.isArray( data[ key ] ) ) data[ key ] = [ data[ key ] ]
+        } )
+
         let _rowsCount = data[ Object.keys( rows )[ 0 ] ].length
         let _rowsNames = Object.keys( rows )
 
@@ -140,7 +145,7 @@ Rectangle
 
                 Text {
                     text: header
-                    font.pointSize: 16
+                    font.pointSize: Globals.h4
                     font.bold: true
                     Layout.fillWidth: true
                     Layout.leftMargin: 20
@@ -190,7 +195,7 @@ Rectangle
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
 
                         font.bold: true
-                        font.pointSize: 14
+                        font.pointSize: Globals.h5
                     }
                 }
 
@@ -278,7 +283,7 @@ Rectangle
                                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
 
                                 font.bold: true
-                                font.pointSize: 14
+                                font.pointSize: Globals.h6
 
                             }
                         }

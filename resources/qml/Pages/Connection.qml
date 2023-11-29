@@ -8,10 +8,7 @@ import "../Globals"
 
 Page
 {
-    property var configuration: Config[ "main" ]
-
-    function updateConfiguration() {
-    }
+    property var configuration: ConfigManager.get()[ "main" ]
 
     contentHeight: pageContent.implicitHeight + 20
 
@@ -35,7 +32,6 @@ Page
             spacing: 10
 
             CardComponent {
-                property list<string> indexes: [ "host", "port", "snmpVersion", "updateDelay" ]
                 fields: [
                     configuration[ "host" ],
                     configuration[ "port" ],
@@ -46,11 +42,12 @@ Page
                     { highlited: true, color: Globals.accentColor, text: "Соединить", callback: () => { SNMP.updateConnection() } },
                     { highlited: true, color: Globals.errorColor, text: "Отключить", callback: () => { SNMP.dropConnection() } }
                 ]
-                onFieldUpdated: ( index, value ) => {
-                    let newConfig = Config.current
-                    configuration[ indexes[ index ] ][ "value" ] = value
+                onFieldUpdated: ( field, value ) => {
+                    let newConfig = ConfigManager.current
+                    console.log( field, value )
+                    configuration[ field ][ "value" ] = value
                     newConfig[ "main" ] = configuration
-                    Config.current = newConfig
+                    ConfigManager.current = newConfig
                 }
             }
 
@@ -72,6 +69,13 @@ Page
                     configuration[ "v2_write" ],
                     configuration[ "v2_write" ],
                 ]
+
+                onFieldUpdated: ( field, value ) => {
+                    let newConfig = ConfigManager.current
+                    configuration[ field ][ "value" ] = value
+                    newConfig[ "main" ] = configuration
+                    ConfigManager.current = newConfig
+                }
             }
 
             CardComponent {
@@ -85,6 +89,13 @@ Page
                     configuration[ "privPassword" ],
                     configuration[ "privProtocol" ],
                 ]
+
+                onFieldUpdated: ( field, value ) => {
+                    let newConfig = ConfigManager.current
+                    configuration[ field ][ "value" ] = value
+                    newConfig[ "main" ] = configuration
+                    ConfigManager.current = newConfig
+                }
             }
         }
     }

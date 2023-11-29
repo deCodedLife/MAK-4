@@ -36,11 +36,11 @@ Page {
                     expand: true
                 },
                 TableHeaderM {
-                    title: "Температура, °C"
+                    title: "Ток, А"
                     expand: true
                 },
                 TableHeaderM {
-                    title: "Ток, А"
+                    title: "Температура, °C"
                     expand: true
                 },
                 TableHeaderM {
@@ -52,8 +52,8 @@ Page {
                 "psVbvNumber": new Wrappers.RowItem(),
                 "psVbvInpVoltage": new Wrappers.RowItem( Wrappers.RowTypes.DESCRIPTION, Wrappers.divideByHundred ),
                 "psVbvVoltage": new Wrappers.RowItem(),
-                "psVbvTemperature": new Wrappers.RowItem(),
                 "psVbvCurrent": new Wrappers.RowItem( Wrappers.RowTypes.DESCRIPTION, Wrappers.divideByThousand ),
+                "psVbvTemperature": new Wrappers.RowItem(),
                 "psVbvStatus": new Wrappers.RowItem( Wrappers.RowTypes.DESCRIPTION, Wrappers.parseErrors, "str" )
             }
         }

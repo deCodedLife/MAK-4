@@ -10,10 +10,13 @@ if ( APPLE )
 
     set(
         SNMP_LIBS
+
         ${NETSNMP_LIBRARY}
         ${NETSNMPAGENT_LIBRARY}
         ${NETSNMPMIBS_LIBRARY}
         ${NETSNMPTRAPD_LIBRARY}
+
+        ${LIBS_FOLDER}/libsnmppp.a
     )
 
 elseif( WIN32 )

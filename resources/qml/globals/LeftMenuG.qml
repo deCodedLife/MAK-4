@@ -32,16 +32,16 @@ QtObject
 
     property list<Item> settingsMenu: [
         MenuItemM { icon: "back.svg"; title: "Меню"; callback: () => loadMenu( mainMenu ) },
-        MenuItemM { title: "Маски аварий"; page: "Pages/Settings.Masks.qml" },
-        MenuItemM { title: "Общее"; page: "Pages/Settings.Overall.qml" },
-        MenuItemM { title: "Батарея"; page: "Pages/Settings.Battery.qml" },
-        MenuItemM { title: "Контакторы"; page: "Pages/Settings.Contactors.qml" },
-        MenuItemM { title: "Сеть"; page: "Pages/Settings.Power.qml" },
-        MenuItemM { title: "Температура"; page: "Pages/Settings.Temperature.qml" },
-        MenuItemM { title: "Конфигурация"; page: "Pages/Settings.Configuration.qml" },
-        MenuItemM { title: "Сетевые настройки"; page: "Pages/Settings.Network.qml" },
-        MenuItemM { title: "Безопасность"; page: "Pages/Settings.Security.qml" },
-        MenuItemM { title: "SNMP"; page: "Pages/Settings.SNMP.qml" }
+        MenuItemM { title: "Маски аварий"; page: "Pages/Settings_Masks.qml" },
+        MenuItemM { title: "Общее"; page: "Pages/Settings_Overall.qml" },
+        MenuItemM { title: "Батарея"; page: "Pages/Settings_Battery.qml" },
+        MenuItemM { title: "Контакторы"; page: "Pages/Settings_Contactors.qml" },
+        MenuItemM { title: "Сеть"; page: "Pages/Settings_Power.qml" },
+        MenuItemM { title: "Температура"; page: "Pages/Settings_Temperature.qml" },
+        MenuItemM { title: "Конфигурация"; page: "Pages/Settings_Configuration.qml" },
+        MenuItemM { title: "Сетевые настройки"; page: "Pages/Settings_Network.qml" },
+        MenuItemM { title: "Безопасность"; page: "Pages/Settings_Security.qml" },
+        MenuItemM { title: "SNMP"; page: "Pages/Settings_SNMP.qml" }
     ]
 
     property list<Item> settingsButtons: [
