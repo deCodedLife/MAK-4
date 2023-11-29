@@ -5,12 +5,24 @@ import QtQuick.Controls.Material
 
 import "../Components"
 import "../Globals"
+import "../wrappers.mjs" as Wrappers
 
 Page
 {
     property var configuration: ConfigManager.get()[ "snmp" ]
-
     contentHeight: pageContent.implicitHeight + 20
+
+    actionButtonIcon: "qrc:/images/icons/save.svg"
+    actionButtonTitle: "Записать"
+
+    onActionButtonTriggered: SNMP.setMultiple( configuration )
+
+    function updateConfig( field, value ) {
+        let newConfig = ConfigManager.current
+        configuration[ field ][ "value" ] = Wrappers.getFieldValue( configuration[ field ], value )
+        newConfig[ "snmp" ] = configuration
+        ConfigManager.current = newConfig
+    }
 
     ColumnLayout {
         id: pageContent
@@ -31,13 +43,7 @@ Page
             fields: [
                 configuration[ "stSNMPVersion" ]
             ]
-            onFieldUpdated: ( field, value ) => {
-                let newConfig = ConfigManager.current
-                console.log( field, value )
-                configuration[ field ][ "value" ] = value
-                newConfig[ "snmp" ] = configuration
-                ConfigManager.current = newConfig
-            }
+            onFieldUpdated: ( field, value ) => updateConfig( field, value )
         }
 
         RowLayout {
@@ -55,12 +61,7 @@ Page
                     configuration[ `stSNMPAdministratorPrivPassword` ]
                 ]
 
-                onFieldUpdated: ( field, value ) => {
-                    let newConfig = ConfigManager.current
-                    configuration[ field ][ "value" ] = value
-                    newConfig[ "snmp" ] = configuration
-                    ConfigManager.current = newConfig
-                }
+                onFieldUpdated: ( field, value ) => updateConfig( field, value )
             }
 
             CardComponent {
@@ -70,12 +71,7 @@ Page
                     configuration[ `stSNMPEngineerPrivPassword` ]
                 ]
 
-                onFieldUpdated: ( field, value ) => {
-                    let newConfig = ConfigManager.current
-                    configuration[ field ][ "value" ] = value
-                    newConfig[ "snmp" ] = configuration
-                    ConfigManager.current = newConfig
-                }
+                onFieldUpdated: ( field, value ) => updateConfig( field, value )
             }
 
             CardComponent {
@@ -85,12 +81,7 @@ Page
                     configuration[ `stSNMPOperatorPrivPassword` ]
                 ]
 
-                onFieldUpdated: ( field, value ) => {
-                    let newConfig = ConfigManager.current
-                    configuration[ field ][ "value" ] = value
-                    newConfig[ "snmp" ] = configuration
-                    ConfigManager.current = newConfig
-                }
+                onFieldUpdated: ( field, value ) => updateConfig( field, value )
             }
         }
 
@@ -109,12 +100,7 @@ Page
                     configuration[ "stSNMPSPrivAlgo" ],
                 ]
 
-                onFieldUpdated: ( field, value ) => {
-                    let newConfig = ConfigManager.current
-                    configuration[ field ][ "value" ] = value
-                    newConfig[ "snmp" ] = configuration
-                    ConfigManager.current = newConfig
-                }
+                onFieldUpdated: ( field, value ) => updateConfig( field, value )
             }
 
             CardComponent {
@@ -123,12 +109,7 @@ Page
                     configuration[ "stSNMPWriteComunity" ],
                 ]
 
-                onFieldUpdated: ( field, value ) => {
-                    let newConfig = ConfigManager.current
-                    configuration[ field ][ "value" ] = value
-                    newConfig[ "snmp" ] = configuration
-                    ConfigManager.current = newConfig
-                }
+                onFieldUpdated: ( field, value ) => updateConfig( field, value )
             }
         }
 
@@ -157,12 +138,7 @@ Page
                             configuration[ `stSNMPTrap${index + 1}Enable` ],
                         ]
 
-                        onFieldUpdated: ( field, value ) => {
-                            let newConfig = ConfigManager.current
-                            configuration[ field ][ "value" ] = value
-                            newConfig[ "snmp" ] = configuration
-                            ConfigManager.current = newConfig
-                        }
+                        onFieldUpdated: ( field, value ) => updateConfig( field, value )
                     }
                 }
             }

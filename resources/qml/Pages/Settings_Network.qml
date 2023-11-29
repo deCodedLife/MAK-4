@@ -5,12 +5,24 @@ import QtQuick.Controls.Material
 
 import "../Components"
 import "../Globals"
+import "../wrappers.mjs" as Wrappers
 
 Page
 {
     property var configuration: ConfigManager.get()[ "network" ]
-
     contentHeight: pageContent.implicitHeight + 20
+
+    actionButtonIcon: "qrc:/images/icons/save.svg"
+    actionButtonTitle: "Записать"
+
+    onActionButtonTriggered: SNMP.setMultiple( configuration )
+
+    function updateConfig( field, value ) {
+        let newConfig = ConfigManager.current
+        configuration[ field ][ "value" ] = Wrappers.getFieldValue( configuration[ field ], value )
+        newConfig[ "network" ] = configuration
+        ConfigManager.current = newConfig
+    }
 
     ColumnLayout {
         id: pageContent
@@ -33,13 +45,7 @@ Page
                 configuration[ "stNetworkMask" ],
                 configuration[ "stNetworkGateway" ]
             ]
-            onFieldUpdated: ( field, value ) => {
-                let newConfig = ConfigManager.current
-                console.log( field, value )
-                configuration[ field ][ "value" ] = value
-                newConfig[ "network" ] = configuration
-                ConfigManager.current = newConfig
-            }
+            onFieldUpdated: ( field, value ) => updateConfig( field, value )
         }
     }
 }

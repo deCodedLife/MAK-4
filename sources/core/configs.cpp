@@ -102,7 +102,7 @@ QJsonObject Configs::Default()
     mainSettings[ "v2_read" ] = Field::ToJSON( { FieldPassword, V2_READ, "Для чтения" } );
     mainSettings[ "v2_write" ] = Field::ToJSON( { FieldPassword, V2_WRITE, "Для записи" } );
 
-    mainSettings[ "updateDelay" ] = Field::ToJSON( { FieldInput, UPDATE_DELAY, "Период опроса" } );
+    mainSettings[ "updateDelay" ] = Field::ToJSON( { FieldCounter, UPDATE_DELAY, "Период опроса" } );
 
     /**
      * @brief snmpSettings
@@ -214,6 +214,15 @@ QJsonObject Configs::Default()
     securitySettings[ "stEnableRemouteChangeSetting" ] = Field::ToJSON( { FieldCheckbox, 1, "Разрешить изменения удалённо" } );
     securitySettings[ "stEnableRemouteUpdateFirmware" ] = Field::ToJSON( { FieldCheckbox, 0, "Разрешить прошивку удалённо" } );
 
+    /**
+     * @brief configurationSettings
+     */
+    QJsonObject configurationSettings;
+    configurationSettings[ "stBatteryGroupsNumber" ] = Field::ToJSON( { FieldCounter, 0, "Количество групп батареи", {}, 0, 4 } );
+    configurationSettings[ "stLoadFusesNumber" ] = Field::ToJSON( { FieldCounter, 1, "Количество автоматов нагрузки", {}, 1, 52 } );
+    configurationSettings[ "stLVDsNumber" ] = Field::ToJSON( { FieldCombobox, "None", "Kоличество контакторов", { { "None", 0 }, { "Только BLVD", 1 }, { "2-BLVD и LLVD1", 2 }, { "3-BLVD, LLVD1 и LLVD2", 3 } } } );
+    configurationSettings[ "stVBVNumber" ] = Field::ToJSON( { FieldCounter, 1, "Kоличество ВБВ", {}, 1, 180 } );
+
 
     data[ "main" ] = mainSettings;
     data[ "snmp" ] = snmpSettings;
@@ -224,6 +233,7 @@ QJsonObject Configs::Default()
     data[ "blvd" ] = blvdSettings;
     data[ "temperature" ] = temperatureSettings;
     data[ "security" ] = securitySettings;
+    data[ "configuration" ] = configurationSettings;
 
     for ( QString settingsLayer : data.keys() )
     {

@@ -7,7 +7,8 @@ export const RowTypes =
     INPUT: 2,
     PASSWORD: 3,
     COMBOBOX: 4,
-    CHECHBOX: 5,
+    CHECKBOX: 5,
+    COUNTER: 6
 }
 
 export class RowItem
@@ -53,6 +54,12 @@ export function secondsToMinutes( value ){ return (value / 60).toFixed(2) }
 export function parseVersion( value ) {
     value = value.toString()
     return `${value[0]}.${value[1]}.${value[2]}`
+}
+
+export function getFieldValue( field, value ) {
+    if ( field[ "type" ] !== RowTypes.CHECKBOX && field[ "type" ] !== RowTypes.COUNTER )
+        return value
+    else return parseInt( value )
 }
 
 export function parseErrors ( value ) {

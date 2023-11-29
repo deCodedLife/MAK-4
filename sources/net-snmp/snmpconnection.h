@@ -48,6 +48,7 @@ public:
     Q_INVOKABLE void getOIDs( QString uid, QList<QString> );
     Q_INVOKABLE void getTable( QString oid );
     Q_INVOKABLE void setOID( QString, QVariant );
+    Q_INVOKABLE void setMultiple( QJsonObject );
 
     Q_INVOKABLE QString dateToReadable( QString );
     Q_INVOKABLE QJsonArray getGroup( QString );
