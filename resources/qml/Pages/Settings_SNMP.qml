@@ -24,6 +24,10 @@ Page
         spacing: 10
 
         CardComponent {
+            Layout.maximumWidth: 1200
+            Layout.alignment: Qt.AlignHCenter| Qt.AlignTop
+            Layout.fillWidth: true
+
             fields: [
                 configuration[ "stSNMPVersion" ]
             ]
