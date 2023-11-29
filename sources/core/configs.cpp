@@ -201,10 +201,19 @@ QJsonObject Configs::Default()
      * @brief temperatureSettings
      */
     QJsonObject temperatureSettings;
-    temperatureSettings[ "stNumberTemperatureSensors" ] = Field::ToJSON( { FieldCounter, 0, "Количество датчиков температуры", {}, 1, 2 } );
+    temperatureSettings[ "stNumberTemperatureSensors" ] = Field::ToJSON( { FieldCounter, 1, "Количество датчиков температуры", {}, 1, 2 } );
     temperatureSettings[ "stLowTemperatureTherehold" ] = Field::ToJSON( { FieldCounter, 0, "Нижний порог температуры, °С:", {}, 0 } );
     temperatureSettings[ "stHightTemperatureTherehold" ] = Field::ToJSON( { FieldCounter, 0, "Верхний порог температуры, °С", {}, 0 } );
     temperatureSettings[ "stTemperatureGisteresis" ] = Field::ToJSON( { FieldCounter, 0, "Гистерезис, °С", {}, 0 } );
+
+    /**
+     * @brief securitySettings
+     */
+    QJsonObject securitySettings;
+    securitySettings[ "stMonitoringPassword" ] = Field::ToJSON( { FieldInput, "", "Пароль для просмотра данных по Modbus, USB, RS485" } );
+    securitySettings[ "stEnableRemouteChangeSetting" ] = Field::ToJSON( { FieldCheckbox, 0, "Разрешить изменения удалённо" } );
+    securitySettings[ "stEnableRemouteUpdateFirmware" ] = Field::ToJSON( { FieldCheckbox, 0, "Разрешить прошивку удалённо" } );
+
 
     data[ "main" ] = mainSettings;
     data[ "snmp" ] = snmpSettings;
@@ -214,6 +223,7 @@ QJsonObject Configs::Default()
     data[ "battery" ] = batterySettings;
     data[ "blvd" ] = blvdSettings;
     data[ "temperature" ] = temperatureSettings;
+    data[ "security" ] = securitySettings;
 
     for ( QString settingsLayer : data.keys() )
     {
