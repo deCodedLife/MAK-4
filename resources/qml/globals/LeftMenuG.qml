@@ -52,5 +52,9 @@ QtObject
     property list<Item> currentMenu: mainMenu
     property list<Item> menuButtons: []
 
-    function loadMenu( items: list<Item> ) { currentMenu = items; menuButtons = [] }
+    function loadMenu( items: list<Item> ) {
+        SNMP.updateConfigs()
+        currentMenu = items
+        menuButtons = []
+    }
 }

@@ -12,7 +12,8 @@ QtObject
     property string succsessColor: "#45CC52"
     property string yellow: "#F1DD23"
 
-    property string textColor: "#8D8D8D"
+    property string grayAccent: "#8D8D8D"
+    property string textColor: "#505050"
     property string grayScale: "#D9D9D9"
 
     property int dpi: Screen.PixelDensity * 25.4

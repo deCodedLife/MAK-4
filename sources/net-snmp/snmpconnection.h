@@ -20,7 +20,8 @@
 
 enum States {
     Disconnected,
-    Connected
+    Connected,
+    SyncConfigs
 };
 
 class SNMPConnection : public TObject
@@ -31,6 +32,7 @@ class SNMPConnection : public TObject
 signals:
     void stateChanged( States );
 
+    void gotSettings();
     void gotTablesCount( QString, int );
     void gotRowsContent( QString, QJsonObject );
 
@@ -49,6 +51,7 @@ public:
     Q_INVOKABLE void getTable( QString oid );
     Q_INVOKABLE void setOID( QString, QVariant );
     Q_INVOKABLE void setMultiple( QJsonObject );
+    Q_INVOKABLE void updateConfigs();
 
     Q_INVOKABLE QString dateToReadable( QString );
     Q_INVOKABLE QJsonArray getGroup( QString );

@@ -10,8 +10,6 @@
 #include <QJsonArray>
 #include <QJsonObject>
 
-#include <string.h>
-
 class AsyncSNMP : public QObject, public QRunnable
 {
     Q_OBJECT
@@ -25,6 +23,7 @@ public:
     void setBounds( SNMPpp::OID from, SNMPpp::OID to = "" );
     void setOIDs( QList<SNMPpp::OID> );
     void setUID( QString );
+    void worker( SNMPpp::PDU );
 
     void run() override;
 
@@ -35,8 +34,10 @@ private:
     SNMPpp::OID startFrom;
     SNMPpp::OID endAt;
 
+    int limit {10};
     QString uid;
     QList<SNMPpp::OID> request {};
+    QMap<SNMPpp::OID, QJsonObject> fields;
 
 };
 
