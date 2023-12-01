@@ -15,11 +15,24 @@ Page
     actionButtonIcon: "qrc:/images/icons/save.svg"
     actionButtonTitle: "Записать"
 
-    onActionButtonTriggered: SNMP.setMultiple( configuration )
+    onActionButtonTriggered: {
+        let changes = {}
+        let keys = Object.keys( configuration )
+
+        for ( let i = 0; i < keys.length; i++ )
+        {
+            let currentConfig = configuration[ keys[i] ]
+            if ( currentConfig[ "changed" ] ) changes[ keys[ i ] ] = currentConfig
+            configuration[ keys[i] ][ "changed" ] = false
+        }
+
+        SNMP.setMultiple( changes )
+    }
 
     function updateConfig( field, value ) {
         let newConfig = ConfigManager.current
         configuration[ field ][ "value" ] = Wrappers.getFieldValue( configuration[ field ], value )
+        configuration[ field ][ "changed" ] = true
         newConfig[ "snmp" ] = configuration
         ConfigManager.current = newConfig
     }
@@ -28,7 +41,7 @@ Page
     {
         target: SNMP
 
-        function onGotSettings()
+        function onSettingsChanged()
         {
             configuration = ConfigManager.get()[ "snmp" ]
         }

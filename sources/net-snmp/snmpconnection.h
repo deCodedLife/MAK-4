@@ -32,7 +32,7 @@ class SNMPConnection : public TObject
 signals:
     void stateChanged( States );
 
-    void gotSettings();
+    void settingsChanged();
     void gotTablesCount( QString, int );
     void gotRowsContent( QString, QJsonObject );
 
