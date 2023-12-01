@@ -21,6 +21,7 @@ Rectangle
     property bool loaded
     property string header: ""
     property list<Item> headers
+    property int updateInterval: ConfigManager.get()[ "main" ][ "updateDelay" ][ "value" ] * 1000
 
     color: "white"
     radius: 10
@@ -303,7 +304,7 @@ Rectangle
         triggeredOnStart: true
         repeat: true
         running: true
-        interval: 20 * 1000
+        interval: updateInterval
         onTriggered: updateViaContent()
     }
 }

@@ -18,7 +18,7 @@ Page
 
     Timer
     {
-        interval: 20 * 1000
+        interval: Math.max( ConfigManager.get()[ "main" ][ "updateDelay" ][ "value" ] * 1000, 10000 )
         triggeredOnStart: true
         running: true
         repeat: true
