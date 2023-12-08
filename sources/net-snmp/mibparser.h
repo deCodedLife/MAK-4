@@ -8,6 +8,7 @@
 #include <QFile>
 #include <QMap>
 #include <QJsonArray>
+#include <QStringBuilder>
 #include <SNMPpp/Varlist.hpp>
 
 #include <net-snmp/net-snmp-config.h>
@@ -25,6 +26,9 @@ public:
     Q_INVOKABLE QJsonObject getObject( QString );
     QMap<QString, oid_object> MIB_OBJECTS;
     QMap<SNMPpp::OID, QString> OID_TOSTR;
+
+    SNMPpp::OID ToOID( QString );
+    QString FromOID( SNMPpp::OID );
 
 private:
     void parseTree( const tree *mib, SNMPpp::OID oid );

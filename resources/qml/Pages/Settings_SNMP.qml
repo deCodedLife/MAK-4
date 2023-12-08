@@ -10,6 +10,7 @@ import "../wrappers.mjs" as Wrappers
 Page
 {
     property var configuration: ConfigManager.get()[ "snmp" ]
+    property list<string> changed: []
     contentHeight: pageContent.implicitHeight + 20
 
     actionButtonIcon: "qrc:/images/icons/save.svg"
@@ -22,8 +23,11 @@ Page
         for ( let i = 0; i < keys.length; i++ )
         {
             let currentConfig = configuration[ keys[i] ]
-            if ( currentConfig[ "changed" ] ) changes[ keys[ i ] ] = currentConfig
-            configuration[ keys[i] ][ "changed" ] = false
+            let isChanged = changed.includes( keys[i] )
+            if ( isChanged ) {
+                changes[ keys[ i ] ] = currentConfig
+                changed.splice( i, 1 )
+            }
         }
 
         SNMP.setMultiple( changes )
@@ -32,7 +36,7 @@ Page
     function updateConfig( field, value ) {
         let newConfig = ConfigManager.current
         configuration[ field ][ "value" ] = Wrappers.getFieldValue( configuration[ field ], value )
-        configuration[ field ][ "changed" ] = true
+        changed.push( field )
         newConfig[ "snmp" ] = configuration
         ConfigManager.current = newConfig
     }

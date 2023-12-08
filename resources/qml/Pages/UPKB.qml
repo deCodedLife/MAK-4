@@ -10,16 +10,15 @@ import "../wrappers.mjs" as Wrappers
 Page
 {
     id: root
-
     contentHeight: content.implicitHeight + 20
 
-    property string columnOID: "psBlockGroup.1"
-    property string tableName: "PSBlockEntry"
+    property string columnOID: "psBlockGroup"
+    property string tableName: "psBlockEntry"
     property int tablesCount: 0
 
     Timer
     {
-        interval: 20 * 1000
+        interval: Math.max( ConfigManager.get()[ "main" ][ "updateDelay" ][ "value" ] * 1000, 10000 )
         triggeredOnStart: true
         running: true
         repeat: true
@@ -36,8 +35,7 @@ Page
         function onGotRowsContent( root: string, data: object )
         {
             if ( root !== columnOID ) return
-            console.log( JSON.stringify( data ) )
-            tablesCount = Object.keys( data[ columnOID ] ).length
+            tablesCount = Object.keys( data ).length
         }
     }
 
@@ -67,7 +65,7 @@ Page
 
             function calcRows() {
                 grid.rows = width >= 1000 ? 2 : 1
-                grid.columns = width >= 1000 ? tablesCount : 2
+                grid.columns = width >= 1000 ? 4 : 2
             }
 
             Component.onCompleted: calcRows()
@@ -79,10 +77,9 @@ Page
                 TableComponent {
                     Layout.alignment: Qt.AlignTop
                     header: "УПКБ" + (index + 1)
-                    tableOID: "PSBlockEntry"
-                    reversed: true
+                    tableOID: "psBlockEntry"
                     external: true
-                    column: index + 1
+                    // column: index + 1
 
                     headers: [
                         TableHeaderM { title: "Номер"; expand: false },
@@ -91,11 +88,15 @@ Page
                         TableHeaderM { title: "Состояние"; expand: false }
                     ]
 
+                    property string numberRow: `psBlockNumber${index}`
+
                     rows: {
-                        "psBlockNumber": new Wrappers.RowItem( Wrappers.RowTypes.TEXT ),
-                        "psBlockVoltage": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByHundred, "num" ),
-                        "psBlockTemperature": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByHundred, "num" ),
-                        "psBlockStatus": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.parseErrors, "str" )
+                        let rowsObj = {}
+                        rowsObj[ `psBlockNumber.${index + 1}` ] = new Wrappers.RowItem( Wrappers.RowTypes.TEXT )
+                        rowsObj[ `psBlockVoltage.${index + 1}` ] = new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByHundred, "num" )
+                        rowsObj[ `psBlockTemperature.${index + 1}` ] = new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByHundred, "num" )
+                        rowsObj[ `psBlockStatus.${index + 1}` ] = new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.parseErrors, "str" )
+                        return rowsObj
                     }
                 }
             }

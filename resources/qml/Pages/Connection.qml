@@ -35,7 +35,7 @@ Page
                 fields: [
                     configuration[ "host" ],
                     configuration[ "port" ],
-                    configuration[ "snmpVersion" ],
+                    configuration[ "stSNMPVersion" ],
                     configuration[ "updateDelay" ],
                 ]
                 buttons: [
@@ -82,12 +82,12 @@ Page
                 header: "SNMP v3"
                 // TODO find value from array in combobox
                 fields: [
-                    configuration[ "user" ],
+                    configuration[ "stSNMPAdministratorName" ],
                     configuration[ "authMethod" ],
-                    configuration[ "authPassword" ],
-                    configuration[ "authProtocol" ],
-                    configuration[ "privPassword" ],
-                    configuration[ "privProtocol" ],
+                    configuration[ "stSNMPAdministratorAuthPassword" ],
+                    configuration[ "stSNMPSAuthAlgo" ],
+                    configuration[ "stSNMPAdministratorPrivPassword" ],
+                    configuration[ "stSNMPSPrivAlgo" ],
                 ]
 
                 onFieldUpdated: ( field, value ) => {

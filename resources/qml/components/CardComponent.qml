@@ -94,7 +94,7 @@ Rectangle
                         value: modelData[ "value" ]
                         onChanged: {
                             if ( !acceptableInput ) return
-                            if ( Wrappers.getFieldValue( modelData, text ) === modelData[ "value" ] ) return
+                            if ( Wrappers.getFieldValue( modelData, text ) === textfield.value ) return
                             fieldUpdated( modelData[ "field" ], text )
                         }
                         echoMode: modelData[ "type" ] === 3 ? TextField.Password : TextField.Normal

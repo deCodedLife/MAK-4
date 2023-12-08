@@ -89,15 +89,15 @@ QJsonObject Configs::Default()
      * @brief mainSettings
      */
     QJsonObject mainSettings;
-    mainSettings[ "snmpVersion" ] = Field::ToJSON( { FieldCombobox, SNMP_VERSION, "Версия SNMP", { {"snmpV2c", 2}, {"snmpV3", 3 } } } );
+    mainSettings[ "stSNMPVersion" ] = Field::ToJSON( { FieldCombobox, SNMP_VERSION, "Версия SNMP", { {"snmpV2c", 2}, {"snmpV3", 3 } } } );
     mainSettings[ "host" ] = Field::ToJSON( { FieldInput, HOST, "IP адрес" } );
     mainSettings[ "port" ] = Field::ToJSON( { FieldInput, PORT, "Порт" } );
-    mainSettings[ "user" ] = Field::ToJSON( { FieldInput, USER, "Имя" } );
+    mainSettings[ "stSNMPAdministratorName" ] = Field::ToJSON( { FieldInput, USER, "Имя" } );
     mainSettings[ "authMethod" ] = Field::ToJSON( { FieldCombobox, AUTH_METHOD, "Уровень", { { "authPriv", 0 }, { "authNoPriv", 0 } } } );
-    mainSettings[ "authProtocol" ] = Field::ToJSON( { FieldCombobox, AUTH_PROTOCOL, "Протокол аутентификации", { { "SHA1", 0 }, { "MD5", 0 } } } );
-    mainSettings[ "privProtocol" ] = Field::ToJSON( { FieldCombobox, PRIV_PROTOCOL, "Протокол приватноси", { {"DES", 0}, {"AES", 0} } } );
-    mainSettings[ "authPassword" ] = Field::ToJSON( { FieldPassword, AUTH_PASSWORD, "Пароль аутентификации" } );
-    mainSettings[ "privPassword" ] = Field::ToJSON( { FieldPassword, PRIV_PASSWORD, "Пароль приватности" } );
+    mainSettings[ "stSNMPSAuthAlgo" ] = Field::ToJSON( { FieldCombobox, AUTH_PROTOCOL, "Протокол аутентификации", { { "SHA1", 0 }, { "MD5", 0 } } } );
+    mainSettings[ "stSNMPSPrivAlgo" ] = Field::ToJSON( { FieldCombobox, PRIV_PROTOCOL, "Протокол приватноси", { {"DES", 0}, {"AES", 0} } } );
+    mainSettings[ "stSNMPAdministratorAuthPassword" ] = Field::ToJSON( { FieldPassword, AUTH_PASSWORD, "Пароль аутентификации" } );
+    mainSettings[ "stSNMPAdministratorPrivPassword" ] = Field::ToJSON( { FieldPassword, PRIV_PASSWORD, "Пароль приватности" } );
 
     mainSettings[ "v2_read" ] = Field::ToJSON( { FieldPassword, V2_READ, "Для чтения" } );
     mainSettings[ "v2_write" ] = Field::ToJSON( { FieldPassword, V2_WRITE, "Для записи" } );

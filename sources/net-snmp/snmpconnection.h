@@ -60,11 +60,12 @@ public:
     QMap< int, QString > errors;
 
 public slots:
-    Q_INVOKABLE void updateConnection();
+    Q_INVOKABLE void updateConnection( bool sync = false );
     Q_INVOKABLE void dropConnection();
     void proceed( AsyncSNMP* );
     void handleSNMPRequest( QString, QMap<SNMPpp::OID, QJsonObject> );
     void handleSNMPFinished( int );
+    void validateConnection( QString, QMap<SNMPpp::OID, QJsonObject> );
 
 private:
     void initFields();

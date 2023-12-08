@@ -44,7 +44,7 @@ Rectangle
         for ( let rowIndex = 0; rowIndex < _rowNames.length; rowIndex++ )
         {
             let rowSlice = fields.slice( rowIndex * fieldsRows, ( rowIndex + 1 ) * fieldsRows )
-            let oidsMap = rowSlice.map( field => field.oid ?? "" )
+            let oidsMap = rowSlice.map( field => field.oid + ".0" ?? "" )
             oidsMap = oidsMap.filter( oid => oid !== "" )
 
             if ( oidsMap.length === 0 ) continue
