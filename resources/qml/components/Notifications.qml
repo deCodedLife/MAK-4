@@ -8,10 +8,10 @@ import "../Globals"
 Item
 {
     property ListModel notifications: ListModel {
-        ListElement{ type: 0; description: "fewfwefmeownfvoerigvfnoefvwep"; delay: 100000 }
-        ListElement{ type: 0; description: "fewfwefmeownfvoerigvfnoefvwep"; delay: 100000 }
-
-        onCountChanged: removeTimer.start()
+        onCountChanged: {
+            if ( notifications.count === 0 ) return
+            removeTimer.start()
+        }
     }
 
     Connections
@@ -48,16 +48,23 @@ Item
             }
         }
         removeDisplaced:Transition{
-            NumberAnimation{ property:"y"; duration: 500; easing.type: Easing.InOutQuad }
+            NumberAnimation{
+                property:"y"
+                duration: 500
+                easing.type: Easing.InOutQuad
+            }
         }
 
         delegate: Item
         {
+
             width: list.width
             height: contentLayout.implicitHeight + 30
 
             Popup
             {
+                z: 2
+
                 width: parent.width
                 height: parent.height
 
@@ -67,7 +74,10 @@ Item
                 focus: type === 1
                 closePolicy: Popup.NoAutoClose
 
+                Material.theme: Material.Dark
+
                 contentItem: RowLayout {
+                    z: 2
                     id: contentLayout
                     spacing: 10
                     anchors.margins: 10
@@ -83,7 +93,7 @@ Item
                                 PropertyChanges {
                                     target: eventItem
                                     icon.source: "qrc:/images/icons/notifications.svg"
-                                    icon.color: "black"
+                                    icon.color: "white"
                                 }
                             },
                             State
@@ -92,7 +102,7 @@ Item
                                 PropertyChanges {
                                     target: eventItem
                                     icon.source: "qrc:/images/icons/error.svg"
-                                    icon.color: "black"
+                                    icon.color: "white"
                                 }
                             }
 
@@ -102,7 +112,7 @@ Item
                     Text {
                         id: textItem
                         Layout.fillWidth: true
-                        color: "black"
+                        color: "white"
                         text: description
                         font.pointSize: Globals.h5
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -110,6 +120,12 @@ Item
                 }
 
                 Component.onCompleted: open()
+            }
+
+            MouseArea {
+                z: 9999
+                anchors.fill: parent
+                onClicked: notifications.remove( index )
             }
         }
     }

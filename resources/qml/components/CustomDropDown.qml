@@ -28,10 +28,11 @@ ComboBox
         }
     }
 
+    onModelChanged: find()
+
     Component.onCompleted: {
         pTextItem.color = Globals.textColor
         pComboBack.filled = true
         pComboBack.fillColor = Globals.backgroundColor
-        find()
     }
 }

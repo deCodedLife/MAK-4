@@ -34,7 +34,7 @@ Page
             CustomSwitch {
                 id: handControl
                 toggled: contactorsConfigs[ "stContactorControl" ] === 1
-                onContentChanged: {
+                onContentChanged: (value) => {
                     let newConfig = ConfigManager.current
                     contactorsConfigs[ "stContactorControl" ] = value
                     newConfig[ "blvd" ] = contactorsConfigs
