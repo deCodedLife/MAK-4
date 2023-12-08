@@ -14,6 +14,8 @@ Page
     id: root
     contentHeight: content.implicitHeight
 
+    property var contactorsConfigs: ConfigManager.get()[ "blvd" ]
+
     ColumnLayout {
         id: content
 
@@ -31,6 +33,14 @@ Page
 
             CustomSwitch {
                 id: handControl
+                toggled: contactorsConfigs[ "stContactorControl" ] === 1
+                onContentChanged: {
+                    let newConfig = ConfigManager.current
+                    contactorsConfigs[ "stContactorControl" ] = value
+                    newConfig[ "blvd" ] = contactorsConfigs
+                    ConfigManager.current = newConfig
+                    SNMP.setMultiple( [ { "stContactorControl": contactorsConfigs[ "stContactorControl" ] } ] )
+                }
                 text: "Ручное управление"
             }
 

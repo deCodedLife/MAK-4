@@ -87,5 +87,6 @@
         <file>qml/Models/TableHeaderM.qml</file>
         <file>qml/Models/TableRowM.qml</file>
         <file>qml/wrappers.mjs</file>
+        <file>qml/Components/Notifications.qml</file>
     </qresource>
 </RCC>

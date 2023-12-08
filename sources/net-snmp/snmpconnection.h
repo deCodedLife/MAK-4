@@ -37,6 +37,7 @@ signals:
     void gotRowsContent( QString, QJsonObject );
 
     void launchThreadPool();
+    void notify(int status, QString message, int delay_ms);
 
 public:
     explicit SNMPConnection(QObject *parent = nullptr);
