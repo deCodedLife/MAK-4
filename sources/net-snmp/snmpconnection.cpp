@@ -84,6 +84,13 @@ void SNMPConnection::handleSNMPRequest( QString root, QMap<SNMPpp::OID, QJsonObj
 {
     if ( rows.empty() ) return;
 
+    if ( root == "initSession" ) {
+        QString oid = parser.MIB_OBJECTS[ "stSNMPVersion" ].oid;
+        QJsonObject result = rows[ SNMPpp::OID( oid.toStdString() + ".0" )  ];
+        int snmpVersion = result[ "num" ].toInt();
+        if ( snmpVersion != 1 && snmpVersion != 3 ) return;
+    }
+
     if ( _state == Disconnected ) {
         emit notify( 0, "Подключено", 3000 );
     }
@@ -173,6 +180,7 @@ void SNMPConnection::setMultiple( QJsonObject fields )
 {
     int limit {10};
     int counter {0};
+    bool hasError = false;
 
     for( QString key : fields.keys() )
     {
@@ -229,10 +237,17 @@ void SNMPConnection::setMultiple( QJsonObject fields )
             }
 
             emit notify(-1, "Не удалось записать объект " + objectName, 3000 );
+            hasError = true;
         }
 
         pdu.free();
     }
+    if ( hasError )
+    {
+         return;
+    }
+
+    emit notify( 0, "Все настройки успешно записаны", 3000 );
     emit settingsChanged();
 }
 
@@ -385,7 +400,7 @@ void SNMPConnection::updateConnection()
             return;
         }
 
-        getOIDs( "", { "stSNMPVersion" } );
+        getOIDs( "initSession", { "stSNMPVersion" } );
     }
     catch ( const std::exception &e )
     {
