@@ -39,8 +39,9 @@ enum FieldTypes
     FieldInput,
     FieldPassword,
     FieldCombobox,
-    FieldCheckbox,
-    FieldCounter
+    FieldSwitch,
+    FieldCounter,
+    FieldCheckbox
 };
 
 struct Field
