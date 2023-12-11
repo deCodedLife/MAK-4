@@ -63,8 +63,8 @@ struct Field
         field[ "description" ] = f.description;
         field[ "model" ] = f.model;
         field[ "filed" ] = f.field;
-        field[ "min" ] = f.min;
-        field[ "max" ] = f.max;
+        if ( f.min != -1 ) field[ "min" ] = f.min;
+        if ( f.max != -1 ) field[ "max" ] = f.max;
         return field;
     };
     static Field FromJSON( QJsonObject obj )
@@ -75,8 +75,8 @@ struct Field
         f.description = obj[ "description" ].toString();
         f.model = obj[ "model" ].toObject();
         f.field = obj[ "field" ].toString();
-        f.min = obj[ "min" ].toInt();
-        f.max = obj[ "max" ].toInt();
+        if ( obj.contains( "min" ) ) f.min = obj[ "min" ].toInt();
+        if ( obj.contains( "max" ) ) f.min = obj[ "max" ].toInt();
         return f;
     }
 };

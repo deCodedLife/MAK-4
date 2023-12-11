@@ -55,13 +55,29 @@ Page
             spacing: 10
 
             CardComponent {
-                fields: [
-                    configuration[ `stFloatVoltage` ],
-                    configuration[ `stEqualizeVoltage` ],
-                    configuration[ `stCriticalLowVoltage` ],
-                    configuration[ `stChargeCurrentLimit` ],
-                    configuration[ `stEqualizeTime` ]
-                ]
+                fields: {
+                    let _fields = []
+
+                    let floatVoltage = configuration[ "stFloatVoltage" ]
+                    floatVoltage[ "wrapper" ] = Wrappers.byHundredZeroOne
+                    _fields.push( floatVoltage )
+
+                    let eqVoltage = configuration[ "stEqualizeVoltage" ]
+                    eqVoltage[ "wrapper" ] = Wrappers.byHundredZeroOne
+                    _fields.push( eqVoltage )
+
+                    let lowVoltage = configuration[ "stCriticalLowVoltage" ]
+                    lowVoltage[ "wrapper" ] = Wrappers.byHundredZeroOne
+                    _fields.push( lowVoltage )
+
+                    let chargeLimit = configuration[ "stChargeCurrentLimit" ]
+                    chargeLimit[ "wrapper" ] = Wrappers.byHundredZeroOne
+                    _fields.push( chargeLimit )
+
+                    _fields.push( configuration[ "stEqualizeTime" ] )
+
+                    return _fields
+                }
 
                 onFieldUpdated: ( field, value ) => updateConfig( field, value )
             }
@@ -71,28 +87,38 @@ Page
 
 
                 CardComponent {
-                    fields: [
-                        configuration[ `stBoostVoltage` ],
-                        configuration[ `stBoostEnable` ]
-                    ]
+                    fields: {
+                        let _fields = []
+                        let boostVoltage = configuration[ "stBoostVoltage" ]
+                        boostVoltage[ "wrapper" ] = Wrappers.byHundredZeroOne
+                        _fields.push( boostVoltage )
+                        _fields.push( configuration[ "stBoostEnable" ] )
+                        return _fields
+                    }
 
                     onFieldUpdated: ( field, value ) => updateConfig( field, value )
                 }
 
                 CardComponent {
-                    fields: [
-                        configuration[ `stTermocompensationCoefficient` ],
-                        configuration[ `stTermocompensationEnable` ]
-                    ]
+                    fields: {
+                        let _fields = []
+                        _fields.push( configuration[ "stTermocompensationCoefficient" ] )
+                        _fields.push( configuration[ "stTermocompensationEnable" ] )
+                        return _fields
+                    }
 
                     onFieldUpdated: ( field, value ) => updateConfig( field, value )
                 }
 
                 CardComponent {
-                    fields: [
-                        configuration[ `stEndTestVoltage` ],
-                        configuration[ `stGroupCapacity` ],
-                    ]
+                    fields: {
+                        let _fields = []
+                        let endTestVoltage = configuration[ "stEndTestVoltage" ]
+                        endTestVoltage[ "wrapper" ] = Wrappers.byHundredZeroOne
+                        _fields.push( endTestVoltage )
+                        _fields.push( configuration[ "stGroupCapacity" ] )
+                        return _fields
+                    }
 
                     onFieldUpdated: ( field, value ) => updateConfig( field, value )
                 }

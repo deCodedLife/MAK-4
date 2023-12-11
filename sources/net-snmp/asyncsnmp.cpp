@@ -1,6 +1,6 @@
 #include "asyncsnmp.h"
 
-AsyncSNMP::AsyncSNMP( SNMPpp::SessionHandle& s, SNMPpp::PDU::EType t, QObject *parent )
+AsyncSNMP::AsyncSNMP( SNMPpp::SessionHandle* s, SNMPpp::PDU::EType t, QObject *parent )
     : QObject( parent ),
     session(s),
     type(t)
@@ -30,13 +30,19 @@ void AsyncSNMP::worker( SNMPpp::PDU pdu )
     {
         while ( true )
         {
+            if ( session == NULL || session == nullptr )
+            {
+                emit finished( -1 );
+                return;
+            }
+
             if ( type == SNMPpp::PDU::kGetBulk )
             {
-                pdu = SNMPpp::getBulk( session, currentOID );
+                pdu = SNMPpp::getBulk( *session, currentOID );
             }
             else
             {
-                pdu = SNMPpp::get( session, pdu );
+                pdu = SNMPpp::get( *session, pdu );
             }
 
 
@@ -82,8 +88,6 @@ void AsyncSNMP::worker( SNMPpp::PDU pdu )
             if ( endAt == currentOID ) break;
             if ( type == SNMPpp::PDU::kGet ) break;
         }
-
-        pdu.free();
     }
     catch( std::exception &e )
     {
@@ -111,17 +115,19 @@ void AsyncSNMP::worker( SNMPpp::PDU pdu )
         }
 
         emit finished( errorCode );
-        return;
     }
+
+    pdu.free();
 }
 
 void AsyncSNMP::run()
 {
     SNMPpp::PDU pdu( type );    
-    int counter = 0;
 
     if ( type == SNMPpp::PDU::kGet )
     {
+        int counter = 0;
+
         for ( SNMPpp::OID oid : request )
         {
             pdu.addNullVar( oid );

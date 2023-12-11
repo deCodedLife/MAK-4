@@ -31,6 +31,7 @@ find_package(
     REQUIRED
     COMPONENTS
     Quick
+    Gui
     Network
     HttpServer
     SVG
@@ -48,6 +49,8 @@ qt_add_executable(MAK-4
 qt_add_qml_module(MAK-4
     URI AtolServer
     VERSION 1.0
+    SOURCES sources/gui/customdoublevalidator.h sources/gui/customdoublevalidator.cpp
+    RESOURCES sources/gui/CMakeLists.txt
 )
 
 if ( APPLE )
@@ -75,6 +78,7 @@ target_link_libraries(
     PRIVATE Qt6::Widgets
     PRIVATE Qt6::Svg
     PRIVATE Snmp
+    PRIVATE GUI
 )
 
 target_include_directories(
@@ -82,6 +86,7 @@ target_include_directories(
     ${INCLUDE_FOLDER}
     ${CMAKE_CURRENT_SOURCE_DIR}/sources/core
     ${CMAKE_CURRENT_SOURCE_DIR}/sources/net-snmp
+    ${CMAKE_CURRENT_SOURCE_DIR}/sources/gui
 )
 
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/mibs)

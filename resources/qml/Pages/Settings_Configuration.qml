@@ -51,8 +51,6 @@ Page
             Layout.alignment: Qt.AlignHCenter| Qt.AlignTop
             Layout.fillWidth: true
 
-            enabled: handControl.toggled
-
             fields: [
                 configuration[ "stBatteryGroupsNumber" ],
                 configuration[ "stLoadFusesNumber" ],

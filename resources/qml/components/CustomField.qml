@@ -4,27 +4,46 @@ import QtQuick.Controls.Material
 import QtQuick.Controls.Material.impl
 
 import "../Globals"
+import CustomDoubleValidator 0.1
 
 TextField
 {
     id: control
+    anchors.fill: parent
+
+    property var counterValidator: CustomDoubleValidator {
+        bottom: parent.minValue
+        top: parent.maxValue
+
+    }
+
+    placeholderText: parent.placeholder ?? ""
 
     property MaterialTextContainer pBackground: background
-    property var value
-
-    signal changed( string value )
+    property var value: {
+        if ( parent.wrapper ) return parent.wrapper( parent.value ?? "" )
+        else parent.value ?? ""
+    }
 
     Material.containerStyle: Material.Filled
     Material.accent: Globals.accentColor
+    echoMode: (parent.type ?? 2) === 3 ? TextField.Password : TextField.Normal
+    validator: (parent.type ?? 2) === 6 ? counterValidator : null
 
-    color: Globals.textColor
+    color: (parent.type ?? 2) === 6
+           ? acceptableInput ? Globals.textColor : Globals.errorColor
+           : Globals.textColor
+
     text: value
 
     onTextChanged: {
-        if ( text === "" ) focus = false
+        if ( !acceptableInput ) return
+
+        // if ( text === "" ) focus = false
         if ( text === "" ) return
         if ( text === value ) return
-        changed( text )
+
+        parent.updateField( text )
     }
 
     Component.onCompleted: pBackground.fillColor = Globals.backgroundColor

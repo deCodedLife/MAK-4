@@ -45,11 +45,39 @@ export class ContentItem
     }
 }
 
+export function byHundredZeroOne( value, reverse = false )
+{
+    return reverse
+            ? parseFloat( value ).toFixed(2) / 0.01
+            : value * 0.01
+}
 
-export function divideByTen( value ) { return value / 10 }
-export function divideByHundred( value ) { return value / 100 }
-export function divideByThousand( value ){ return value / 1000 }
-export function secondsToMinutes( value ){ return (value / 60).toFixed(2) }
+export function verySpecificWrapper( value, reverse = false )
+{
+    value = value.toString().split( "C10" )[0]
+    return reverse
+            ? parseFloat( value ).toFixed(2) / 0.01
+            : value * 0.01 + "C10"
+}
+
+export function divideByTen( value, reverse = false ) {
+    return reverse
+            ? parseFloat( value ).toFixed(1) * 10
+            : value / 10
+}
+export function divideByHundred( value, reverse = false ) {
+    return reverse
+            ? parseFloat( value ).toFixed(2) * 100
+            : value / 100
+}
+export function divideByThousand( value, reverse = false ){
+    return reverse
+            ? parseFloat( value ).toFixed(3) * 1000
+            : value / 1000
+}
+export function secondsToMinutes( value, reverse = false ){
+    return reverse ? value * 60 : (value / 60).toFixed(2)
+}
 
 export function parseVersion( value ) {
     value = value.toString()
@@ -57,9 +85,9 @@ export function parseVersion( value ) {
 }
 
 export function getFieldValue( field, value ) {
-    if ( field[ "type" ] !== RowTypes.CHECKBOX && field[ "type" ] !== RowTypes.COUNTER )
-        return value
-    else return parseInt( value )
+    // if ( field[ "type" ] !== RowTypes.CHECKBOX && field[ "type" ] !== RowTypes.COUNTER )
+    return value
+    // else return parseFloat( value ).toFixed(1)
 }
 
 export function parseErrors ( value ) {
