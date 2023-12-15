@@ -272,7 +272,7 @@ void SNMPConnection::updateConfigs()
 
     for ( QString key : configs.keys() )
     {
-        if ( key == "main" || key == "errors" ) continue;
+        if ( key == "main" || key == "errors" || key == "masks" ) continue;
 
         QJsonObject config = configs[ key ].toObject();
         QList<SNMPpp::OID> oids;

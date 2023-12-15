@@ -34,14 +34,14 @@
 
 enum FieldTypes
 {
-    FieldText,
-    FieldDescription,
-    FieldInput,
-    FieldPassword,
-    FieldCombobox,
-    FieldSwitch,
-    FieldCounter,
-    FieldCheckbox
+    FieldText,        //0
+    FieldDescription, //1
+    FieldInput,       //2
+    FieldPassword,    //3
+    FieldCombobox,    //4
+    FieldSwitch,      //5
+    FieldCounter,     //6
+    FieldCheckbox     //7
 };
 
 struct Field
