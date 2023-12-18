@@ -102,7 +102,11 @@ Page
                 CardComponent {
                     fields: {
                         let _fields = []
-                        _fields.push( configuration[ "stTermocompensationCoefficient" ] )
+
+                        let termocompensation = configuration[ "stTermocompensationCoefficient" ]
+                        termocompensation[ "wrapper" ] = Wrappers.divideByTen
+                        _fields.push( termocompensation )
+
                         _fields.push( configuration[ "stTermocompensationEnable" ] )
                         return _fields
                     }

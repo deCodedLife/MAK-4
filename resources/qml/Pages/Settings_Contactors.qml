@@ -59,11 +59,11 @@ Page
                 let blvd1 = configuration[ "stLLVD1DisconnectedVoltage" ]
                 blvd1[ "wrapper" ] = Wrappers.divideByHundred
                 _fields.push( blvd1 )
-                let blvd2 = configuration[ "stLLVD1DisconnectedVoltage" ]
-                blvd1[ "wrapper" ] = Wrappers.divideByHundred
+                let blvd2 = configuration[ "stLLVD2DisconnectedVoltage" ]
+                blvd2[ "wrapper" ] = Wrappers.divideByHundred
                 _fields.push( blvd2 )
-                let blvd3 = configuration[ "stLLVD1DisconnectedVoltage" ]
-                blvd1[ "wrapper" ] = Wrappers.divideByHundred
+                let blvd3 = configuration[ "stLLVD3DisconnectedVoltage" ]
+                blvd3[ "wrapper" ] = Wrappers.divideByHundred
                 _fields.push( blvd3 )
 
 

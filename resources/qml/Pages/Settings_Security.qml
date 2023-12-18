@@ -11,15 +11,32 @@ Page
 {
     property var configuration: ConfigManager.get()[ "security" ]
     contentHeight: pageContent.implicitHeight + 20
+    property list<string> changed: []
 
     actionButtonIcon: "qrc:/images/icons/save.svg"
     actionButtonTitle: "Записать"
 
-    onActionButtonTriggered: SNMP.setMultiple( configuration )
+    onActionButtonTriggered: {
+        let changes = {}
+        let keys = Object.keys( configuration )
+
+        for ( let i = 0; i < keys.length; i++ )
+        {
+            let currentConfig = configuration[ keys[i] ]
+            let isChanged = changed.includes( keys[i] )
+            if ( isChanged ) {
+                changes[ keys[ i ] ] = currentConfig
+                changed.splice( i, 1 )
+            }
+        }
+
+        SNMP.setMultiple( changes )
+    }
 
     function updateConfig( field, value ) {
         let newConfig = ConfigManager.current
         configuration[ field ][ "value" ] = Wrappers.getFieldValue( configuration[ field ], value )
+        changed.push( field )
         newConfig[ "security" ] = configuration
         ConfigManager.current = newConfig
     }

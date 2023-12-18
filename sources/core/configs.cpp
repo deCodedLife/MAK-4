@@ -94,7 +94,7 @@ QJsonObject Configs::Default()
     mainSettings[ "port" ] = Field::ToJSON( { FieldInput, PORT, "Порт" } );
     mainSettings[ "stSNMPAdministratorName" ] = Field::ToJSON( { FieldInput, USER, "Имя" } );
     mainSettings[ "authMethod" ] = Field::ToJSON( { FieldCombobox, AUTH_METHOD, "Уровень", { { "authPriv", 0 }, { "authNoPriv", 0 } } } );
-    mainSettings[ "stSNMPSAuthAlgo" ] = Field::ToJSON( { FieldCombobox, AUTH_PROTOCOL, "Протокол аутентификации", { { "SH", 2 }, { "MD5", 1 } } } );
+    mainSettings[ "stSNMPSAuthAlgo" ] = Field::ToJSON( { FieldCombobox, AUTH_PROTOCOL, "Протокол аутентификации", { { "SHA1", 2 }, { "MD5", 1 } } } );
     mainSettings[ "stSNMPSPrivAlgo" ] = Field::ToJSON( { FieldCombobox, PRIV_PROTOCOL, "Протокол приватноси", { { "DES", 1 }, { "AES", 2 } } } );
     mainSettings[ "stSNMPAdministratorAuthPassword" ] = Field::ToJSON( { FieldPassword, AUTH_PASSWORD, "Пароль аутентификации" } );
     mainSettings[ "stSNMPAdministratorPrivPassword" ] = Field::ToJSON( { FieldPassword, PRIV_PASSWORD, "Пароль приватности" } );
@@ -122,7 +122,7 @@ QJsonObject Configs::Default()
     snmpSettings[ "stSNMPOperatorAuthPassword" ] = Field::ToJSON( { FieldPassword, "*****", "Пароль аутентификации оператора" } );
     snmpSettings[ "stSNMPOperatorPrivPassword" ] = Field::ToJSON( { FieldPassword, "*****", "Приватный пароль оператора" } );
 
-    snmpSettings[ "stSNMPSAuthAlgo" ] = Field::ToJSON( { FieldCombobox, ST_SNMP_AUTH_ALGO, "Протокол приватности", { { "Нет", 0 }, { "MD5", 1 }, { "SH", 2 } } } );
+    snmpSettings[ "stSNMPSAuthAlgo" ] = Field::ToJSON( { FieldCombobox, ST_SNMP_AUTH_ALGO, "Протокол приватности", { { "Нет", 0 }, { "MD5", 1 }, { "SHA1", 2 } } } );
     snmpSettings[ "stSNMPSPrivAlgo" ] = Field::ToJSON( { FieldCombobox, ST_SNMP_PRIV_ALGO, "Протокол шифрования", { { "Нет", 0 }, { "DES", 1 }, { "AES128", 2 } } } );
 
     snmpSettings[ "stSNMPReadComunity" ] = Field::ToJSON( { FieldPassword, "*****", "Коммьюнити для чтения" } );
@@ -195,7 +195,7 @@ QJsonObject Configs::Default()
     batterySettings[ "stTermocompensationCoefficient" ] = Field::ToJSON( { FieldCounter, 35, "Коэффициент термокомпенсации, мВ/эл/°C", {}, 1 } );
     batterySettings[ "stChargeCurrentLimit" ] = Field::ToJSON( { FieldCounter, 10, "Ограничение тока заряда, C10", {}, 0 } );
     batterySettings[ "stGroupCapacity" ] = Field::ToJSON( { FieldCounter, 100, "Ёмкость группы, Ач", {}, 0 } );
-    batterySettings[ "stEqualizeTime" ] = Field::ToJSON( { FieldCounter, 1, "Время выравнивающего заряда", {}, 1, 24 } );
+    batterySettings[ "stEqualizeTime" ] = Field::ToJSON( { FieldCounter, 1, "Время выравнивающего заряда, ч", {}, 1, 24 } );
 
     /**
      * @brief temperatureSettings
@@ -211,7 +211,7 @@ QJsonObject Configs::Default()
      */
     QJsonObject securitySettings;
     securitySettings[ "stMonitoringPassword" ] = Field::ToJSON( { FieldPassword, "********", "Пароль для просмотра данных по Modbus, USB, RS485" } );
-    securitySettings[ "stEnableRemouteChangeSetting" ] = Field::ToJSON( { FieldSwitch, 1, "Разрешить изменения удалённо" } );
+    securitySettings[ "stEnableRemouteChangeSetting" ] = Field::ToJSON( { FieldSwitch, 1, "Разрешить изменения по Modbus" } );
     securitySettings[ "stEnableRemouteUpdateFirmware" ] = Field::ToJSON( { FieldSwitch, 0, "Разрешить прошивку удалённо" } );
 
     /**
@@ -283,11 +283,14 @@ QJsonObject Configs::Default()
 
     errors["480"] = "Авария Li-Ion АБ";
     errors["481"] = "Нет связи с БМС";
-    // errors["512"] = "Контроллер загрузился";
-    // errors["513"] = "Сохранение настроек";
-    // errors["514"] = "Установка часов";
-    // errors["515"] = "Запуск батарейного теста";
-    // errors["516"] = "Запуск выравнивающего заряда";
+
+    QJsonObject journal;
+    journal = errors;
+    journal["512"] = "Контроллер загрузился";
+    journal["513"] = "Сохранение настроек";
+    journal["514"] = "Установка часов";
+    journal["515"] = "Запуск батарейного теста";
+    journal["516"] = "Запуск выравнивающего заряда";
 
 
     data[ "main" ] = mainSettings;
@@ -300,6 +303,7 @@ QJsonObject Configs::Default()
     data[ "temperature" ] = temperatureSettings;
     data[ "security" ] = securitySettings;
     data[ "configuration" ] = configurationSettings;
+
 
     /**
      * @brief masks
@@ -398,6 +402,7 @@ QJsonObject Configs::Default()
     }
 
     data[ "errors" ] = errors;
+    data[ "journal" ] = journal;
     data[ "masks" ] = masksList;
 
     return data;

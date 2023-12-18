@@ -16,5 +16,6 @@ Rectangle
     {
         anchors.fill: parent
         onClicked: checked = !checked
+        cursorShape: Qt.PointingHandCursor
     }
 }

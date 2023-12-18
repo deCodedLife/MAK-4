@@ -34,7 +34,11 @@ ComboBox
     onModelChanged: find()
     onCurrentIndexChanged: {
         if ( preSelected === currentIndex ) return
-        parent.updateField( Object.keys( parent.model ?? [] )[ currentIndex ] )
+        let key = Object.keys( parent.model ?? [] )[ currentIndex ]
+        parent.updateField( key )
+        preSelected = currentIndex
+        parent.value = key
+        find()
     }
 
     Component.onCompleted: {
