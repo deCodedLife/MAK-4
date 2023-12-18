@@ -29,6 +29,7 @@ Page
         FieldsTable {
             Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
             Layout.maximumWidth: 1200
+            activeColumns: 1
 
             headers: [
                 TableHeaderM {

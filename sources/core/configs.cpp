@@ -89,15 +89,15 @@ QJsonObject Configs::Default()
      * @brief mainSettings
      */
     QJsonObject mainSettings;
-    mainSettings[ "snmpVersion" ] = Field::ToJSON( { FieldCombobox, SNMP_VERSION, "Версия SNMP", { {"snmpV2c", 2}, {"snmpV3", 3 } } } );
+    mainSettings[ "stSNMPVersion" ] = Field::ToJSON( { FieldCombobox, SNMP_VERSION, "Версия SNMP", { {"snmpV2c", 2}, {"snmpV3", 3 } } } );
     mainSettings[ "host" ] = Field::ToJSON( { FieldInput, HOST, "IP адрес" } );
     mainSettings[ "port" ] = Field::ToJSON( { FieldInput, PORT, "Порт" } );
-    mainSettings[ "user" ] = Field::ToJSON( { FieldInput, USER, "Имя" } );
+    mainSettings[ "stSNMPAdministratorName" ] = Field::ToJSON( { FieldInput, USER, "Имя" } );
     mainSettings[ "authMethod" ] = Field::ToJSON( { FieldCombobox, AUTH_METHOD, "Уровень", { { "authPriv", 0 }, { "authNoPriv", 0 } } } );
-    mainSettings[ "authProtocol" ] = Field::ToJSON( { FieldCombobox, AUTH_PROTOCOL, "Протокол аутентификации", { { "SHA1", 0 }, { "MD5", 0 } } } );
-    mainSettings[ "privProtocol" ] = Field::ToJSON( { FieldCombobox, PRIV_PROTOCOL, "Протокол приватноси", { {"DES", 0}, {"AES", 0} } } );
-    mainSettings[ "authPassword" ] = Field::ToJSON( { FieldPassword, AUTH_PASSWORD, "Пароль аутентификации" } );
-    mainSettings[ "privPassword" ] = Field::ToJSON( { FieldPassword, PRIV_PASSWORD, "Пароль приватности" } );
+    mainSettings[ "stSNMPSAuthAlgo" ] = Field::ToJSON( { FieldCombobox, AUTH_PROTOCOL, "Протокол аутентификации", { { "SHA1", 2 }, { "MD5", 1 } } } );
+    mainSettings[ "stSNMPSPrivAlgo" ] = Field::ToJSON( { FieldCombobox, PRIV_PROTOCOL, "Протокол приватноси", { { "DES", 1 }, { "AES", 2 } } } );
+    mainSettings[ "stSNMPAdministratorAuthPassword" ] = Field::ToJSON( { FieldPassword, AUTH_PASSWORD, "Пароль аутентификации" } );
+    mainSettings[ "stSNMPAdministratorPrivPassword" ] = Field::ToJSON( { FieldPassword, PRIV_PASSWORD, "Пароль приватности" } );
 
     mainSettings[ "v2_read" ] = Field::ToJSON( { FieldPassword, V2_READ, "Для чтения" } );
     mainSettings[ "v2_write" ] = Field::ToJSON( { FieldPassword, V2_WRITE, "Для записи" } );
@@ -108,7 +108,7 @@ QJsonObject Configs::Default()
      * @brief snmpSettings
      */
     QJsonObject snmpSettings;
-    snmpSettings[ "stSNMPVersion" ] = Field::ToJSON( { FieldCombobox, ST_SNMP_VERSION, "Версия протокола Snmp", { { "snmpV2c", 2 }, { "snmpV3", 3 } } } );
+    snmpSettings[ "stSNMPVersion" ] = Field::ToJSON( { FieldCombobox, ST_SNMP_VERSION, "Версия протокола Snmp", { { "snmpV2c", 1 }, { "snmpV3", 3 } } } );
 
     snmpSettings[ "stSNMPAdministratorName" ] = Field::ToJSON( { FieldInput, "Admin", "Имя администратора" } );
     snmpSettings[ "stSNMPAdministratorAuthPassword" ] = Field::ToJSON( { FieldPassword, "*****", "Пароль аутентификации администратора" } );
@@ -122,8 +122,8 @@ QJsonObject Configs::Default()
     snmpSettings[ "stSNMPOperatorAuthPassword" ] = Field::ToJSON( { FieldPassword, "*****", "Пароль аутентификации оператора" } );
     snmpSettings[ "stSNMPOperatorPrivPassword" ] = Field::ToJSON( { FieldPassword, "*****", "Приватный пароль оператора" } );
 
-    snmpSettings[ "stSNMPSAuthAlgo" ] = Field::ToJSON( { FieldCombobox, ST_SNMP_AUTH_ALGO, "Способ защиты данных", { { "Нет", 0 }, { "MD5", 1 }, { "SHA1", 2 } } } );
-    snmpSettings[ "stSNMPSPrivAlgo" ] = Field::ToJSON( { FieldCombobox, ST_SNMP_PRIV_ALGO, "Способ шифрования", { { "Нет", 0 }, { "DES", 1 }, { "AES128", 2 } } } );
+    snmpSettings[ "stSNMPSAuthAlgo" ] = Field::ToJSON( { FieldCombobox, ST_SNMP_AUTH_ALGO, "Протокол приватности", { { "Нет", 0 }, { "MD5", 1 }, { "SHA1", 2 } } } );
+    snmpSettings[ "stSNMPSPrivAlgo" ] = Field::ToJSON( { FieldCombobox, ST_SNMP_PRIV_ALGO, "Протокол шифрования", { { "Нет", 0 }, { "DES", 1 }, { "AES128", 2 } } } );
 
     snmpSettings[ "stSNMPReadComunity" ] = Field::ToJSON( { FieldPassword, "*****", "Коммьюнити для чтения" } );
     snmpSettings[ "stSNMPWriteComunity" ] = Field::ToJSON( { FieldPassword, "*****", "Коммьюнити для записи" } );
@@ -137,7 +137,7 @@ QJsonObject Configs::Default()
     for ( int index = 1; index < 4; index++ )
     {
         QString numIndex = QString::number( index );
-        snmpSettings[ "stSNMPTrap" + numIndex + "Enable" ] = Field::ToJSON( { FieldCheckbox, 0, "Ip Trap №" + numIndex + " вкл" } );
+        snmpSettings[ "stSNMPTrap" + numIndex + "Enable" ] = Field::ToJSON( { FieldSwitch, 0, "Ip Trap №" + numIndex + " вкл" } );
     }
 
     /**
@@ -152,7 +152,7 @@ QJsonObject Configs::Default()
      */
     QJsonObject overallSettings;
     overallSettings[ "psTimeZone" ] = Field::ToJSON( { FieldCounter, 12, "Часовой пояс", {}, -48, 52 } );
-    overallSettings[ "psBuzzerEnable" ] = Field::ToJSON( { FieldCheckbox, 0, "Звук включен" } );
+    overallSettings[ "psBuzzerEnable" ] = Field::ToJSON( { FieldSwitch, 0, "Звук включен" } );
 
     /**
      * @brief networkSettings
@@ -178,7 +178,7 @@ QJsonObject Configs::Default()
     blvdSettings[ "stLLVD1DisconnectedCapacity" ] = Field::ToJSON( { FieldCounter, 0, "Ёмкость отключения контактора низкоприоритетной нагрузки 1, А⋅ч", {}, 0, 99 } );
     blvdSettings[ "stLLVD2DisconnectedCapacity" ] = Field::ToJSON( { FieldCounter, 0, "Ёмкость отключения контактора низкоприоритетной нагрузки 2, А⋅ч", {}, 0, 99 } );
     blvdSettings[ "stLLVD3DisconnectedCapacity" ] = Field::ToJSON( { FieldCounter, 0, "Ёмкость отключения контактора низкоприоритетной нагрузки 3, А⋅ч", {}, 0, 99 } );
-    blvdSettings[ "stContactorControl" ] = Field::ToJSON( { FieldCheckbox, 0, "Ручное управление" } );
+    blvdSettings[ "stContactorControl" ] = Field::ToJSON( { FieldSwitch, 0, "Ручное управление" } );
 
 
     /**
@@ -187,15 +187,15 @@ QJsonObject Configs::Default()
     QJsonObject batterySettings;
     batterySettings[ "stFloatVoltage" ] = Field::ToJSON( { FieldCounter, 6660, "Напряжение содержания, В", {}, 0 } );
     batterySettings[ "stBoostVoltage" ] = Field::ToJSON( { FieldCounter, 6690, "Напряжение ускоренного заряда, В", {}, 0 } );
-    batterySettings[ "stBoostEnable" ] = Field::ToJSON( { FieldCheckbox, 0, "Ускоренный заряд" } );
+    batterySettings[ "stBoostEnable" ] = Field::ToJSON( { FieldSwitch, 0, "Ускоренный заряд" } );
     batterySettings[ "stEqualizeVoltage" ] = Field::ToJSON( { FieldCounter, 6900, "Напряжение выравнивающего заряда, В", {}, 0 } );
     batterySettings[ "stEndTestVoltage" ] = Field::ToJSON( { FieldCounter, 5400, "Напряжение окончания теста, В", {}, 0 } );
     batterySettings[ "stCriticalLowVoltage" ] = Field::ToJSON( { FieldCounter, 5100, "Напряжение глубокого разряда, В", {}, 0 } );
-    batterySettings[ "stTermocompensationEnable" ] = Field::ToJSON( { FieldCheckbox, 1, "Термокомпенсация" } );
-    batterySettings[ "stTermocompensationCoefficient" ] = Field::ToJSON( { FieldCounter, 35, "Коээфициэнт термокомпенсации, мВ/эл/°C", {}, 1 } );
+    batterySettings[ "stTermocompensationEnable" ] = Field::ToJSON( { FieldSwitch, 1, "Термокомпенсация" } );
+    batterySettings[ "stTermocompensationCoefficient" ] = Field::ToJSON( { FieldCounter, 35, "Коэффициент термокомпенсации, мВ/эл/°C", {}, 1 } );
     batterySettings[ "stChargeCurrentLimit" ] = Field::ToJSON( { FieldCounter, 10, "Ограничение тока заряда, C10", {}, 0 } );
     batterySettings[ "stGroupCapacity" ] = Field::ToJSON( { FieldCounter, 100, "Ёмкость группы, Ач", {}, 0 } );
-    batterySettings[ "stEqualizeTime" ] = Field::ToJSON( { FieldCounter, 1, "Время выравнивающего заряда", {}, 1, 24 } );
+    batterySettings[ "stEqualizeTime" ] = Field::ToJSON( { FieldCounter, 1, "Время выравнивающего заряда, ч", {}, 1, 24 } );
 
     /**
      * @brief temperatureSettings
@@ -211,8 +211,8 @@ QJsonObject Configs::Default()
      */
     QJsonObject securitySettings;
     securitySettings[ "stMonitoringPassword" ] = Field::ToJSON( { FieldPassword, "********", "Пароль для просмотра данных по Modbus, USB, RS485" } );
-    securitySettings[ "stEnableRemouteChangeSetting" ] = Field::ToJSON( { FieldCheckbox, 1, "Разрешить изменения удалённо" } );
-    securitySettings[ "stEnableRemouteUpdateFirmware" ] = Field::ToJSON( { FieldCheckbox, 0, "Разрешить прошивку удалённо" } );
+    securitySettings[ "stEnableRemouteChangeSetting" ] = Field::ToJSON( { FieldSwitch, 1, "Разрешить изменения по Modbus" } );
+    securitySettings[ "stEnableRemouteUpdateFirmware" ] = Field::ToJSON( { FieldSwitch, 0, "Разрешить прошивку удалённо" } );
 
     /**
      * @brief configurationSettings
@@ -220,8 +220,77 @@ QJsonObject Configs::Default()
     QJsonObject configurationSettings;
     configurationSettings[ "stBatteryGroupsNumber" ] = Field::ToJSON( { FieldCounter, 0, "Количество групп батареи", {}, 0, 4 } );
     configurationSettings[ "stLoadFusesNumber" ] = Field::ToJSON( { FieldCounter, 1, "Количество автоматов нагрузки", {}, 1, 52 } );
-    configurationSettings[ "stLVDsNumber" ] = Field::ToJSON( { FieldCombobox, "None", "Kоличество контакторов", { { "None", 0 }, { "Только BLVD", 1 }, { "2-BLVD и LLVD1", 2 }, { "3-BLVD, LLVD1 и LLVD2", 3 } } } );
+    configurationSettings[ "stLVDsNumber" ] = Field::ToJSON( { FieldCombobox, "Нет", "Kоличество контакторов", { { "Нет", 0 }, { "Только BLVD", 1 }, { "2-BLVD и LLVD1", 2 }, { "3-BLVD, LLVD1 и LLVD2", 3 } } } );
     configurationSettings[ "stVBVNumber" ] = Field::ToJSON( { FieldCounter, 1, "Kоличество ВБВ", {}, 1, 180 } );
+
+
+    /**
+     * @brief errors
+     */
+    QJsonObject errors;
+    errors["0"] = "Внутренняя ошибка";
+    errors["32"] = "Напряжение нагрузки понижено";
+    errors["33"] = "Напряжение нагрузки повышено";
+    errors["34"] = "Включена термокомпенсация";
+
+    for ( int index = 1; index <= 52; index++ )
+        errors[ QString::number( index + 34) ] = "Отключен автомат защиты нагрузки " + QString::number( index );
+
+    errors["87"] = "Авария устройства дискретных вводов (УКДВ-1М)";
+    errors["96"] = "Батарея разряжается";
+    errors["97"] = "Глубокий разряда батареи";
+    errors["98"] = "Батарея в режиме заряда";
+    errors["99"] = "Батарея в режиме ускоренного заряды";
+    errors["100"] = "Батарея в режиме содержания";
+    errors["101"] = "Батарея в режиме выравнивающего заряда";
+    errors["102"] = "Идет батарейный тест";
+
+    for ( int index = 1; index <= 4; index++ )
+        errors[ QString::number( index + 102) ] = "Отключен аппарат защиты батереи группы " + QString::number( index );
+
+    for ( int index = 1; index <= 4; index++ )
+        errors[ QString::number( index + 110) ] = "Авария моноблока группы " + QString::number( index ) + " батареи (с УПКБ-М)";
+
+    errors["119"] = "Ошибка связи с УПКБ (устройство поэлементного контроля батареи)";
+    errors["120"] = "Ток заряда меньше 1А";
+    errors["121"] = "Ток заряда меньше 2А";
+    errors["122"] = "Ток заряда меньше 3А";
+    errors["123"] = "Ток заряда меньше 4А";
+    errors["124"] = "Ток заряда меньше 5А";
+    errors["125"] = "Перегрев батареи";
+    errors["126"] = "Идет короткий тест батареи";
+    errors["127"] = "Ошибка короткого теста батареи";
+    errors["128"] = "Батарейный контактор отключен";
+    errors["129"] = "Контактор 1 отключен";
+    errors["130"] = "Контактор 2 отключен";
+
+    for ( int index = 1; index <= 180; index++ )
+        errors[ QString::number( index + 159) ] = "Авария ВБВ " + QString::number( index );
+
+    errors["340"] = "Нет резерва ВБВ";
+    errors["341"] = "Активен режим энергосбережения";
+    errors["352"] = "Авария фазы 1";
+    errors["353"] = "Авария фазы 2";
+    errors["354"] = "Авария фазы 3";
+    errors["355"] = "Ошибка контроля сети";
+    errors["356"] = "Авария секции грозозащиты";
+    errors["384"] = "Температура понижена (с датчика 2)";
+    errors["385"] = "Температура повышена (с датчика 2)";
+    errors["386"] = "Ошибка контроля температуры";
+
+    for ( int index = 1; index <= 16; index++ )
+        errors[ QString::number( index + 415) ] = "Авария сухого контакта " + QString::number( index );
+
+    errors["480"] = "Авария Li-Ion АБ";
+    errors["481"] = "Нет связи с БМС";
+
+    QJsonObject journal;
+    journal = errors;
+    journal["512"] = "Контроллер загрузился";
+    journal["513"] = "Сохранение настроек";
+    journal["514"] = "Установка часов";
+    journal["515"] = "Запуск батарейного теста";
+    journal["516"] = "Запуск выравнивающего заряда";
 
 
     data[ "main" ] = mainSettings;
@@ -234,6 +303,89 @@ QJsonObject Configs::Default()
     data[ "temperature" ] = temperatureSettings;
     data[ "security" ] = securitySettings;
     data[ "configuration" ] = configurationSettings;
+
+
+    /**
+     * @brief masks
+     */
+    QJsonObject masks;
+
+    QJsonArray masksList;
+    QStringList preffixes = { "a1", "a2", "r1", "r2", "r3", "r4" };
+
+    for ( QString preffix: preffixes )
+    {
+        masksList.append( {{ preffix + "InternallError",  Field::ToJSON( { FieldCheckbox, 0, "Внутренняя ошибка" } ) }} );
+
+        masksList.append( {{ preffix + "LoadUnderVoltageAlarm", Field::ToJSON( { FieldCheckbox, 0, "Напряжение нагрузки понижено" } ) }} );
+        masksList.append( {{ preffix + "LoadOverVoltageAlarm", Field::ToJSON( { FieldCheckbox, 0, "Напряжение нагрузки повышено" } ) }} );
+        masksList.append( {{ preffix + "Termocompensation", Field::ToJSON( { FieldCheckbox, 0, "Включена термокомпенсация" } ) }} );
+
+        for ( int fuseIndex = 1; fuseIndex <= 52; fuseIndex++ )
+        {
+            masksList.append( {{ preffix + "LoadFuses" + QString::number( fuseIndex ),
+                Field::ToJSON( { FieldCheckbox, 0, "Отключен автомат защиты нагрузки " + QString::number( fuseIndex ) } ) }} );
+        }
+
+        masksList.append( {{ preffix + "UKDVAlarm", Field::ToJSON( { FieldCheckbox, 0, "Авария устройства дискретных вводов (УКДВ-1М)" } ) }} );
+        masksList.append( {{ preffix + "BatteryDischarge", Field::ToJSON( { FieldCheckbox, 0, "Батарея разряжается" } ) }} );
+        masksList.append( {{ preffix + "LowBatteryVoltage", Field::ToJSON( { FieldCheckbox, 0, "Глубокий разряда батареи" } ) }} );
+        masksList.append( {{ preffix + "BatteryCharge", Field::ToJSON( { FieldCheckbox, 0, "Батарея в режиме заряда" } ) }} );
+        masksList.append( {{ preffix + "BatteryBoost", Field::ToJSON( { FieldCheckbox, 0, "Батарея в режиме ускоренного заряды" } ) }} );
+        masksList.append( {{ preffix + "BatteryFloat", Field::ToJSON( { FieldCheckbox, 0, "Батарея в режиме содержания" } ) }} );
+        masksList.append( {{ preffix + "BatteryEqualize", Field::ToJSON( { FieldCheckbox, 0, "Батарея в режиме выравнивающего заряда" } ) }} );
+        masksList.append( {{ preffix + "BatteryTest", Field::ToJSON( { FieldCheckbox, 0, "Идет батарейный тест" } ) }} );
+        masksList.append( {{ preffix + "BatteryFuse1Off", Field::ToJSON( { FieldCheckbox, 0, "Отключен аппарат защиты батереи группы 1" } ) }} );
+        masksList.append( {{ preffix + "BatteryFuse2Off", Field::ToJSON( { FieldCheckbox, 0, "Отключен аппарат защиты батереи группы 2" } ) }} );
+        masksList.append( {{ preffix + "BatteryFuse3Off", Field::ToJSON( { FieldCheckbox, 0, "Отключен аппарат защиты батереи группы 3" } ) }} );
+        masksList.append( {{ preffix + "BatteryFuse4Off", Field::ToJSON( { FieldCheckbox, 0, "Отключен аппарат защиты батереи группы 4" } ) }} );
+        masksList.append( {{ preffix + "BatteryBlockElGr1Alarm", Field::ToJSON( { FieldCheckbox, 0, "Авария моноблока группы 1 батареи (с УПКБ-М)" } ) }} );
+        masksList.append( {{ preffix + "BatteryBlockElGr2Alarm", Field::ToJSON( { FieldCheckbox, 0, "Авария моноблока группы 2 батареи (с УПКБ-М)" } ) }} );
+        masksList.append( {{ preffix + "BatteryBlockElGr3Alarm", Field::ToJSON( { FieldCheckbox, 0, "Авария моноблока группы 3 батареи (с УПКБ-М)" } ) }} );
+        masksList.append( {{ preffix + "BatteryBlockElGr4Alarm", Field::ToJSON( { FieldCheckbox, 0, "Авария моноблока группы 4 батареи (с УПКБ-М)" } ) }} );
+        masksList.append( {{ preffix + "UPKBAlarm", Field::ToJSON( { FieldCheckbox, 0, "Ошибка связи с УПКБ (устройство поэлементного контроля батареи)" } ) }} );
+        masksList.append( {{ preffix + "ChargeCurrentLess1A", Field::ToJSON( { FieldCheckbox, 0, "Ток заряда меньше 1А" } ) }} );
+        masksList.append( {{ preffix + "ChargeCurrentLess2A", Field::ToJSON( { FieldCheckbox, 0, "Ток заряда меньше 2А" } ) }} );
+        masksList.append( {{ preffix + "ChargeCurrentLess3A", Field::ToJSON( { FieldCheckbox, 0, "Ток заряда меньше 3А" } ) }} );
+        masksList.append( {{ preffix + "ChargeCurrentLess4A", Field::ToJSON( { FieldCheckbox, 0, "Ток заряда меньше 4А" } ) }} );
+        masksList.append( {{ preffix + "ChargeCurrentLess5A", Field::ToJSON( { FieldCheckbox, 0, "Ток заряда меньше 5А" } ) }} );
+        masksList.append( {{ preffix + "BatteryOverheat", Field::ToJSON( { FieldCheckbox, 0, "Перегрев батареи" } ) }} );
+        masksList.append( {{ preffix + "BatteryShortTest", Field::ToJSON( { FieldCheckbox, 0, "Идет короткий тест батареи" } ) }} );
+        masksList.append( {{ preffix + "BatteryShortTestFail", Field::ToJSON( { FieldCheckbox, 0, "Ошибка короткого теста батареи" } ) }} );
+        masksList.append( {{ preffix + "BLVDoff", Field::ToJSON( { FieldCheckbox, 0, "Батарейный контактор отключен" } ) }} );
+        masksList.append( {{ preffix + "LLVD1off", Field::ToJSON( { FieldCheckbox, 0, "Контактор 1 отключен" } ) }} );
+        masksList.append( {{ preffix + "LLVD2off", Field::ToJSON( { FieldCheckbox, 0, "LLVD1off" } ) }} );
+
+        for ( int vbvIndex = 1; vbvIndex <= 180; vbvIndex++ )
+        {
+            masksList.append( {{ preffix + "VBV" + QString::number( vbvIndex ) + "Alarm",
+                Field::ToJSON( { FieldCheckbox, 0, "Авария ВБВ  " + QString::number( vbvIndex ) } ) }} );
+        }
+
+        masksList.append( {{ preffix + "VBVNoReserve", Field::ToJSON( { FieldCheckbox, 0, "Нет резерва ВБВ" } ) }} );
+        masksList.append( {{ preffix + "VBVHighEfficiency", Field::ToJSON( { FieldCheckbox, 0, "Активен режим энергосбережения" } ) }} );
+        masksList.append( {{ preffix + "Phase1Alarm", Field::ToJSON( { FieldCheckbox, 0, "Авария фазы 1" } ) }} );
+        masksList.append( {{ preffix + "Phase2Alarm", Field::ToJSON( { FieldCheckbox, 0, "Авария фазы 2" } ) }} );
+        masksList.append( {{ preffix + "Phase3Alarm", Field::ToJSON( { FieldCheckbox, 0, "Авария фазы 3" } ) }} );
+        masksList.append( {{ preffix + "MainsSensorError", Field::ToJSON( { FieldCheckbox, 0, "Ошибка контроля сети" } ) }} );
+        masksList.append( {{ preffix + "LightProtectionAlarm", Field::ToJSON( { FieldCheckbox, 0, "Авария секции грозозащиты" } ) }} );
+        masksList.append( {{ preffix + "LowTemperature", Field::ToJSON( { FieldCheckbox, 0, "Температура понижена (с датчика 2)" } ) }} );
+        masksList.append( {{ preffix + "HighTemperature", Field::ToJSON( { FieldCheckbox, 0, "Температура повышена (с датчика 2)" } ) }} );
+        masksList.append( {{ preffix + "TemperatureSensorError", Field::ToJSON( { FieldCheckbox, 0, "Ошибка контроля температуры" } ) }} );
+
+        for ( int contactIndex = 1; contactIndex <= 16; contactIndex++ )
+        {
+            masksList.append( {{ preffix + "DryContact" + QString::number( contactIndex ),
+                Field::ToJSON( { FieldCheckbox, 0, "Авария сухого контакта " + QString::number( contactIndex ) } ) }} );
+        }
+
+
+        masksList.append( {{ preffix + "BatteryLiIonAlarm", Field::ToJSON( { FieldCheckbox, 0, "Авария Li-Ion АБ" } ) }} );
+        masksList.append( {{ preffix + "BatteryBMSComFail", Field::ToJSON( { FieldCheckbox, 0, "Нет связи с БМС" } ) }} );
+
+    }
+
+
 
     for ( QString settingsLayer : data.keys() )
     {
@@ -248,6 +400,10 @@ QJsonObject Configs::Default()
 
         data[ settingsLayer ] = layer;
     }
+
+    data[ "errors" ] = errors;
+    data[ "journal" ] = journal;
+    data[ "masks" ] = masksList;
 
     return data;
 }

@@ -7,19 +7,23 @@ Item
 {
     id: control
 
-    property string text
-    property bool toggled: false
-    property bool dobbled: false
+    property string text: parent.placeholder ?? ""
+    property bool toggled: ( parent.value ?? 0 ) === 1
+    property bool dobbled: ( parent.dobbledSwitch ?? false )
 
     signal contentChanged( int value )
     state: toggled ? "enabled" : "disabled"
 
     Layout.fillWidth: true
-    height: content.implicitHeight
+    Layout.alignment: Qt.AlignVCenter
+
+    anchors.fill: parent
+    anchors.centerIn: parent
 
     RowLayout {
         id: content
         anchors.fill: parent
+        anchors.centerIn: parent
 
         spacing: dobbled ? 10 : 5
 
@@ -104,6 +108,7 @@ Item
         cursorShape: Qt.PointingHandCursor
         onClicked: {
             toggled = !toggled
+            control.parent.updateField( toggled )
             contentChanged( toggled )
         }
     }

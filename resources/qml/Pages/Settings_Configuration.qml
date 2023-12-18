@@ -24,6 +24,16 @@ Page
         ConfigManager.current = newConfig
     }
 
+    Connections
+    {
+        target: SNMP
+
+        function onSettingsChanged()
+        {
+            configuration = ConfigManager.get()[ "configuration" ]
+        }
+    }
+
     ColumnLayout {
         id: pageContent
 
@@ -40,8 +50,6 @@ Page
             Layout.maximumWidth: 1200
             Layout.alignment: Qt.AlignHCenter| Qt.AlignTop
             Layout.fillWidth: true
-
-            enabled: handControl.toggled
 
             fields: [
                 configuration[ "stBatteryGroupsNumber" ],

@@ -24,6 +24,16 @@ Page
         ConfigManager.current = newConfig
     }
 
+    Connections
+    {
+        target: SNMP
+
+        function onSettingsChanged()
+        {
+            configuration = ConfigManager.get()[ "blvd" ]
+        }
+    }
+
     ColumnLayout {
         id: pageContent
 
@@ -35,46 +45,40 @@ Page
 
         spacing: 10
 
-
-        CustomSwitch {
-            Layout.maximumWidth: 1200
-            Layout.alignment: Qt.AlignHCenter| Qt.AlignTop
-            Layout.fillWidth: true
-
-            property var field: configuration[ "stContactorControl" ]
-            id: handControl
-            text: field[ "description" ]
-            toggled: field[ "value" ]
-            dobbled: true
-            onContentChanged: value => {
-                let newConfig = ConfigManager.current
-                configuration[ "stContactorControl" ][ "value" ] = value
-                newConfig[ "blvd" ] = configuration
-                ConfigManager.current = newConfig
-            }
-        }
-
         CardComponent {
             Layout.maximumWidth: 1200
             Layout.alignment: Qt.AlignHCenter| Qt.AlignTop
             Layout.fillWidth: true
 
-            enabled: handControl.toggled
+            fields: {
+                let _fields = []
 
-            fields: [
-                configuration[ "stBLVDDisconnectedVoltage" ],
-                configuration[ "stLLVD1DisconnectedVoltage" ],
-                configuration[ "stLLVD2DisconnectedVoltage" ],
-                configuration[ "stLLVD3DisconnectedVoltage" ],
-                configuration[ "stBLVDDisconnectedTime" ],
-                configuration[ "stLLVD1DisconnectedTime" ],
-                configuration[ "stLLVD2DisconnectedTime" ],
-                configuration[ "stLLVD3DisconnectedTime" ],
-                configuration[ "stBLVDDisconnectedCapacity" ],
-                configuration[ "stLLVD1DisconnectedCapacity" ],
-                configuration[ "stLLVD2DisconnectedCapacity" ],
-                configuration[ "stLLVD3DisconnectedCapacity" ]
-            ]
+                let blvd0 = configuration[ "stBLVDDisconnectedVoltage" ]
+                blvd0[ "wrapper" ] = Wrappers.divideByHundred
+                _fields.push( blvd0 )
+                let blvd1 = configuration[ "stLLVD1DisconnectedVoltage" ]
+                blvd1[ "wrapper" ] = Wrappers.divideByHundred
+                _fields.push( blvd1 )
+                let blvd2 = configuration[ "stLLVD2DisconnectedVoltage" ]
+                blvd2[ "wrapper" ] = Wrappers.divideByHundred
+                _fields.push( blvd2 )
+                let blvd3 = configuration[ "stLLVD3DisconnectedVoltage" ]
+                blvd3[ "wrapper" ] = Wrappers.divideByHundred
+                _fields.push( blvd3 )
+
+
+                _fields.push( configuration[ "stBLVDDisconnectedTime" ] )
+                _fields.push( configuration[ "stLLVD1DisconnectedTime" ] )
+                _fields.push( configuration[ "stLLVD2DisconnectedTime" ] )
+                _fields.push( configuration[ "stLLVD3DisconnectedTime" ] )
+
+                _fields.push( configuration[ "stBLVDDisconnectedCapacity" ] )
+                _fields.push( configuration[ "stLLVD1DisconnectedCapacity" ] )
+                _fields.push( configuration[ "stLLVD2DisconnectedCapacity" ] )
+                _fields.push( configuration[ "stLLVD3DisconnectedCapacity" ] )
+
+                return _fields
+            }
             onFieldUpdated: ( field, value ) => updateConfig( field, value )
         }
     }

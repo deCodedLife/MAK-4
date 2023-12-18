@@ -14,6 +14,8 @@ Page
     id: root
     contentHeight: content.implicitHeight
 
+    property var contactorsConfigs: ConfigManager.get()[ "blvd" ]
+
     ColumnLayout {
         id: content
 
@@ -29,15 +31,29 @@ Page
             Layout.maximumWidth: 1200
             spacing: 10
 
-            CustomSwitch {
-                id: handControl
-                text: "Ручное управление"
+            Item {
+                Layout.fillWidth: true
+                height: 38
+
+                CustomSwitch {
+                    id: handControl
+                    toggled: contactorsConfigs[ "stContactorControl" ] === 1
+                    onContentChanged: (value) => {
+                        let newConfig = ConfigManager.current
+                        contactorsConfigs[ "stContactorControl" ] = value
+                        newConfig[ "blvd" ] = contactorsConfigs
+                        ConfigManager.current = newConfig
+                        SNMP.setOID( "stContactorControl", contactorsConfigs[ "stContactorControl" ] )
+                    }
+                    text: "Ручное управление"
+                }
             }
 
             FieldsTable {
                 id: table
                 Layout.alignment: Qt.AlignTop
                 enabled: handControl.toggled
+                activeColumns: 1
 
                 headers: [
                     TableHeaderM {
@@ -57,11 +73,11 @@ Page
                     new Wrappers.ContentItem( null, "Нагрузочный 2 (LLVD 2)" ),
                     new Wrappers.ContentItem( null, "Нагрузочный 2 (LLVD 3)" ),
 
-                    new Wrappers.ContentItem( "psContactorSycnro", "", Wrappers.RowTypes.CHECHBOX, "num" ),
-                    new Wrappers.ContentItem( "psContactorBLVDState", "", Wrappers.RowTypes.CHECHBOX, "num" ),
-                    new Wrappers.ContentItem( "psContactorL1VDState", "", Wrappers.RowTypes.CHECHBOX, "num" ),
-                    new Wrappers.ContentItem( "psContactorL2VDState", "", Wrappers.RowTypes.CHECHBOX, "num" ),
-                    new Wrappers.ContentItem( "psContactorL3VDState", "", Wrappers.RowTypes.CHECHBOX, "num" )
+                    new Wrappers.ContentItem( "psContactorSycnro", "", Wrappers.RowTypes.SWITCH, "num" ),
+                    new Wrappers.ContentItem( "psContactorBLVDState", "", Wrappers.RowTypes.SWITCH, "num" ),
+                    new Wrappers.ContentItem( "psContactorL1VDState", "", Wrappers.RowTypes.SWITCH, "num" ),
+                    new Wrappers.ContentItem( "psContactorL2VDState", "", Wrappers.RowTypes.SWITCH, "num" ),
+                    new Wrappers.ContentItem( "psContactorL3VDState", "", Wrappers.RowTypes.SWITCH, "num" )
                 ]
             }
         }

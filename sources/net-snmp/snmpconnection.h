@@ -20,7 +20,8 @@
 
 enum States {
     Disconnected,
-    Connected
+    Connected,
+    SyncConfigs
 };
 
 class SNMPConnection : public TObject
@@ -31,10 +32,12 @@ class SNMPConnection : public TObject
 signals:
     void stateChanged( States );
 
+    void settingsChanged();
     void gotTablesCount( QString, int );
     void gotRowsContent( QString, QJsonObject );
 
     void launchThreadPool();
+    void notify(int status, QString message, int delay_ms);
 
 public:
     explicit SNMPConnection(QObject *parent = nullptr);
@@ -49,6 +52,7 @@ public:
     Q_INVOKABLE void getTable( QString oid );
     Q_INVOKABLE void setOID( QString, QVariant );
     Q_INVOKABLE void setMultiple( QJsonObject );
+    Q_INVOKABLE void updateConfigs();
 
     Q_INVOKABLE QString dateToReadable( QString );
     Q_INVOKABLE QJsonArray getGroup( QString );
@@ -56,11 +60,12 @@ public:
     QMap< int, QString > errors;
 
 public slots:
-    Q_INVOKABLE void updateConnection();
+    Q_INVOKABLE void updateConnection( bool sync = false );
     Q_INVOKABLE void dropConnection();
     void proceed( AsyncSNMP* );
     void handleSNMPRequest( QString, QMap<SNMPpp::OID, QJsonObject> );
     void handleSNMPFinished( int );
+    void validateConnection( QString, QMap<SNMPpp::OID, QJsonObject> );
 
 private:
     void initFields();

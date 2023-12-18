@@ -30,6 +30,7 @@ Page
         FieldsTable {
             Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
             Layout.maximumWidth: 1200
+            activeColumns: 5
 
             headers: [
                 TableHeaderM { title: "Температура 1, °C"; expand: false },

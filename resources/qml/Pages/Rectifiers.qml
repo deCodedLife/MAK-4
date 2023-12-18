@@ -22,6 +22,7 @@ Page {
             Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
             Layout.maximumWidth: 1200
             tableOID: "psVbvEntry"
+            updateInterval: Math.max( ConfigManager.get()[ "main" ][ "updateDelay" ][ "value" ] * 1000, 10000 )
 
             headers: [
                 TableHeaderM {

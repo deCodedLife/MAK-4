@@ -36,6 +36,7 @@ Page
                 Layout.alignment: Qt.AlignTop
                 header: "Таблица аварий 1-й степени"
                 tableOID: "psAlarm1Entry"
+                updateInterval: Math.max( ConfigManager.get()[ "main" ][ "updateDelay" ][ "value" ] * 1000, 5000 )
 
                 headers: [
                     TableHeaderM {

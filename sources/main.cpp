@@ -6,6 +6,7 @@
 #include <QFontDatabase>
 
 #include <configs.h>
+#include <customdoublevalidator.h>
 #include <snmpconnection.h>
 
 #include <mibparser.h>
@@ -41,6 +42,8 @@ int main( int argc, char *argv[] )
     ctx->setContextProperty( "Config", cfg->get() );
     ctx->setContextProperty( "SNMP", snmp );
     ctx->setContextProperty( "MIB", snmp->GetParser() );
+
+    qmlRegisterType<CustomDoubleValidator>( "CustomDoubleValidator", 0, 1, "CustomDoubleValidator" );
 
 
     engine.load( QUrl( "qrc:/qml/Main.qml" ) );

@@ -14,6 +14,15 @@ Item
 
         function onStateChanged() {
             currentState = SNMP.state()
+
+            if ( currentState == 1 ) {
+                let newConfig = ConfigManager.get()
+                let deviceIP = newConfig[ "main" ][ "host" ][ "value" ]
+                let devicePort = newConfig[ "main" ][ "port" ][ "value" ]
+                Globals.windowSuffix = `${deviceIP}:${devicePort}`
+                return
+            }
+            Globals.windowSuffix = ""
         }
     }
 
@@ -30,7 +39,7 @@ Item
             height: 16
             radius: width / 2
 
-            color: currentState == 1 ? Globals.succsessColor : Globals.textColor
+            color: currentState == 1 ? Globals.succsessColor : Globals.grayAccent
         }
 
         Text {

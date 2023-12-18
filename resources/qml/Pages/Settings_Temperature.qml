@@ -24,6 +24,16 @@ Page
         ConfigManager.current = newConfig
     }
 
+    Connections
+    {
+        target: SNMP
+
+        function onSettingsChanged()
+        {
+            configuration = ConfigManager.get()[ "temperature" ]
+        }
+    }
+
     ColumnLayout {
         id: pageContent
 
@@ -40,12 +50,25 @@ Page
             Layout.alignment: Qt.AlignHCenter| Qt.AlignTop
             Layout.fillWidth: true
 
-            fields: [
-                configuration[ "stNumberTemperatureSensors" ],
-                configuration[ "stLowTemperatureTherehold" ],
-                configuration[ "stHightTemperatureTherehold" ],
-                configuration[ "stTemperatureGisteresis" ]
-            ]
+            fields: {
+                let _fields = []
+                _fields.push( configuration[ "stNumberTemperatureSensors" ] )
+
+                let temperatureTherehold = configuration[ "stLowTemperatureTherehold" ]
+                temperatureTherehold[ "wrapper" ] = Wrappers.divideByTen
+                _fields.push( temperatureTherehold )
+
+
+                let temperatureHight = configuration[ "stHightTemperatureTherehold" ]
+                temperatureHight[ "wrapper" ] = Wrappers.divideByTen
+                _fields.push( temperatureHight )
+
+                let temperatureGisteresis = configuration[ "stTemperatureGisteresis" ]
+                temperatureGisteresis[ "wrapper" ] = Wrappers.divideByTen
+                _fields.push( temperatureGisteresis )
+
+                return _fields
+            }
 
             onFieldUpdated: ( field, value ) => {
                 let newConfig = ConfigManager.current

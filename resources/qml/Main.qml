@@ -16,7 +16,7 @@ ApplicationWindow
     minimumHeight: 400
 
     visible: true
-    title: "MAK-4"
+    title: "MAK-4 " + (Globals.windowSuffix != "" ? `[${Globals.windowSuffix}]` : "")
 
     color: Globals.accentColor
     Material.theme: Material.Light
@@ -43,9 +43,22 @@ ApplicationWindow
             }
 
             PageLoader {
+                id: pageLoader
                 Layout.fillWidth: true
                 Layout.fillHeight: true
             }
+        }
+    }
+
+    ColumnLayout {
+        anchors.fill: parent
+
+        Notifications {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            Layout.maximumWidth: 350
+            Layout.alignment: Qt.AlignRight | Qt.AlignBottom
         }
     }
 }

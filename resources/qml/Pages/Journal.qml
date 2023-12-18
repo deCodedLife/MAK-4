@@ -1,8 +1,13 @@
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Controls
+import QtQuick.Controls.Material
 
 import "../Components"
 import "../Globals"
+import "../Models"
+import "../wrappers.mjs" as Wrappers
+
 
 Page
 {
@@ -22,30 +27,58 @@ Page
         anchors.leftMargin: 20
         anchors.rightMargin: 20
 
-        TableComponent {
+        JournalTable {
+            id: journalTable
             Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
             Layout.maximumWidth: 1200
+            tableOID: "psJournalEntry"
+            rowsLength: width == 1200 ? 25 : 18
 
-            header: "Таблица аварий 1-й степени"
+            footer: `Текущая страница: ${journalTable.currentPage}`
 
             headers: [
-                { "title": "№", "expand": false },
-                { "title": "Время события", "expand": true },
-                { "title": "Тип", "expand": false },
-                { "title": "Название", "expand": true }
+                TableHeaderM { title: "Номер события"; expand: true },
+                TableHeaderM { title: "Время события"; expand: true },
+                TableHeaderM { title: "Тип события"; expand: true },
+                TableHeaderM { title: "Событие"; expand: true }
             ]
 
-//            content: {
-//                let objects = SNMP.getBulk( "psJournalTable" )
-//                let fields = []
-//                let middle = objects.length / 2
+            rows: {
+                "psJournalNumber": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, v => {return v}, "num" ),
+                "psJournalTime": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, (value) =>
+                {
+                    let dateTime = SNMP.dateToReadable( value ).split( " " )
+                    return `${dateTime[0]} ${dateTime[1]}`
+                }, "str" ),
+                "psJournalMode": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.parseErrors, "str" ),
+                "psJournalEvent": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, (value) =>
+                {
+                    return Config[ "journal" ][ value.toString() ]
+                }, "num" ),
+            }
 
-//                for ( let index = 0; index < middle; index++ ) {
-//                    fields.push( { type: 5, value: objects[ index ] } )
-//                    fields.push( { type: 5, value: objects[ middle + index ] } )
-//                }
-//                return fields
-//            }
+        }
+
+        RowLayout {
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+            Layout.maximumWidth: 1200
+            Layout.fillWidth: true
+
+            Button {
+                highlighted: true
+                text: "Далее"
+                Material.accent: Globals.accentColor
+                onClicked: journalTable.currentPage++
+            }
+
+            Button {
+                highlighted: true
+                text: "Назад"
+                Material.accent: Globals.secondaryColor
+                onClicked: journalTable.currentPage--
+            }
+
+            Item{ Layout.fillWidth: true }
         }
     }
 }

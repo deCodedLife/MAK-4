@@ -4,6 +4,7 @@ import QtQuick.Controls
 import QtQuick.Controls.Material
 
 import "../Globals"
+import "../wrappers.mjs" as Wrappers
 
 Rectangle
 {
@@ -16,39 +17,41 @@ Rectangle
     property var fields
 
     property int columnsCount: headers.length
+    property int activeColumns
     property int rowsCount
 
     property bool loaded
+    property bool autoUpdate: true
     property string header: ""
+    property string hashRoot
     property list<Item> headers
+    property int updateInterval: ConfigManager.get()[ "main" ][ "updateDelay" ][ "value" ] * 1000
 
     color: "white"
     radius: 10
 
-    function updateViaContent( row )
+    function updateViaContent()
     {
         content = []
+        hashRoot = Wrappers.md5( fields[ 0 ].oid ?? fields[ 0 ].description )
 
-        let infoItems = fields.filter( field => field.type === 1 )
-        infoItems.map( field => {
-            let row = {}
-            row[ "type" ] = field.type
-            row[ "value" ] = field.description
-            content.push( row )
-        } )
+        var _request = []
 
-        let _rowNames = headers.map( h => h.title )
-        let fieldsRows = fields.length / _rowNames.length;
-
-        for ( let rowIndex = 0; rowIndex < _rowNames.length; rowIndex++ )
+        for ( let _index = 0; _index < fields.length; _index++ )
         {
-            let rowSlice = fields.slice( rowIndex * fieldsRows, ( rowIndex + 1 ) * fieldsRows )
-            let oidsMap = rowSlice.map( field => field.oid ?? "" )
-            oidsMap = oidsMap.filter( oid => oid !== "" )
+            let field = fields[ _index ]
+            if ( field.type !== 1 && field.oid ) {
+                _request.push( field.oid + ".0" )
+                continue
+            }
 
-            if ( oidsMap.length === 0 ) continue
-            SNMP.getOIDs( _rowNames[ rowIndex ], oidsMap )
+            content.push( {
+                "type": field.type,
+                "value": field.description
+            } )
         }
+
+        SNMP.getOIDs( hashRoot, _request )
     }
 
     Connections
@@ -57,44 +60,37 @@ Rectangle
 
         function onGotRowsContent( root: string, data: object )
         {
-            let foundHeaders = headers.filter( h => h.title === root )
-            if ( foundHeaders.length === 0 ) return
+            if ( root !== hashRoot ) return
 
-            let rawFields = Object.keys( data )
-            let rowPerCol = fields.length / headers.length
-            let startFrom = headers.indexOf( foundHeaders[0] ) * rowPerCol
-
-
-            for ( let fieldIndex = startFrom; fieldIndex < (startFrom + rowPerCol); fieldIndex++ )
+            for ( let _indexData = 0; _indexData < fields.length; _indexData++ )
             {
-                let field = fields[ fieldIndex ]
-                let row = data[ field.oid ]
-                row[ "oid" ] = field.oid
-                row[ "type" ] = field.type
-                row[ "value" ] = field.wrapper( row[ field.key ] )
+                if ( !fields[ _indexData ].oid ) continue
 
-                content.push( row )
+                content.push( {
+                    "oid": fields[ _indexData ].oid,
+                    "type": fields[ _indexData ].type,
+                    "value": fields[ _indexData ].wrapper( data[ fields[ _indexData ].oid ][ fields[ _indexData ].key ] )
+                })
             }
 
-            if ( startFrom + rowPerCol === fields.length ) {
-                loaded = true
-                rowsCount = 0
-                rowsCount = rowPerCol
-            }
+            loaded = true
+            rowsCount = 0
+            rowsCount = Object.keys( data ).length / activeColumns
         }
     }
 
     Flickable {
         id: flickable
 
-        interactive: width < contentWidth || height < contentHeight
-        contentHeight: contentLayout.implicitHeight
+        interactive: width < contentWidth
+        // contentHeight: contentLayout.implicitHeight
         contentWidth: contentLayout.implicitWidth
         clip: true
         boundsMovement: Flickable.StopAtBounds
 
         width: root.width
         height: contentLayout.implicitHeight + ( width < contentWidth ? 20 : 0 )
+        // height: root.height
 
         ScrollBar.horizontal: ScrollBar {
             id: control
@@ -122,6 +118,8 @@ Rectangle
             id: contentLayout
             width: gridLayout.implicitWidth > root.width ? gridLayout.implicitWidth : root.width
             spacing: 0
+
+            onHeightChanged: flickable.contentHeight = implicitHeight
 
             Item{ Layout.topMargin: 20 }
 
@@ -198,9 +196,9 @@ Rectangle
                         Layout.row: (index + 1) * 2
                         width: 0
                         height: 0
-                        CroppedLine {
-                            width: gridLayout.width
-                        }
+                        // CroppedLine {
+                            // width: gridLayout.width
+                        // }
                     }
                 }
 
@@ -224,6 +222,7 @@ Rectangle
 
                             Layout.preferredHeight: {
                                 if ( itemText.visible ) return itemText.contentHeight
+                                if ( checkbox.visible ) return checkbox.height
                                 if ( switchValue.visible ) return switchValue.height
 
                                 return 0
@@ -246,13 +245,35 @@ Rectangle
                                 id: switchValue
                                 width: item.width
                                 visible: item.type === 5
+                                property bool previousState: item.currentVar[ "value" ] === 1
 
                                 toggled: {
                                     if (item.type !== 5) return false
                                     else item.currentVar[ "value" ] === 1
                                 }
 
-                                onContentChanged: value => SNMP.setOID( item.currentVar[ "oid" ], value )
+                                onContentChanged: checked => {
+                                    if ( checked === previousState ) return
+                                    SNMP.setOID( item.currentVar[ "oid" ], checked ? 1 : 0 )
+                                    previousState = checked
+                                }
+                            }
+
+                            CustomCheckbox {
+                                id: checkbox
+                                visible: item.type === 7
+                                property bool previousState: item.currentVar[ "value" ] === 1
+
+                                checked: {
+                                    if ( item.type !== 7 ) return false
+                                    else item.currentVar[ "value" ] === 1
+                                }
+
+                                onCheckedChanged: {
+                                    if ( checked === previousState ) return
+                                    SNMP.setOID( item.currentVar[ "oid" ], checked ? 1 : 0 )
+                                    previousState = checked
+                                }
                             }
 
                             Text {
@@ -303,7 +324,10 @@ Rectangle
         triggeredOnStart: true
         repeat: true
         running: true
-        interval: 20 * 1000
-        onTriggered: updateViaContent()
+        interval: updateInterval
+        onTriggered: {
+            if ( !autoUpdate ) return
+            updateViaContent()
+        }
     }
 }

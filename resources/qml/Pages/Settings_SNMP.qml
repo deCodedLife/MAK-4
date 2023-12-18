@@ -10,18 +10,45 @@ import "../wrappers.mjs" as Wrappers
 Page
 {
     property var configuration: ConfigManager.get()[ "snmp" ]
+    property list<string> changed: []
     contentHeight: pageContent.implicitHeight + 20
 
     actionButtonIcon: "qrc:/images/icons/save.svg"
     actionButtonTitle: "Записать"
 
-    onActionButtonTriggered: SNMP.setMultiple( configuration )
+    onActionButtonTriggered: {
+        let changes = {}
+        let keys = Object.keys( configuration )
+
+        for ( let i = 0; i < keys.length; i++ )
+        {
+            let currentConfig = configuration[ keys[i] ]
+            let isChanged = changed.includes( keys[i] )
+            if ( isChanged ) {
+                changes[ keys[ i ] ] = currentConfig
+                changed.splice( i, 1 )
+            }
+        }
+
+        SNMP.setMultiple( changes )
+    }
 
     function updateConfig( field, value ) {
         let newConfig = ConfigManager.current
         configuration[ field ][ "value" ] = Wrappers.getFieldValue( configuration[ field ], value )
+        changed.push( field )
         newConfig[ "snmp" ] = configuration
         ConfigManager.current = newConfig
+    }
+
+    Connections
+    {
+        target: SNMP
+
+        function onSettingsChanged()
+        {
+            configuration = ConfigManager.get()[ "snmp" ]
+        }
     }
 
     ColumnLayout {
