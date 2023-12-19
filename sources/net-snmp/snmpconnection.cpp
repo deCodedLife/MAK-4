@@ -80,6 +80,7 @@ void SNMPConnection::getOIDs( QString uid, QList<QString> objects )
 void SNMPConnection::handleSNMPRequest( QString root, QMap<SNMPpp::OID, QJsonObject> rows )
 {
     if ( rows.empty() ) return;
+    if ( readSession == NULL ) return;
 
     QJsonObject fields;
 

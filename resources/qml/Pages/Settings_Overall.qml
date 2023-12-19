@@ -54,10 +54,16 @@ Page
             spacing: 10
 
             CardComponent {
-                fields: [
-                    configuration[ "psTimeZone" ],
-                    configuration[ "psBuzzerEnable" ]
-                ]
+                fields: {
+                    let _fields = []
+
+                    let timezone = configuration[ "psTimeZone" ]
+                    timezone[ "wrapper" ] = Wrappers.divideByFour
+                    _fields.push( timezone )
+
+                    _fields.push( configuration[ "psBuzzerEnable" ] )
+                    return _fields
+                }
                 onFieldUpdated: ( field, value ) => updateConfig( field, value )
             }
 
