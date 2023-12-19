@@ -112,7 +112,8 @@ Item
         cursorShape: Qt.PointingHandCursor
         onClicked: {
             toggled = !toggled
-            control.parent.updateField( toggled )
+            if ( control.parent.updateField )
+                control.parent.updateField( toggled )
             contentChanged( toggled )
         }
     }
