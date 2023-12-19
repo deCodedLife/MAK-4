@@ -1,6 +1,7 @@
 pragma Singleton
 
 import QtQuick
+import QtQuick.Dialogs
 import QtQuick.Controls.Material
 
 import "../Models"
@@ -8,6 +9,9 @@ import "../Models"
 QtObject
 {
     property string iconsLocation: "qrc:/images/icons/"
+    property var fileDialog
+
+    signal openDialog
 
     property list<Item> mainMenu: [
         MenuItemM { icon: "lan.svg"; title: "Соединение"; page: "Pages/Connection.qml" },
@@ -27,7 +31,7 @@ QtObject
         MenuItemM { icon: "thermostat.svg"; title: "Температура"; page: "Pages/Temprerature.qml" },
         MenuItemM { icon: "dry_connectors.svg"; title: "Сухие контакты"; page: "Pages/DryContacts.qml" },
         MenuItemM { icon: "memory.svg"; title: "BMS"; page: "Pages/BMS.qml" },
-        MenuItemM { icon: "settings.svg"; title: "Настройки"; callback: () => { SNMP.updateConfigs(); loadMenu( settingsMenu ); menuButtons = settingsButtons } }
+        MenuItemM { icon: "settings.svg"; title: "Настройки"; callback: () => { loadMenu( settingsMenu ); menuButtons = settingsButtons } }
     ]
 
     property list<Item> settingsMenu: [
@@ -45,8 +49,10 @@ QtObject
     ]
 
     property list<Item> settingsButtons: [
-        MenuItemM { icon: "open.svg"; title: "Считать из файла"; callback: () => {} },
-        MenuItemM { icon: "save.svg"; title: "Сохранить в файл"; callback: () => {} }
+        MenuItemM { icon: "download.svg"; title: "Считать всё из контроллера"; callback: () => SNMP.updateConfigs() },
+        MenuItemM { icon: "upload.svg"; title: "Записать всё в контроллер"; callback: () => SNMP.sendConfigs() },
+        MenuItemM { icon: "open.svg"; title: "Считать из файла"; callback: () => { fileDialog.fileMode = FileDialog.OpenFile; fileDialog.open() } },
+        MenuItemM { icon: "save.svg"; title: "Сохранить в файл"; callback: () => { fileDialog.fileMode = FileDialog.SaveFile; fileDialog.open() } }
     ]
 
     property list<Item> currentMenu: mainMenu

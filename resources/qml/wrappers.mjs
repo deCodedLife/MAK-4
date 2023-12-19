@@ -91,13 +91,8 @@ export function getFieldValue( field, value ) {
         else if ( value === "false" ) return 0;
         return value ? 1 : 0;
     }
-    if ( field[ "type" ] === RowTypes.COMBOBOX ) {
-        for ( let index = 0; index < Object.keys( field[ "model" ] ).length; index++ ) {
-            let fieldKey = Object.keys( field[ "model" ] )[ index ]
-            let fieldValue = field[ "model" ][ fieldKey ]
-            if ( fieldKey == value ) return fieldValue
-        }
-    }
+    if ( field[ "type" ] === RowTypes.COMBOBOX )
+        return parseInt( value )
     // if ( field[ "type" ] !== RowTypes.CHECKBOX && field[ "type" ] !== RowTypes.COUNTER )
     return value
     // else return parseFloat( value ).toFixed(1)
