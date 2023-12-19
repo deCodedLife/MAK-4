@@ -76,7 +76,7 @@ Page
             CardComponent {
                 header: "SNMP v2C (Community)"
                 fields: [
-                    configuration[ "v2_write" ],
+                    configuration[ "v2_read" ],
                     configuration[ "v2_write" ],
                 ]
 

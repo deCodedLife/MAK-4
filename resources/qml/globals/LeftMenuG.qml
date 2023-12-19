@@ -31,7 +31,11 @@ QtObject
         MenuItemM { icon: "thermostat.svg"; title: "Температура"; page: "Pages/Temprerature.qml" },
         MenuItemM { icon: "dry_connectors.svg"; title: "Сухие контакты"; page: "Pages/DryContacts.qml" },
         MenuItemM { icon: "memory.svg"; title: "BMS"; page: "Pages/BMS.qml" },
-        MenuItemM { icon: "settings.svg"; title: "Настройки"; callback: () => { loadMenu( settingsMenu ); menuButtons = settingsButtons } }
+        MenuItemM { icon: "settings.svg"; title: "Настройки"; callback: () => {
+            loadMenu( settingsMenu )
+            menuButtons = settingsButtons
+            if ( SNMP.state() === 1 ) SNMP.updateConfigs();
+        } }
     ]
 
     property list<Item> settingsMenu: [
