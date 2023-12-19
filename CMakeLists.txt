@@ -46,13 +46,6 @@ qt_add_executable(MAK-4
     ${CMAKE_CURRENT_SOURCE_DIR}/resources/qml.qrc
 )
 
-qt_add_qml_module(MAK-4
-    URI AtolServer
-    VERSION 1.0
-    SOURCES sources/gui/customdoublevalidator.h sources/gui/customdoublevalidator.cpp
-    RESOURCES sources/gui/CMakeLists.txt
-)
-
 if ( APPLE )
 
     set_target_properties(MAK-4 PROPERTIES

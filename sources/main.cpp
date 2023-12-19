@@ -6,6 +6,7 @@
 #include <QFontDatabase>
 
 #include <configs.h>
+#include <ipaddressvalidator.h>
 #include <customdoublevalidator.h>
 #include <snmpconnection.h>
 
@@ -18,13 +19,9 @@ int main( int argc, char *argv[] )
 
     qint32 fontId = QFontDatabase::addApplicationFont( "://fonts/Roboto.ttf" );
     QStringList fontList = QFontDatabase::applicationFontFamilies( fontId );
-
     QGuiApplication::setFont( QFont( fontList.first() ) );
-//    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling, false );
-    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling, true);
 
     QJsonObject config;
-
     Configs *cfg = new Configs();
     cfg->Read( &config );
 
@@ -44,7 +41,7 @@ int main( int argc, char *argv[] )
     ctx->setContextProperty( "MIB", snmp->GetParser() );
 
     qmlRegisterType<CustomDoubleValidator>( "CustomDoubleValidator", 0, 1, "CustomDoubleValidator" );
-
+    qmlRegisterType<IPAddressValidator>( "IPAddressValidator", 0, 1, "IPAddressValidator" );
 
     engine.load( QUrl( "qrc:/qml/Main.qml" ) );
     return app.exec();

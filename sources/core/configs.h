@@ -40,7 +40,8 @@ enum FieldTypes
     FieldCombobox,    //4
     FieldSwitch,      //5
     FieldCounter,     //6
-    FieldCheckbox     //7
+    FieldCheckbox,    //7
+    FieldAdress       //8
 };
 
 struct Field
