@@ -1,4 +1,5 @@
 #include "snmpconnection.h"
+#include <iosfwd>
 
 SNMPConnection::SNMPConnection(QObject *parent)
     : TObject{parent},
@@ -81,6 +82,8 @@ void SNMPConnection::getOIDs( QString uid, QList<QString> objects )
 
 void SNMPConnection::handleSNMPRequest( QString root, QMap<SNMPpp::OID, QJsonObject> rows )
 {
+    if ( rows.empty() ) return;
+
     _state = Connected;
     emit stateChanged( _state );
 
@@ -200,7 +203,7 @@ void SNMPConnection::setMultiple( QJsonObject fields )
                 value.toString().toStdString().size() );
             break;
         default:
-            pdu.addNullVar( oid );
+            // pdu.addNullVar( oid );
             break;
         }
 
@@ -211,6 +214,17 @@ void SNMPConnection::setMultiple( QJsonObject fields )
         catch( const std::exception &e )
         {
             emit error_occured( Callback::New( e.what(), Callback::Warning ) );
+            QString objectName = parser.OID_TOSTR[ oid ];
+
+            if ( field.contains( "description" ) ) {
+                objectName = field[ "description" ].toString();
+                if ( objectName.trimmed().isEmpty() )
+                {
+                    objectName = parser.OID_TOSTR[ oid ];
+                }
+            }
+
+            emit notify(-1, "Не удалось записать объект " + objectName, 3000 );
         }
 
         pdu.free();
@@ -302,7 +316,11 @@ QString SNMPConnection::dateToReadable( QString date )
 
 void SNMPConnection::updateConnection()
 {
+    SOCK_CLEANUP;
     SOCK_STARTUP;
+
+    _state = Disconnected;
+    emit stateChanged( _state );
 
     QJsonObject configs = pConfigs->get()[ "main" ].toObject();
     SNMPpp::closeSession( readSession );
