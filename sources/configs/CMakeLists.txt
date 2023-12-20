@@ -1,7 +1,0 @@
-FILE ( GLOB CONFIGS_SOURCES *.cpp *.h )
-LIST ( SORT CONFIGS_SOURCES )
-
-add_library(
-    Configs STATIC
-    ${CONFIGS_SOURCES}
-)
