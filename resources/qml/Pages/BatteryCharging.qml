@@ -33,11 +33,11 @@ Page
 
                 headers: [
                     { "title": "№ разряда", "expand": false },
-                    { "title": "Время начала, В", "expand": true },
-                    { "title": "Результат", "expand": true },
-                    { "title": "Длительность, (мин)", "expand": true },
-                    { "title": "Емкость, Ач", "expand": false },
-                    { "title": "Конечное напряжение, В", "expand": false },
+                    { "title": "Время начала", "expand": false },
+                    { "title": "Результат теста", "expand": false },
+                    { "title": "Длительность\n(мин)", "expand": false },
+                    { "title": "Емкость\nАч", "expand": false },
+                    { "title": "Конечное\nнапряжение, В", "expand": false },
                     { "title": "группа1", "expand": false },
                     { "title": "группа2", "expand": false },
                     { "title": "группа3", "expand": false },

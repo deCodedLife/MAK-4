@@ -6,11 +6,41 @@ import "../Globals"
 
 Page
 {
-    contentHeight: content.implicitHeight
+    id: root
+
+    contentHeight: content.implicitHeight + 20
 
     function addWrapper( config, wrapper ) {
         config[ "wrapper" ] = wrapper
         return config
+    }
+
+    state: "stopped"
+    states: [
+        State {
+            name: "stopped"
+            PropertyChanges {
+                target: root
+                actionButtonIcon: "qrc:/images/icons/start.svg"
+                actionButtonTitle: "Начать тест"
+            }
+        },
+        State {
+            name: "started"
+            PropertyChanges {
+                target: root
+                actionButtonIcon: "qrc:/images/icons/stop.svg"
+                actionButtonTitle: "Закончить тест"
+            }
+        }
+    ]
+
+    onActionButtonTriggered: {
+        if ( state === "stopped" ) {
+            state = "started"
+            return
+        }
+        state = "stopped"
     }
 
     ColumnLayout {
@@ -33,11 +63,11 @@ Page
 
                 headers: [
                     { "title": "№ разряда", "expand": false },
-                    { "title": "Время начала, В", "expand": true },
-                    { "title": "Результат", "expand": true },
-                    { "title": "Длительность, (мин)", "expand": true },
-                    { "title": "Емкость, Ач", "expand": false },
-                    { "title": "Конечное напряжение, В", "expand": false },
+                    { "title": "Время начала", "expand": false },
+                    { "title": "Результат теста", "expand": false },
+                    { "title": "Длительность\n(мин)", "expand": false },
+                    { "title": "Емкость\nАч", "expand": false },
+                    { "title": "Конечное\nнапряжение, В", "expand": false },
                     { "title": "группа1", "expand": false },
                     { "title": "группа2", "expand": false },
                     { "title": "группа3", "expand": false },
@@ -48,8 +78,6 @@ Page
                     let objects = SNMP.getBulk( "psTestEntry" )
                     let fields = []
                     let middle = objects.length / 14
-
-                    console.log( objects.length, middle )
 
                     for ( let index = 0; index < middle; index++ ) {
                         fields.push( { type: 5, value: objects[ index ] } )
