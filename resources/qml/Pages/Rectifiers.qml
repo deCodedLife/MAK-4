@@ -1,12 +1,12 @@
 import QtQuick
 import QtQuick.Layouts
 
-import "../Components/wrappers.mjs" as Wrappers
+import "../wrappers.mjs" as Wrappers
 import "../Components"
 import "../Globals"
+import "../Models"
 
-Page
-{
+Page {
     contentHeight: content.implicitHeight + 20
 
     ColumnLayout {
@@ -24,21 +24,37 @@ Page
             tableOID: "psVbvEntry"
 
             headers: [
-                TableHeaderM{ title: "№" },
-                TableHeaderM{ title: "Входное\nнапряжение, В"; expand: true },
-                TableHeaderM{ title: "Выходное\nнапряжение, В"; expand: true },
-                TableHeaderM{ title: "Температура, °C"; expand: true },
-                TableHeaderM{ title: "Ток, А"; expand: true },
-                TableHeaderM{ title: "Состояние" }
+                TableHeaderM {
+                    title: "№"
+                },
+                TableHeaderM {
+                    title: "Входное\nнапряжение, В"
+                    expand: true
+                },
+                TableHeaderM {
+                    title: "Выходное\nнапряжение, В"
+                    expand: true
+                },
+                TableHeaderM {
+                    title: "Температура, °C"
+                    expand: true
+                },
+                TableHeaderM {
+                    title: "Ток, А"
+                    expand: true
+                },
+                TableHeaderM {
+                    title: "Состояние"
+                }
             ]
 
             rows: {
-                "psVbvNumber": { key: "num", wrapper: null },
-                "psVbvInpVoltage": { key: "num", wrapper: Wrappers.divideByHundred },
-                "psVbvVoltage": { key: "num", wrapper: null },
-                "psVbvTemperature": { key: "num", wrapper: null },
-                "psVbvCurrent": { key: "num", wrapper: Wrappers.divideByThousand, },
-                "psVbvStatus": { key: "str", wrapper: Wrappers.parseErrors},
+                "psVbvNumber": new Wrappers.RowItem(),
+                "psVbvInpVoltage": new Wrappers.RowItem( Wrappers.RowTypes.DESCRIPTION, Wrappers.divideByHundred ),
+                "psVbvVoltage": new Wrappers.RowItem(),
+                "psVbvTemperature": new Wrappers.RowItem(),
+                "psVbvCurrent": new Wrappers.RowItem( Wrappers.RowTypes.DESCRIPTION, Wrappers.divideByThousand ),
+                "psVbvStatus": new Wrappers.RowItem( Wrappers.RowTypes.DESCRIPTION, Wrappers.parseErrors, "str" )
             }
         }
     }

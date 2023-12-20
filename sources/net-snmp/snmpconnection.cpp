@@ -3,11 +3,11 @@
 SNMPConnection::SNMPConnection(QObject *parent)
     : TObject{parent},
     pHandle(NULL),
-    _state( Disconnected )
+    _state( Disconnected ),
+    isBusy(false),
+    requests({})
 {
     m_sender = "SNMP Agent";
-
-
 }
 
 SNMPConnection::~SNMPConnection()
@@ -37,136 +37,96 @@ void SNMPConnection::setState( States state )
     emit stateChanged( state );
 }
 
-QList<QString> SNMPConnection::getOIDs( QList<QString> objects )
+void SNMPConnection::proceed( AsyncSNMP* request )
 {
-    SNMPpp::PDU pdu( SNMPpp::PDU::kGet );
-    QList<QString> reply;
-
-    if ( objects.length() == 0 )
+    if ( request == nullptr ) return;
+    if ( isBusy )
     {
-        return reply;
+        requests.append( request );
+        return;
     }
-
-    try
-    {
-        for ( QString objectName : objects )
-        {
-            if ( !parser.MIB_OBJECTS.contains( objectName ) ) continue;
-            oid_object object = parser.MIB_OBJECTS[ objectName ];
-            SNMPpp::OID o( object.oid.toStdString() );
-            o += 0;
-            pdu.addNullVar( o );
-        }
-
-        pdu = SNMPpp::get( pHandle, pdu );
-
-        for ( QString objectName : objects )
-        {
-            if ( !parser.MIB_OBJECTS.contains( objectName ) ) {
-                reply.append( "" );
-                continue;
-            }
-            oid_object object = parser.MIB_OBJECTS[ objectName ];
-            SNMPpp::OID o( object.oid.toStdString() );
-            o += 0;
-            QString value;
-
-            if ( pdu.varlist().asnType( o ) == ASN_INTEGER ) value = QString::number( *pdu.varlist().valueAt( o ).integer );
-            else value = QString::fromStdString( pdu.varlist().asString( o ) );
-            reply.append( value );
-        }
-    }
-    catch( const std::exception &e )
-    {
-        emit error_occured( Callback::New( e.what(), Callback::Warning ) );
-    }
-
-    pdu.free();
-    return reply;
-}
-
-void SNMPConnection::getRows( QString objectName )
-{
-    oid_object object = parser.MIB_OBJECTS[ objectName ];
-    SNMPpp::OID start( object.oid.toStdString() );
-
-    AsyncSNMP *request = new AsyncSNMP();
-    request->setOIDs( pHandle, start );
-
-    connect( request, &AsyncSNMP::rows, this, [&]( SNMPpp::OID root, QMap<SNMPpp::OID, QJsonObject> rows ) {
-        QJsonObject fields;
-        for ( SNMPpp::OID oid : rows.keys() )
-        {
-            QJsonArray data;
-            QString oidName = parser.OID_TOSTR[ oid.parent() ];
-
-            if ( fields.contains( oidName ) ) data = fields[ oidName ].toArray();
-            rows[ oid ][ "field" ] = oidName;
-
-            data.append( rows[ oid ] );
-            fields[ oidName ] = data;
-        }
-        emit gotRowsContent( parser.OID_TOSTR[ root ], fields  );
-    } );
+    else isBusy = true;
 
     QThreadPool::globalInstance()->start( request );
+}
+
+void SNMPConnection::getOIDs( QString uid, QList<QString> objects )
+{
+    QList< SNMPpp::OID > oids;
+    AsyncSNMP *request = new AsyncSNMP( pHandle, SNMPpp::PDU::kGet );
+
+    for ( QString objectName : objects )
+    {
+        oid_object object = parser.MIB_OBJECTS[ objectName ];
+        SNMPpp::OID oid( object.oid.toStdString() );
+        oid += 0;
+
+        oids.append( oid );
+    }
+
+    request->setUID( uid );
+    request->setOIDs( oids );
+
+    connect( request, &AsyncSNMP::rows, this, &SNMPConnection::handleSNMPRequest);
+    proceed( request );
+}
+
+void SNMPConnection::handleSNMPRequest( QString root, QMap<SNMPpp::OID, QJsonObject> rows )
+{
+    isBusy = false;
+
+    _state = Connected;
+    emit stateChanged( _state );
+
+    QJsonObject fields;
+
+    for ( SNMPpp::OID oid : rows.keys() )
+    {
+        QString oidName = parser.OID_TOSTR[ oid.parent() ];
+
+        QJsonArray data;
+        QJsonObject row = rows[ oid ];
+
+        row[ "field" ] = oidName;
+
+        if ( fields.contains( oidName ) )
+        {
+            if ( fields[ oidName ].isArray() )
+            {
+                data = fields[ oidName ].toArray();
+            }
+            else
+            {
+                data.append( fields[ oidName ].toObject() );
+            }
+
+            data.append( row );
+
+            fields[ oidName ] = data;
+            continue;
+        }
+
+        fields[ oidName ] = row;
+    }
+
+    emit gotRowsContent( root, fields  );
+
+    if ( requests.empty() ) return;
+    proceed( requests.first() );
+    requests.removeFirst();
 }
 
 void SNMPConnection::getTable( QString objectName )
 {
     oid_object object = parser.MIB_OBJECTS[ objectName ];
     SNMPpp::OID start( object.oid.toStdString() );
-    QJsonObject fields;
 
-    try
-    {
-        SNMPpp::OID currentOID = start;
+    AsyncSNMP *request = new AsyncSNMP( pHandle, SNMPpp::PDU::kGetBulk );
+    request->setBounds( start );
+    request->setUID( objectName );
 
-        while( true )
-        {
-            SNMPpp::PDU pdu = SNMPpp::getBulk( pHandle, currentOID );
-
-            if ( pdu.empty() ) break;
-            bool shouldBreak {false};
-
-            SNMPpp::MapOidVarList list = pdu.varlist().getMap();
-            SNMPpp::MapOidVarList::iterator iter;
-
-            for ( iter = list.begin(); iter != list.end(); iter++ )
-            {
-                currentOID = iter->first;
-
-                if ( !start.isParentOf( currentOID ) )
-                {
-                    shouldBreak = true;
-                    break;
-                }
-
-                QJsonArray data;
-                QJsonObject field;
-
-                if ( fields.contains( parser.OID_TOSTR[ currentOID.parent() ] ) )
-                {
-                    data = fields[ parser.OID_TOSTR[ currentOID.parent() ] ].toArray();
-                }
-
-                field[ "str" ] = QString::fromStdString( pdu.varlist().asString( currentOID ) );
-                field[ "num" ] = (qint64) *iter->second->val.integer;
-
-                data.append( field );
-                fields[ parser.OID_TOSTR[ currentOID.parent() ] ] = data;
-            }
-
-            if ( shouldBreak ) break;
-            if ( list.size() < 2 ) break;
-        }
-    }
-    catch( std::exception &e )
-    {
-        error_occured( Callback::New( e.what(), Callback::Warning ) );
-    }
-
-    emit gotRowsContent( objectName, fields );
+    connect( request, &AsyncSNMP::rows, this, &SNMPConnection::handleSNMPRequest );
+    proceed( request );
 }
 
 void SNMPConnection::setOID( QString objectName, QVariant data )
@@ -267,17 +227,7 @@ void SNMPConnection::updateConnection()
             return;
         }
 
-        QList<QString> reply = getOIDs( { "stSNMPVersion" } );
-
-        if ( reply.empty() ) {
-            _state = Disconnected;
-            emit stateChanged( _state );
-            emit error_occured( Callback::New( "Не удалось получить данные с устройства", Callback::Warning ) );
-            return;
-        }
-
-        _state = Connected;
-        emit stateChanged( _state );
+        getOIDs( "", { "stSNMPVersion" } );
     }
     catch ( const std::exception &e )
     {

@@ -12,53 +12,43 @@ Rectangle
     Layout.fillWidth: true
     Layout.preferredHeight: contentLayout.implicitHeight + ( flickable.width < flickable.contentWidth ? 20 : 0 )
 
-    property var rows
     property var content
-
-    property string tableOID
-    property string header: ""
-
-    property bool loaded
-    property bool contentTable: !tableOID
+    property var fields
 
     property int columnsCount: headers.length
     property int rowsCount
 
+    property bool loaded
+    property string header: ""
     property list<Item> headers
 
     color: "white"
     radius: 10
 
-    function updateViaTable( data: obejct )
+    function updateViaContent( row )
     {
-        rowsCount = 0
-        content = {}
+        content = []
 
-        Object.keys( rows ).forEach( key => content[ key ] = [] )
+        let infoItems = fields.filter( field => field.type === 1 )
+        infoItems.map( field => {
+            let row = {}
+            row[ "type" ] = field.type
+            row[ "value" ] = field.description
+            content.push( row )
+        } )
 
-        let _rowsCount = data[ Object.keys( rows )[ 0 ] ].length
-        let _rowsNames = Object.keys( rows )
+        let _rowNames = headers.map( h => h.title )
+        let fieldsRows = fields.length / _rowNames.length;
 
-        for ( let columnIndex  = 0; columnIndex < _rowsCount; columnIndex++ )
+        for ( let rowIndex = 0; rowIndex < _rowNames.length; rowIndex++ )
         {
+            let rowSlice = fields.slice( rowIndex * fieldsRows, ( rowIndex + 1 ) * fieldsRows )
+            let oidsMap = rowSlice.map( field => field.oid ?? "" )
+            oidsMap = oidsMap.filter( oid => oid !== "" )
 
-            for ( let rowIndex = 0; rowIndex < _rowsNames.length; rowIndex++ )
-            {
-                let rowName = _rowsNames[ rowIndex ]
-
-                let row = data[ rowName ][ columnIndex ]
-                let rowData = row[ rows[ rowName ].key ]
-                let rowDataWrapper = rows[ rowName ].wrapper
-
-                row[ "type" ] = rows[ rowName ].type
-                row[ "value" ] = rowDataWrapper( rowData )
-                content[ rowName ].push( row )
-            }
-
+            if ( oidsMap.length === 0 ) continue
+            SNMP.getOIDs( _rowNames[ rowIndex ], oidsMap )
         }
-
-        rowsCount = _rowsCount
-        loaded = true
     }
 
     Connections
@@ -67,8 +57,28 @@ Rectangle
 
         function onGotRowsContent( root: string, data: object )
         {
-            if ( root !== tableOID ) return
-            else updateViaTable( data )
+            let foundHeaders = headers.filter( h => h.title === root )
+            if ( foundHeaders.length === 0 ) return
+
+            let rawFields = Object.keys( data )
+            let rowPerCol = fields.length / headers.length
+            let startFrom = headers.indexOf( foundHeaders[0] ) * rowPerCol
+
+
+            for ( let fieldIndex = startFrom; fieldIndex < fields.length; fieldIndex++ )
+            {
+                let field = fields[ fieldIndex ]
+                let row = data[ field.oid ]
+                row[ "value" ] = field.wrapper( row[ field.key ] )
+
+                content.push( row )
+            }
+
+            if ( startFrom + rowPerCol === fields.length ) {
+                loaded = true
+                rowsCount = 0
+                rowsCount = rowPerCol
+            }
         }
     }
 
@@ -213,6 +223,8 @@ Rectangle
                             Layout.preferredHeight: {
                                 if ( itemText.visible ) return itemText.contentHeight
                                 if ( switchValue.visible ) return switchValue.height
+
+                                return 0
                             }
 
                             Layout.preferredWidth: headers[ index ][ "expand" ]  === false ? itemText.contentWidth : null
@@ -220,9 +232,9 @@ Rectangle
                             Layout.leftMargin: index === 0 ? 20 : 0
                             Layout.rightMargin: (index === headers.length - 1) ? 20 : 0
 
-                            property var currentVar: content[ Object.keys( rows )[ index ] ][ row.currentRow ]
+                            property var currentVar: content[ row.currentRow + index * rowsCount ] ?? { type: 1, value: " " }
                             property var type: {
-                                if ( typeof( item.currentVar[ "type" ] ) == "undefined" ) return 5
+                                if ( typeof( item.currentVar[ "type" ] ) == "undefined" ) return 1
                                 return item.currentVar[ "type" ]
                             }
 
@@ -248,7 +260,7 @@ Rectangle
                                 id: itemText
                                 width: item.width
 
-                                visible: item.type === 0 || item.type === 1
+                                visible: item.type === 1 || item.type === 2
                                 text: item.currentVar[ "value" ]
 
                                 color: "black"
@@ -291,10 +303,8 @@ Rectangle
         id: updateTableTimer
         triggeredOnStart: true
         repeat: true
-        running: tableOID
+        running: true
         interval: 20 * 1000
-        onTriggered: {
-            if ( tableOID ) SNMP.getTable( tableOID )
-        }
+        onTriggered: updateViaContent()
     }
 }

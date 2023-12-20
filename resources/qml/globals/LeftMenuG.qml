@@ -3,6 +3,8 @@ pragma Singleton
 import QtQuick
 import QtQuick.Controls.Material
 
+import "../Models"
+
 QtObject
 {
     property string iconsLocation: "qrc:/images/icons/"

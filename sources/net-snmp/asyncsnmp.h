@@ -2,22 +2,13 @@
 #define ASYNCSNMP_H
 
 #include <tobject.h>
-#include <QThread>
+#include <QRunnable>
 
 #include <SNMPpp/PDU.hpp>
 #include <SNMPpp/Get.hpp>
-//#include <SNMPpp/OID.hpp>
 
 #include <QJsonArray>
 #include <QJsonObject>
-
-#include <QRunnable>
-
-struct TableHead
-{
-    SNMPpp::OID oid;
-    int count;
-};
 
 class AsyncSNMP : public QObject, public QRunnable
 {
@@ -25,18 +16,25 @@ class AsyncSNMP : public QObject, public QRunnable
 
 signals:
     void finished( int rowsCount );
-    void rows( SNMPpp::OID root, QMap<SNMPpp::OID, QJsonObject> );
+    void rows( QString, QMap<SNMPpp::OID, QJsonObject> );
 
 public:
-    explicit AsyncSNMP( QObject *parent = nullptr );
+    explicit AsyncSNMP( SNMPpp::SessionHandle&, SNMPpp::PDU::EType = SNMPpp::PDU::kGet, QObject *parent = nullptr );
+    void setBounds( SNMPpp::OID from, SNMPpp::OID to = "" );
+    void setOIDs( QList<SNMPpp::OID> );
+    void setUID( QString );
 
-    void setOIDs( SNMPpp::SessionHandle&, SNMPpp::OID from, SNMPpp::OID to = "" );
     void run() override;
 
 private:
     SNMPpp::SessionHandle session;
+    SNMPpp::PDU::EType type;
+
     SNMPpp::OID startFrom;
     SNMPpp::OID endAt;
+
+    QString uid;
+    QList<SNMPpp::OID> request {};
 
 };
 

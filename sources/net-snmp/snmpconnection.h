@@ -44,9 +44,8 @@ public:
     Q_INVOKABLE States state();
     Q_INVOKABLE void setState( States );
 
-    Q_INVOKABLE QList<QString> getOIDs( QList<QString> );
+    Q_INVOKABLE void getOIDs( QString uid, QList<QString> );
     Q_INVOKABLE void getTable( QString oid );
-    Q_INVOKABLE void getRows( QString oid );
     Q_INVOKABLE void setOID( QString, QVariant );
 
     Q_INVOKABLE QString dateToReadable( QString );
@@ -57,6 +56,8 @@ public:
 public slots:
     Q_INVOKABLE void updateConnection();
     Q_INVOKABLE void dropConnection();
+    void proceed( AsyncSNMP* );
+    void handleSNMPRequest( QString, QMap<SNMPpp::OID, QJsonObject> );
 
 private:
     void initFields();
@@ -69,6 +70,7 @@ private:
     States _state;
     MibParser parser;
 
-    QList<QThread *> backgroundThreads;
+    bool isBusy;
+    QList<AsyncSNMP*> requests;
 
 };
