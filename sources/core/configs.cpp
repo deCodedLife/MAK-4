@@ -122,8 +122,8 @@ QJsonObject Configs::Default()
     snmpSettings[ "stSNMPOperatorAuthPassword" ] = Field::ToJSON( { FieldPassword, "*****", "Пароль аутентификации оператора" } );
     snmpSettings[ "stSNMPOperatorPrivPassword" ] = Field::ToJSON( { FieldPassword, "*****", "Приватный пароль оператора" } );
 
-    snmpSettings[ "stSNMPSAuthAlgo" ] = Field::ToJSON( { FieldCombobox, ST_SNMP_AUTH_ALGO, "Способ защиты данных", { { "Нет", 0 }, { "MD5", 1 }, { "SHA1", 2 } } } );
-    snmpSettings[ "stSNMPSPrivAlgo" ] = Field::ToJSON( { FieldCombobox, ST_SNMP_PRIV_ALGO, "Способ шифрования", { { "Нет", 0 }, { "DES", 1 }, { "AES128", 2 } } } );
+    snmpSettings[ "stSNMPSAuthAlgo" ] = Field::ToJSON( { FieldCombobox, ST_SNMP_AUTH_ALGO, "Протокол приватности", { { "Нет", 0 }, { "MD5", 1 }, { "SHA1", 2 } } } );
+    snmpSettings[ "stSNMPSPrivAlgo" ] = Field::ToJSON( { FieldCombobox, ST_SNMP_PRIV_ALGO, "Протокол шифрования", { { "Нет", 0 }, { "DES", 1 }, { "AES128", 2 } } } );
 
     snmpSettings[ "stSNMPReadComunity" ] = Field::ToJSON( { FieldPassword, "*****", "Коммьюнити для чтения" } );
     snmpSettings[ "stSNMPWriteComunity" ] = Field::ToJSON( { FieldPassword, "*****", "Коммьюнити для записи" } );
