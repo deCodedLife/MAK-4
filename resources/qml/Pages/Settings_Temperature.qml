@@ -34,6 +34,7 @@ Page
                 configuration[ "stHightTemperatureTherehold" ],
                 configuration[ "stTemperatureGisteresis" ]
             ]
+
             onFieldUpdated: ( field, value ) => {
                 let newConfig = ConfigManager.current
                 console.log( field, value )
