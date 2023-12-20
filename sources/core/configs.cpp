@@ -84,19 +84,25 @@ void Configs::write( QJsonObject configs )
 QJsonObject Configs::Default()
 {
     QJsonObject data;
-    data[ "snmpVersion" ] = SNMP_VERSION;
-    data[ "host" ] = HOST;
-    data[ "user" ] = USER;
-    data[ "authMethod" ] = AUTH_METHOD;
-    data[ "authProtocol" ] = AUTH_PROTOCOL;
-    data[ "privProtocol" ] = PRIV_PROTOCOL;
-    data[ "authPassword" ] = AUTH_PASSWORD;
-    data[ "privPassword" ] = PRIV_PASSWORD;
 
-    data[ "v2_read" ] = V2_READ;
-    data[ "v2_write" ] = V2_WRITE;
+    QJsonObject mainSettings;
+    mainSettings[ "snmpVersion" ] = Field::ToJSON( { FieldCombobox, SNMP_VERSION, "Версия SNMP", { "snmpV2c", "snmpV3" } } );
+    mainSettings[ "host" ] = Field::ToJSON( { FieldInput, HOST, "IP адрес" } );
+    mainSettings[ "port" ] = Field::ToJSON( { FieldInput, PORT, "Порт" } );
+    mainSettings[ "user" ] = Field::ToJSON( { FieldInput, USER, "Имя" } );
+    mainSettings[ "authMethod" ] = Field::ToJSON( { FieldCombobox, AUTH_METHOD, "Уровень", { "authPriv", "authNoPriv" } } );
+    mainSettings[ "authProtocol" ] = Field::ToJSON( { FieldCombobox, AUTH_PROTOCOL, "Протокол аутентификации", { "SHA1", "MD5" } } );
+    mainSettings[ "privProtocol" ] = Field::ToJSON( { FieldCombobox, PRIV_PROTOCOL, "Протокол приватноси", { "DES", "AES" } } );
+    mainSettings[ "authPassword" ] = Field::ToJSON( { FieldInput, AUTH_PASSWORD, "Пароль аутентификации" } );
+    mainSettings[ "privPassword" ] = Field::ToJSON( { FieldInput, PRIV_PASSWORD, "Пароль приватности" } );
 
-    data[ "updateDelay" ] = UPDATE_DELAY;
+    mainSettings[ "v2_read" ] = Field::ToJSON( { FieldInput, V2_READ, "Для чтения" } );
+    mainSettings[ "v2_write" ] = Field::ToJSON( { FieldInput, V2_WRITE, "Для записи" } );
+
+    mainSettings[ "updateDelay" ] = Field::ToJSON( { FieldInput, UPDATE_DELAY, "Период опроса" } );
+
+    data[ "main" ] = mainSettings;
+
     return data;
 }
 
