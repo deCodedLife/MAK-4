@@ -57,11 +57,11 @@ Page
                     new Wrappers.ContentItem( null, "Нагрузочный 2 (LLVD 2)" ),
                     new Wrappers.ContentItem( null, "Нагрузочный 2 (LLVD 3)" ),
 
-                    new Wrappers.ContentItem( "psContactorSycnro", "", Wrappers.RowTypes.CHECHBOX, "num" ),
-                    new Wrappers.ContentItem( "psContactorBLVDState", "", Wrappers.RowTypes.CHECHBOX, "num" ),
-                    new Wrappers.ContentItem( "psContactorL1VDState", "", Wrappers.RowTypes.CHECHBOX, "num" ),
-                    new Wrappers.ContentItem( "psContactorL2VDState", "", Wrappers.RowTypes.CHECHBOX, "num" ),
-                    new Wrappers.ContentItem( "psContactorL3VDState", "", Wrappers.RowTypes.CHECHBOX, "num" )
+                    new Wrappers.ContentItem( "psContactorSycnro", "", Wrappers.RowTypes.CHECKBOX, "num" ),
+                    new Wrappers.ContentItem( "psContactorBLVDState", "", Wrappers.RowTypes.CHECKBOX, "num" ),
+                    new Wrappers.ContentItem( "psContactorL1VDState", "", Wrappers.RowTypes.CHECKBOX, "num" ),
+                    new Wrappers.ContentItem( "psContactorL2VDState", "", Wrappers.RowTypes.CHECKBOX, "num" ),
+                    new Wrappers.ContentItem( "psContactorL3VDState", "", Wrappers.RowTypes.CHECKBOX, "num" )
                 ]
             }
         }
