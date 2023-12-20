@@ -89,3 +89,52 @@ QJsonObject MibParser::getObject( QString field )
 {
     return oid_object::ToJSON( MIB_OBJECTS[ field ] );
 }
+
+SNMPpp::OID MibParser::ToOID( QString object )
+{
+    SNMPpp::OID oidObject;
+    QStringList pathItems = object.split( "." );
+
+    for( QString item : pathItems )
+    {
+        bool isNumber = true;
+        uint itemNum = item.toUInt( &isNumber );
+
+        if ( isNumber )
+        {
+            oidObject += itemNum;
+            continue;
+        }
+
+        oidObject = SNMPpp::OID( MIB_OBJECTS[ item ].oid.toStdString() );
+    }
+
+    return oidObject;
+}
+
+QString MibParser::FromOID( SNMPpp::OID oid )
+{
+    QStringList objectName;
+
+
+    if ( OID_TOSTR.contains( oid ) )
+    {
+        return OID_TOSTR[ oid ];
+    }
+
+    SNMPpp::OID currentOID = oid;
+    while ( !currentOID.empty() )
+    {
+        QString currentName = QString::fromStdString( currentOID.to_str() );
+        objectName.push_front( "." + currentName.split( "." ).last() );
+        currentOID = currentOID.parent();
+
+        if ( OID_TOSTR.contains( currentOID ) )
+        {
+            objectName.push_front( OID_TOSTR[ currentOID ] );
+            return objectName.join("");
+        }
+    }
+
+    return objectName.join("");
+}
