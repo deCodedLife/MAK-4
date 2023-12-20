@@ -321,7 +321,7 @@ void SNMPConnection::updateConfigs()
                         config[ fieldName ] = field;
                         break;
 
-                    case FieldCheckbox:
+                    case FieldSwitch:
                         field[ "value" ] = fieldValue;
                         config[ fieldName ] = field;
                         break;
