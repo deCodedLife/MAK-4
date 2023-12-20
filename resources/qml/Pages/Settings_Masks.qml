@@ -34,6 +34,7 @@ Page
             updateInterval: Math.max( ConfigManager.get()[ "main" ][ "updateDelay" ][ "value" ] * 1000, 10000 )
             activeColumns: 6
             autoUpdate: false
+            hideSeparators: true
 
             headers: [
                 TableHeaderM {
