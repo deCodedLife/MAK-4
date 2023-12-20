@@ -25,6 +25,10 @@ Page
 
 
         CustomSwitch {
+            Layout.maximumWidth: 1200
+            Layout.alignment: Qt.AlignHCenter| Qt.AlignTop
+            Layout.fillWidth: true
+
             property var field: configuration[ "stContactorControl" ]
             id: handControl
             text: field[ "description" ]
@@ -39,6 +43,10 @@ Page
         }
 
         CardComponent {
+            Layout.maximumWidth: 1200
+            Layout.alignment: Qt.AlignHCenter| Qt.AlignTop
+            Layout.fillWidth: true
+
             enabled: handControl.toggled
 
             fields: [
