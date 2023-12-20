@@ -4,6 +4,7 @@
 #include <QFontDatabase>
 
 #include <configs.h>
+#include <snmpconnection.h>
 
 int main( int argc, char *argv[] )
 {
@@ -27,8 +28,12 @@ int main( int argc, char *argv[] )
         cfg->write( config );
     }
 
+    SNMPConnection *snmp = new SNMPConnection();
+    snmp->SetConfig( cfg );
+
     QQmlContext *ctx = engine.rootContext();
     ctx->setContextProperty( "Config", cfg );
+    ctx->setContextProperty( "SNMP", snmp );
 
 
     engine.load( QUrl( "qrc:/qml/Main.qml" ) );
