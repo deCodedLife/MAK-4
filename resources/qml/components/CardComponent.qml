@@ -11,7 +11,7 @@ Rectangle
     property var fields: []
     property var buttons: []
 
-    signal fieldUpdated( index: int, value: string )
+    signal fieldUpdated( index: string, value: string )
 
     Layout.alignment: Qt.AlignTop
     Layout.fillWidth: true
@@ -84,7 +84,7 @@ Rectangle
                         visible: modelData[ "type" ] === 0 || modelData[ "type" ] === 1
                         placeholderText: modelData[ "description" ]
                         value: modelData[ "value" ]
-                        onChanged: fieldUpdated( index, text )
+                        onChanged: fieldUpdated( modelData[ "field" ], text )
                         echoMode: modelData[ "type" ] === 1 ? TextField.Password : TextField.Normal
                     }
 
@@ -97,7 +97,7 @@ Rectangle
                         onCurrentIndexChanged: {
                             if ( preSelected === currentIndex ) return
                             preSelected = currentIndex
-                            fieldUpdated( index, currentIndex )
+                            fieldUpdated( modelData[ "field" ], modelData[ "model" ][ currentIndex ] )
                         }
                     }
                 }

@@ -39,6 +39,11 @@ Rectangle
 
         Object.keys( rows ).forEach( key => content[ key ] = [] )
 
+        Object.keys( rows ).forEach( key => {
+            if ( typeof( data[ key ] ) === "undefined" ) return;
+            if ( !Array.isArray( data[ key ] ) ) data[ key ] = [ data[ key ] ]
+        } )
+
         let _rowsCount = data[ Object.keys( rows )[ 0 ] ].length
         let _rowsNames = Object.keys( rows )
 

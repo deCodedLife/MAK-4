@@ -220,7 +220,8 @@ void SNMPConnection::updateConnection()
             SNMPpp::openSession(
                 pHandle,
                 address.toStdString(),
-                v2_read.value.toString().toStdString() );
+                v2_read.value.toString().toStdString(),
+                SNMP_VERSION_2c);
         }
         else
         {

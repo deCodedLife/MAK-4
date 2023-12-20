@@ -32,7 +32,6 @@ Page
             spacing: 10
 
             CardComponent {
-                property list<string> indexes: [ "host", "port", "snmpVersion", "updateDelay" ]
                 fields: [
                     configuration[ "host" ],
                     configuration[ "port" ],
@@ -43,9 +42,10 @@ Page
                     { highlited: true, color: Globals.accentColor, text: "Соединить", callback: () => { SNMP.updateConnection() } },
                     { highlited: true, color: Globals.errorColor, text: "Отключить", callback: () => { SNMP.dropConnection() } }
                 ]
-                onFieldUpdated: ( index, value ) => {
+                onFieldUpdated: ( field, value ) => {
                     let newConfig = ConfigManager.current
-                    configuration[ indexes[ index ] ][ "value" ] = value
+                    console.log( field, value )
+                    configuration[ field ][ "value" ] = value
                     newConfig[ "main" ] = configuration
                     ConfigManager.current = newConfig
                 }
@@ -69,6 +69,13 @@ Page
                     configuration[ "v2_write" ],
                     configuration[ "v2_write" ],
                 ]
+
+                onFieldUpdated: ( field, value ) => {
+                    let newConfig = ConfigManager.current
+                    configuration[ field ][ "value" ] = value
+                    newConfig[ "main" ] = configuration
+                    ConfigManager.current = newConfig
+                }
             }
 
             CardComponent {
@@ -82,6 +89,13 @@ Page
                     configuration[ "privPassword" ],
                     configuration[ "privProtocol" ],
                 ]
+
+                onFieldUpdated: ( field, value ) => {
+                    let newConfig = ConfigManager.current
+                    configuration[ field ][ "value" ] = value
+                    newConfig[ "main" ] = configuration
+                    ConfigManager.current = newConfig
+                }
             }
         }
     }

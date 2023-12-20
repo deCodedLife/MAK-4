@@ -13,6 +13,7 @@
 #include <SNMPpp/Session.hpp>
 #include <SNMPpp/Get.hpp>
 #include <SNMPpp/Set.hpp>
+#include <SNMPpp/net-snmppp.hpp>
 
 #include "mibparser.h"
 #include "asyncsnmp.h"
