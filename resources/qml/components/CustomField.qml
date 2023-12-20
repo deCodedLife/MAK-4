@@ -33,8 +33,7 @@ TextField
     validator: {
         if ( !parent.type ) return null
         if ( parent.type === 6 ) return counterValidator
-        if ( parent.type === 8 )
-            return adressValidator
+        if ( parent.type === 8 ) return adressValidator
         return null
     }
 

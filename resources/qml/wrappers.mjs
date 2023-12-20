@@ -57,6 +57,14 @@ export function byHundredZeroOne( value, reverse = false )
             : value * 0.01
 }
 
+export function divideByFour( value, reverse = false )
+{
+    value = value.toString().split( "C10" )[0]
+    return reverse
+            ? escapePrecision( parseFloat( value ).toFixed(2) * 4 )
+            : value / 4
+}
+
 export function verySpecificWrapper( value, reverse = false )
 {
     value = value.toString().split( "C10" )[0]
