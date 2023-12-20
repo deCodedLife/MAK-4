@@ -33,20 +33,20 @@ Page
             ]
 
             content: [
-                configuration[ "deviceInfo0" ],
-                configuration[ "psSerial" ],
+                { type: 5, value: "Серийный номер источника питания" },
+                { type: 4, field: "psSerial" },
 
-                configuration[ "deviceInfo1" ],
-                configuration[ "psDescription" ],
+                { type: 5, value: "Описание источника питания" },
+                { type: 4, field: "psDescription" },
 
-                configuration[ "deviceInfo2" ],
-                addWrapper( configuration[ "psFWRevision" ], ( value ) => {
+                { type: 5, value: "Версия ПО контроллера" },
+                addWrapper( { type: 4, field: "psFWRevision" }, ( value ) => {
                                 let stringVal = value.toString()
                                 return `${stringVal[0]}.${stringVal[1]}.${stringVal[2]}`
                 } ),
 
-                configuration[ "deviceInfo3" ],
-                addWrapper( configuration[ "psTime" ], ( value ) => {
+                { type: 5, value: "Текущее время MAK-4 UTC" },
+                addWrapper( { type: 4, field: "psTime" }, ( value ) => {
                                let dateTime = SNMP.dateToReadable( value ).split( " " )
                                return `${dateTime[0]}\n${dateTime[1]}`
                            } )

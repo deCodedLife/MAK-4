@@ -10,7 +10,7 @@ Rectangle
     id: root
 
     Layout.fillWidth: true
-    height: contentLayout.implicitHeight
+    Layout.preferredHeight: contentLayout.implicitHeight
 
     property list<var> headers: []
     property list<var> content
@@ -26,16 +26,17 @@ Rectangle
 
     ColumnLayout {
         id: contentLayout
-        width: parent.width
-        height: implicitHeight
+        width: root.width
         spacing: 0
 
         Item{ Layout.topMargin: 20 }
 
         ColumnLayout
         {
+            id: headerLayout
+
             Layout.alignment: Qt.AlignTop
-            Layout.fillWidth: true
+            width: contentLayout.width
 
             spacing: 10
             visible: header != ""
@@ -58,7 +59,9 @@ Rectangle
 
         GridLayout {
             id: gridLayout
+            clip: true
 
+            width: contentLayout.width
             Layout.alignment: Qt.AlignTop
             Layout.topMargin: header != "" ? 10 : 0
             Layout.bottomMargin: 20
@@ -118,29 +121,38 @@ Rectangle
 
                     Item {
                         id: item
+                        height: itemText.contentHeight
 
                         Layout.row: (row.currentRow + 1) * 2 + 1
                         Layout.column: index
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: itemText.contentHeight
 
                         Layout.leftMargin: index === 0 ? 20 : 0
                         Layout.rightMargin: (index === headers.length - 1) ? 20 : 0
 
-                        width: itemText.contentWidth
-
                         property var currentVar: content[ index + ( row.currentRow * columnsCount ) ]
+                        property var type: {
+                            if ( typeof( item.currentVar[ "type" ] ) == "undefined" ) return 5
+                            return item.currentVar[ "type" ]
+                        }
 
-                        height: itemText.contentHeight
+                        onWidthChanged: height = itemText.contentHeight
 
                         Text {
                             id: itemText
                             width: item.width
 
-                            visible: item.currentVar[ "type" ] === 4 || item.currentVar[ "type" ] === 5
+                            visible: item.type === 4 || item.type === 5
                             text: {
-                                if ( item.currentVar[ "type" ] === 5 ) return currentVar[ "value" ]
+                                let value = item.currentVar[ "value" ] ?? ""
                                 let wrapper = item.currentVar[ "wrapper" ]
-                                if ( typeof( wrapper ) == "undefined"  ) return values[ index + ( row.currentRow * columnsCount ) ]
-                                return wrapper( values[ index + ( row.currentRow * columnsCount ) ] )
+
+                                if ( item.type === 5 ) value = item.currentVar[ "value" ]
+                                else value = values[ index + ( row.currentRow * columnsCount ) ]
+
+                                if ( typeof( wrapper ) == "undefined" ) return value
+                                return wrapper( value )
                             }
 
                             color: "black"
@@ -150,6 +162,7 @@ Rectangle
 
                             font.bold: true
                             font.pointSize: 14
+
                         }
                     }
                 }

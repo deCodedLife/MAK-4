@@ -59,5 +59,8 @@
         <file>qml/Components/CroppedLine.qml</file>
         <file>qml/Pages/Emergency.qml</file>
         <file>qml/Pages/SignalRelays.qml</file>
+        <file>qml/Pages/Journal.qml</file>
+        <file>qml/Pages/Load.qml</file>
+        <file>qml/Pages/BatteryInfo.qml</file>
     </qresource>
 </RCC>

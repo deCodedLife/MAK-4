@@ -42,13 +42,20 @@ QList<QString> SNMPConnection::getOIDs( QList<QString> objects )
     SNMPpp::PDU pdu( SNMPpp::PDU::kGet );
     QList<QString> reply;
 
+    if ( objects.length() == 0 )
+    {
+        return reply;
+    }
+
     try
     {
         for ( QString objectName : objects )
         {
             if ( !parser.MIB_OBJECTS.contains( objectName ) ) continue;
             oid_object object = parser.MIB_OBJECTS[ objectName ];
-            pdu.addNullVar( SNMPpp::OID( object.oid.toStdString() + ".0" ) );
+            SNMPpp::OID o( object.oid.toStdString() );
+            o += 0;
+            pdu.addNullVar( o );
         }
 
         pdu = SNMPpp::get( pHandle, pdu );
@@ -60,7 +67,13 @@ QList<QString> SNMPConnection::getOIDs( QList<QString> objects )
                 continue;
             }
             oid_object object = parser.MIB_OBJECTS[ objectName ];
-            reply.append( QString::fromStdString( pdu.varlist().asString( object.oid.toStdString() + ".0" ) ) );
+            SNMPpp::OID o( object.oid.toStdString() );
+            o += 0;
+            QString value;
+
+            if ( pdu.varlist().asnType( o ) == ASN_INTEGER ) value = QString::number( *pdu.varlist().valueAt( o ).integer );
+            else value = QString::fromStdString( pdu.varlist().asString( o ) );
+            reply.append( value );
         }
     }
     catch( const std::exception &e )
@@ -76,20 +89,30 @@ QList<QString> SNMPConnection::getBulk( QString object )
 {
     oid_object oid_object = parser.MIB_OBJECTS[ object ];
     SNMPpp::OID oid( oid_object.oid.toStdString() );
-    SNMPpp::PDU pdu( SNMPpp::PDU::kGetNext );
+    SNMPpp::PDU pdu( SNMPpp::PDU::kGetBulk );
     QStringList objects;
 
     try
     {
-        SNMPpp::OID currentOID( oid_object.oid.toStdString() );
+        SNMPpp::OID lastOID = oid;
 
-        while ( true )
+        while (true)
         {
-            pdu = SNMPpp::getNext( pHandle, currentOID );
-            currentOID = pdu.firstOID();
+            bool shouldBreak {false};
 
-            if ( !oid.isParentOf( currentOID ) ) break;
-            objects.append( QString::number( *pdu.varlist().valueAt( currentOID ).integer ) );
+            pdu = SNMPpp::getBulk( pHandle, lastOID );
+            SNMPpp::MapOidVarList list = pdu.varlist().getMap();
+
+            for ( SNMPpp::MapOidVarList::iterator itemIterator = list.begin(); itemIterator != list.end(); itemIterator++ ) {
+                if ( !oid.isParentOf( itemIterator->first ) ) {
+                    shouldBreak = true;
+                    break;
+                };
+                objects.append( QString::number( *itemIterator->second->val.integer ) );
+                lastOID = itemIterator->first;
+            }
+
+            if ( shouldBreak ) break;
         }
     }
     catch ( const std::exception &e )
@@ -236,17 +259,6 @@ QVariant SNMPConnection::getFieldValue( QString object ) {
 void SNMPConnection::initFields()
 {
     QJsonObject fields;
-    fields[ "deviceInfo0" ] = Field::ToJSON( { FieldDescription, "Серийный номер источника питания", "" } );
-    fields[ "psSerial" ] = Field::ToJSON( { FieldText, getFieldValue( "psSerial" ), "Серийный номер источника питания" } );
-
-    fields[ "deviceInfo1" ] = Field::ToJSON( { FieldDescription, "Описание источника питания", "" } );
-    fields[ "psDescription" ] = Field::ToJSON( { FieldText, getFieldValue( "psDescription" ), "Описание источника питания" } );
-
-    fields[ "deviceInfo2" ] = Field::ToJSON( { FieldDescription, "Версия ПО контроллера", "" } );
-    fields[ "psFWRevision" ] = Field::ToJSON( { FieldText, getFieldValue( "psFWRevision" ), "Версия ПО контроллера" } );
-
-    fields[ "deviceInfo3" ] = Field::ToJSON( { FieldDescription, "Текущее время MAK-4 UTC", "" } );
-    fields[ "psTime" ] = Field::ToJSON( { FieldText, getFieldValue( "psTime" ), "Текущее время MAK-4 UTC" } );
 
     for ( QString field : fields.keys() ) {
         QJsonObject fieldObj = fields[ field ].toObject();

@@ -6,7 +6,7 @@ import "../Globals"
 
 Page
 {
-    contentHeight: content.implicitHeight
+    contentHeight: content.implicitHeight + 20
 
     function addWrapper( config, wrapper ) {
         config[ "wrapper" ] = wrapper
@@ -30,7 +30,6 @@ Page
 
             TableComponent {
                 Layout.alignment: Qt.AlignTop
-
                 header: "Таблица аварий 1-й степени"
 
                 headers: [
