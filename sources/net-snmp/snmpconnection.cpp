@@ -201,12 +201,6 @@ void SNMPConnection::setMultiple( QJsonObject fields )
             pConfigs->write( settings );
         }
 
-        if ( field[ "type" ] == FieldCombobox )
-        {
-            value = field[ "model" ].toObject()[ field[ "value" ].toString() ].toInt();
-        }
-
-
         oid_object obj = parser.MIB_OBJECTS[ key ];
         SNMPpp::OID oid( parser.ToOID( key + ".0" ) );
 
@@ -305,17 +299,8 @@ void SNMPConnection::updateConfigs()
                 switch ( field[ "type" ].toInt() )
                 {
                     case FieldCombobox:
-
-                        for ( QString modelKey : field[ "model" ].toObject().keys() ) {
-
-                            int modelValue = field[ "model" ].toObject()[ modelKey ].toInt();
-                            if ( modelValue == fieldValue )
-                            {
-                                field[ "value" ] = modelKey;
-                                config[ fieldName ] = field;
-                                break;
-                            }
-                        }
+                        field[ "value" ] = fieldValue;
+                        config[ fieldName ] = field;
 
                         break;
 
@@ -347,6 +332,22 @@ void SNMPConnection::updateConfigs()
     }
 }
 
+void SNMPConnection::sendConfigs()
+{
+    QJsonObject configs = pConfigs->get();
+
+    for ( QString key : configs.keys() )
+    {
+        if ( key == "main" || key == "errors" || key == "masks" || key == "journal" ) continue;
+        setMultiple( configs[ key ].toObject() );
+    }
+}
+
+void SNMPConnection::sendConfigsChangedEvent()
+{
+    emit settingsChanged();
+}
+
 QString SNMPConnection::dateToReadable( QString date )
 {
     return QDateTime::fromString( date, "ddMMyyyyhhmmss" ).toString( "dd-MM-yyyy hh:mm:ss" );
@@ -374,7 +375,7 @@ void SNMPConnection::updateConnection( bool sync )
 
     try
     {
-        if ( snmpVer.value.toString() == "snmpV2c" )
+        if ( snmpVer.value.toInt() == 1 )
         {
             Field v2_write = Field::FromJSON( configs[ "v2_write" ].toObject() );
             Field v2_read = Field::FromJSON(configs[ "v2_read" ].toObject());
@@ -407,9 +408,9 @@ void SNMPConnection::updateConnection( bool sync )
                 user.value.toString().toStdString(),
                 authPassword.value.toString().toStdString(),
                 privPassword.value.toString().toStdString(),
-                authMethod.value.toString().toStdString(),
-                authProtocol.value.toString().toStdString(),
-                privProtocol.value.toString().toStdString()
+                authMethod.model[ authMethod.value.toString() ].toString().toStdString(),
+                authProtocol.model[ authProtocol.value.toString() ].toString().toStdString(),
+                privProtocol.model[ privProtocol.value.toString() ].toString().toStdString()
             );
 
             writeSession = readSession;

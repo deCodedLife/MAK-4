@@ -81,6 +81,73 @@ void Configs::write( QJsonObject configs )
     m_file->close();
 }
 
+void Configs::saveFile( QString fileName )
+{
+    m_file = new QFile( fileName );
+
+    if ( !m_file->open( QIODevice::WriteOnly | QIODevice::Truncate ) )
+    {
+        // Open file for writing
+        emit error_occured( Callback::New( "Не удалось открыть файл: " + m_file->errorString(), Callback::Error ) );
+        return;
+    }
+
+    if ( !isValid( config ) )
+    {
+        // Validate configs
+        return;
+    }
+
+    // Convert json to hexed string
+    QByteArray configsHexed = QJsonDocument( config )
+                                  .toJson( QJsonDocument::Compact )
+                                  .toHex();
+
+    // Write configuration
+    m_file->write( configsHexed );
+    m_file->close();
+}
+
+void Configs::openFile( QString fileName )
+{
+    m_file = new QFile( fileName );
+
+    if ( !m_file->exists() )
+    {
+        // Check if file exists
+        emit error_occured( Callback::New( "Файл [ " + fileName + " ] Не найден", Callback::Error ) );
+        return;
+    }
+
+    if ( !m_file->open( QIODevice::ReadOnly ) )
+    {
+        // Open file for reading
+        emit error_occured( Callback::New( "Не удалось открыть файл: " + m_file->errorString(), Callback::Error ) );
+        return;
+    }
+
+    // Reading file
+    QByteArray contentHexed = m_file->readAll();
+    QByteArray decodedContent = QByteArray::fromHex( contentHexed );
+
+    if ( !isValid( QJsonDocument::fromJson( decodedContent ).object() ) )
+    {
+        return;
+    }
+
+    QJsonParseError *err = nullptr;
+    config = QJsonDocument::fromJson( decodedContent, err ).object();
+
+    if ( err != nullptr ) {
+        emit error_occured( Callback::New( "Не удалось прочитать файл: " + err->errorString(), Callback::Error ) );
+        return;
+    }
+
+    emit updated( config );
+
+    m_file->close();
+}
+
 QJsonObject Configs::Default()
 {
     QJsonObject data;
@@ -89,13 +156,13 @@ QJsonObject Configs::Default()
      * @brief mainSettings
      */
     QJsonObject mainSettings;
-    mainSettings[ "stSNMPVersion" ] = Field::ToJSON( { FieldCombobox, SNMP_VERSION, "Версия SNMP", { {"snmpV2c", 2}, {"snmpV3", 3 } } } );
+    mainSettings[ "stSNMPVersion" ] = Field::ToJSON( { FieldCombobox, SNMP_VERSION, "Версия SNMP", { { "1", "snmpV2c" }, { "3", "snmpV3" } } } );
     mainSettings[ "host" ] = Field::ToJSON( { FieldInput, HOST, "IP адрес" } );
     mainSettings[ "port" ] = Field::ToJSON( { FieldInput, PORT, "Порт" } );
     mainSettings[ "stSNMPAdministratorName" ] = Field::ToJSON( { FieldInput, USER, "Имя" } );
-    mainSettings[ "authMethod" ] = Field::ToJSON( { FieldCombobox, AUTH_METHOD, "Уровень", { { "authPriv", 0 }, { "authNoPriv", 0 } } } );
-    mainSettings[ "stSNMPSAuthAlgo" ] = Field::ToJSON( { FieldCombobox, AUTH_PROTOCOL, "Протокол аутентификации", { { "SHA1", 2 }, { "MD5", 1 } } } );
-    mainSettings[ "stSNMPSPrivAlgo" ] = Field::ToJSON( { FieldCombobox, PRIV_PROTOCOL, "Протокол приватноси", { { "DES", 1 }, { "AES", 2 } } } );
+    mainSettings[ "authMethod" ] = Field::ToJSON( { FieldCombobox, AUTH_METHOD, "Уровень", { { "0", "authPriv" }, { "1", "authNoPriv" } } } );
+    mainSettings[ "stSNMPSAuthAlgo" ] = Field::ToJSON( { FieldCombobox, AUTH_PROTOCOL, "Протокол аутентификации", { { "2", "SHA1" }, { "1", "MD5" } } } );
+    mainSettings[ "stSNMPSPrivAlgo" ] = Field::ToJSON( { FieldCombobox, PRIV_PROTOCOL, "Протокол приватноси", { { "1", "DES" }, { "2", "AES" } } } );
     mainSettings[ "stSNMPAdministratorAuthPassword" ] = Field::ToJSON( { FieldPassword, AUTH_PASSWORD, "Пароль аутентификации" } );
     mainSettings[ "stSNMPAdministratorPrivPassword" ] = Field::ToJSON( { FieldPassword, PRIV_PASSWORD, "Пароль приватности" } );
 
@@ -108,7 +175,7 @@ QJsonObject Configs::Default()
      * @brief snmpSettings
      */
     QJsonObject snmpSettings;
-    snmpSettings[ "stSNMPVersion" ] = Field::ToJSON( { FieldCombobox, ST_SNMP_VERSION, "Версия протокола Snmp", { { "snmpV2c", 1 }, { "snmpV3", 3 } } } );
+    snmpSettings[ "stSNMPVersion" ] = Field::ToJSON( { FieldCombobox, SNMP_VERSION, "Версия протокола Snmp", { { "1", "snmpV2c" }, { "3", "snmpV3" } } } );
 
     snmpSettings[ "stSNMPAdministratorName" ] = Field::ToJSON( { FieldInput, "Admin", "Имя администратора" } );
     snmpSettings[ "stSNMPAdministratorAuthPassword" ] = Field::ToJSON( { FieldPassword, "*****", "Пароль аутентификации администратора" } );
@@ -122,8 +189,8 @@ QJsonObject Configs::Default()
     snmpSettings[ "stSNMPOperatorAuthPassword" ] = Field::ToJSON( { FieldPassword, "*****", "Пароль аутентификации оператора" } );
     snmpSettings[ "stSNMPOperatorPrivPassword" ] = Field::ToJSON( { FieldPassword, "*****", "Приватный пароль оператора" } );
 
-    snmpSettings[ "stSNMPSAuthAlgo" ] = Field::ToJSON( { FieldCombobox, ST_SNMP_AUTH_ALGO, "Протокол приватности", { { "Нет", 0 }, { "MD5", 1 }, { "SHA1", 2 } } } );
-    snmpSettings[ "stSNMPSPrivAlgo" ] = Field::ToJSON( { FieldCombobox, ST_SNMP_PRIV_ALGO, "Протокол шифрования", { { "Нет", 0 }, { "DES", 1 }, { "AES128", 2 } } } );
+    snmpSettings[ "stSNMPSAuthAlgo" ] = Field::ToJSON( { FieldCombobox, AUTH_PROTOCOL, "Протокол приватности", { { "0", "Нет" }, { "1", "MD5" }, { "2", "SHA1" } } } );
+    snmpSettings[ "stSNMPSPrivAlgo" ] = Field::ToJSON( { FieldCombobox, PRIV_PROTOCOL, "Протокол шифрования", { { "0", "Нет" }, { "1", "DES" }, { "2", "AES128" } } } );
 
     snmpSettings[ "stSNMPReadComunity" ] = Field::ToJSON( { FieldPassword, "*****", "Коммьюнити для чтения" } );
     snmpSettings[ "stSNMPWriteComunity" ] = Field::ToJSON( { FieldPassword, "*****", "Коммьюнити для записи" } );
@@ -220,7 +287,7 @@ QJsonObject Configs::Default()
     QJsonObject configurationSettings;
     configurationSettings[ "stBatteryGroupsNumber" ] = Field::ToJSON( { FieldCounter, 0, "Количество групп батареи", {}, 0, 4 } );
     configurationSettings[ "stLoadFusesNumber" ] = Field::ToJSON( { FieldCounter, 1, "Количество автоматов нагрузки", {}, 1, 52 } );
-    configurationSettings[ "stLVDsNumber" ] = Field::ToJSON( { FieldCombobox, "Нет", "Kоличество контакторов", { { "Нет", 0 }, { "Только BLVD", 1 }, { "2-BLVD и LLVD1", 2 }, { "3-BLVD, LLVD1 и LLVD2", 3 } } } );
+    configurationSettings[ "stLVDsNumber" ] = Field::ToJSON( { FieldCombobox, "Нет", "Kоличество контакторов", { { "0", "Нет" }, { "1", "Только BLVD" }, { "2", "2-BLVD и LLVD1" }, { "3", "3-BLVD, LLVD1 и LLVD2" } } } );
     configurationSettings[ "stVBVNumber" ] = Field::ToJSON( { FieldCounter, 1, "Kоличество ВБВ", {}, 1, 180 } );
 
 

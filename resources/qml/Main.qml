@@ -4,6 +4,8 @@ import QtQuick.Controls
 import QtQuick.Controls.Material
 import QtQuick.Controls.Material.impl
 
+import QtQuick.Dialogs
+
 import "Globals"
 import "Components"
 
@@ -22,6 +24,24 @@ ApplicationWindow
     Material.theme: Material.Light
     Material.accent: Material.Blue
     Material.containerStyle: Material.Filled
+
+    FileDialog {
+        id: fileDialog
+        nameFilters: ["MAK-4 settings files (*.m4ss)"]
+        fileMode: FileDialog.OpenFile
+        onAccepted: {
+            let file = selectedFile.toString()
+            if ( Qt.platform.os === "windows" ) file = file.split( "file:///" )[ 1 ]
+            else file = file.split( "file://" )[ 1 ]
+
+            if ( fileMode == FileDialog.OpenFile ) ConfigManager.openFile( file )
+            else ConfigManager.saveFile( file )
+
+            SNMP.dropConnection()
+            SNMP.sendConfigsChangedEvent()
+        }
+        Component.onCompleted: LeftMenuG.fileDialog = fileDialog
+    }
 
     ColumnLayout {
         anchors.fill: parent

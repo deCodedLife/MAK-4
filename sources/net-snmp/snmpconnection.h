@@ -53,6 +53,8 @@ public:
     Q_INVOKABLE void setOID( QString, QVariant );
     Q_INVOKABLE void setMultiple( QJsonObject );
     Q_INVOKABLE void updateConfigs();
+    Q_INVOKABLE void sendConfigs();
+    Q_INVOKABLE void sendConfigsChangedEvent();
 
     Q_INVOKABLE QString dateToReadable( QString );
     Q_INVOKABLE QJsonArray getGroup( QString );

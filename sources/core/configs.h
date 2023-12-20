@@ -3,19 +3,18 @@
 #define CONFIG_FILE "config.m4ss"
 
 // 0 - SNMP 2, 1 - SNMP3
-#define SNMP_VERSION "snmpV3"
+#define SNMP_VERSION 3
 #define HOST "185.51.21.124"//185.51.21.124
 #define PORT "16190"
 #define USER "user000001"
-#define AUTH_METHOD "authPriv"
-#define AUTH_PROTOCOL "MD5"
-#define PRIV_PROTOCOL "AES"
+#define AUTH_METHOD 0
+#define AUTH_PROTOCOL 1
+#define PRIV_PROTOCOL 2
 #define AUTH_PASSWORD "0000000001"
 #define PRIV_PASSWORD "0000000011"
 #define UPDATE_DELAY 3
 
 // SNMP SETTINGS
-#define ST_SNMP_VERSION "snmpV3"
 #define ST_SNMP_AUTH_ALGO "MD5"
 #define ST_SNMP_PRIV_ALGO "AES128"
 
@@ -118,6 +117,9 @@ public:
 
     Q_INVOKABLE QJsonObject get();
     Q_INVOKABLE void write( QJsonObject );
+
+    Q_INVOKABLE void saveFile( QString );
+    Q_INVOKABLE void openFile( QString );
 
     void Read( QJsonObject* );
     static QJsonObject Default();
