@@ -19,7 +19,7 @@ Page
     }
 
     state: {
-        SNMP.getOIDs( buttonOID, [ buttonOID ] )
+        SNMP.getOIDs( buttonOID, [ buttonOID + ".0" ] )
         return "null"
     }
 

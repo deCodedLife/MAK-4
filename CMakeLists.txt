@@ -44,13 +44,7 @@ qt_add_executable(MAK-4
     ${SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/sources/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/resources/qml.qrc
-)
-
-qt_add_qml_module(MAK-4
-    URI AtolServer
-    VERSION 1.0
-    SOURCES sources/gui/customdoublevalidator.h sources/gui/customdoublevalidator.cpp
-    RESOURCES sources/gui/CMakeLists.txt
+    ${CMAKE_CURRENT_SOURCE_DIR}/resources/MAK.rc
 )
 
 if ( APPLE )

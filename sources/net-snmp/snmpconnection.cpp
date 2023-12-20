@@ -80,6 +80,7 @@ void SNMPConnection::getOIDs( QString uid, QList<QString> objects )
 void SNMPConnection::handleSNMPRequest( QString root, QMap<SNMPpp::OID, QJsonObject> rows )
 {
     if ( rows.empty() ) return;
+    if ( readSession == NULL ) return;
 
     QJsonObject fields;
 
@@ -201,12 +202,6 @@ void SNMPConnection::setMultiple( QJsonObject fields )
             pConfigs->write( settings );
         }
 
-        if ( field[ "type" ] == FieldCombobox )
-        {
-            value = field[ "model" ].toObject()[ field[ "value" ].toString() ].toInt();
-        }
-
-
         oid_object obj = parser.MIB_OBJECTS[ key ];
         SNMPpp::OID oid( parser.ToOID( key + ".0" ) );
 
@@ -305,17 +300,8 @@ void SNMPConnection::updateConfigs()
                 switch ( field[ "type" ].toInt() )
                 {
                     case FieldCombobox:
-
-                        for ( QString modelKey : field[ "model" ].toObject().keys() ) {
-
-                            int modelValue = field[ "model" ].toObject()[ modelKey ].toInt();
-                            if ( modelValue == fieldValue )
-                            {
-                                field[ "value" ] = modelKey;
-                                config[ fieldName ] = field;
-                                break;
-                            }
-                        }
+                        field[ "value" ] = fieldValue;
+                        config[ fieldName ] = field;
 
                         break;
 
@@ -347,6 +333,22 @@ void SNMPConnection::updateConfigs()
     }
 }
 
+void SNMPConnection::sendConfigs()
+{
+    QJsonObject configs = pConfigs->get();
+
+    for ( QString key : configs.keys() )
+    {
+        if ( key == "main" || key == "errors" || key == "masks" || key == "journal" ) continue;
+        setMultiple( configs[ key ].toObject() );
+    }
+}
+
+void SNMPConnection::sendConfigsChangedEvent()
+{
+    emit settingsChanged();
+}
+
 QString SNMPConnection::dateToReadable( QString date )
 {
     return QDateTime::fromString( date, "ddMMyyyyhhmmss" ).toString( "dd-MM-yyyy hh:mm:ss" );
@@ -355,26 +357,25 @@ QString SNMPConnection::dateToReadable( QString date )
 void SNMPConnection::updateConnection( bool sync )
 {
     requests.clear();
-
-    SOCK_CLEANUP;
-    SOCK_STARTUP;
-
     _state = Disconnected;
     emit stateChanged( _state );
 
     QJsonObject configs = pConfigs->get()[ "main" ].toObject();
-    SNMPpp::closeSession( readSession );
 
     Field host = Field::FromJSON( configs[ "host" ].toObject() );
     Field port = Field::FromJSON( configs[ "port" ].toObject() );
 
     QString address = "udp:" + host.value.toString() + ":" + port.value.toString();
-
     Field snmpVer = Field::FromJSON( configs[ "stSNMPVersion" ].toObject() );
 
     try
     {
-        if ( snmpVer.value.toString() == "snmpV2c" )
+        dropConnection( false );
+
+        SOCK_CLEANUP;
+        SOCK_STARTUP;
+
+        if ( snmpVer.value.toInt() != SNMP_VERSION )
         {
             Field v2_write = Field::FromJSON( configs[ "v2_write" ].toObject() );
             Field v2_read = Field::FromJSON(configs[ "v2_read" ].toObject());
@@ -390,6 +391,8 @@ void SNMPConnection::updateConnection( bool sync )
                 address.toStdString(),
                 v2_write.value.toString().toStdString(),
                 SNMP_VERSION_2c);
+
+            _currentVersion = 1;
         }
         else
         {
@@ -407,12 +410,13 @@ void SNMPConnection::updateConnection( bool sync )
                 user.value.toString().toStdString(),
                 authPassword.value.toString().toStdString(),
                 privPassword.value.toString().toStdString(),
-                authMethod.value.toString().toStdString(),
-                authProtocol.value.toString().toStdString(),
-                privProtocol.value.toString().toStdString()
+                authMethod.model[ authMethod.value.toString() ].toString().toStdString(),
+                authProtocol.model[ authProtocol.value.toString() ].toString().toStdString(),
+                privProtocol.model[ privProtocol.value.toString() ].toString().toStdString()
             );
 
             writeSession = readSession;
+            _currentVersion = SNMP_VERSION;
         }
 
         if ( readSession == NULL ) {
@@ -446,9 +450,6 @@ void SNMPConnection::updateConnection( bool sync )
     }
     catch ( const std::exception &e )
     {
-        SOCK_CLEANUP;
-        SNMPpp::closeSession( readSession );
-
         QString error = QString::fromStdString( e.what() );
 
         _state = Disconnected;
@@ -456,16 +457,34 @@ void SNMPConnection::updateConnection( bool sync )
         emit error_occured( Callback::New( error, Callback::Error ) );
 
         emit notify( -1, "Ошибка SNMP: " + error, 3000 );
+        dropConnection();
     }
 }
 
-void SNMPConnection::dropConnection()
+void SNMPConnection::dropConnection( bool sendNotify )
 {
-    SOCK_CLEANUP;
-    _state = Disconnected;
-    emit stateChanged( _state );
-    SNMPpp::closeSession( readSession );
-    emit notify( -1, "Соединение сброшено", 3000 );
+    if ( _state == Disconnected ) return;
+
+    try {
+        _state = Disconnected;
+        emit stateChanged( _state );
+        if ( sendNotify ) emit notify( -1, "Соединение сброшено", 3000 );
+        SOCK_CLEANUP;
+
+        if ( readSession == NULL ) return;
+        if ( _currentVersion == SNMP_VERSION )
+        {
+            SNMPpp::closeSession( readSession );
+            writeSession = NULL;
+            return;
+        }
+
+        SNMPpp::closeSession( readSession );
+        SNMPpp::closeSession( writeSession );
+    } catch( std::exception &e )
+    {
+        emit error_occured( Callback::New( e.what(), Callback::Error ) );
+    }
 }
 
 QVariant SNMPConnection::getFieldValue( QString object ) {

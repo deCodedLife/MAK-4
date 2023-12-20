@@ -16,29 +16,48 @@ ComboBox
     currentIndex: -1
 
     displayText: ""
-    model: Object.keys( parent.model ?? [] )
+    model: {
+        let _model = []
+        let keys = Object.keys( parent.model ?? [] )
+        for ( let index = 0; index < keys.length; index++ )
+            _model.push( parent.model[ keys[ index ] ] )
+        return _model
+    }
+
     Material.accent: Globals.accentColor
 
     function find() {
         if ( model.length === 0 ) return
-        for ( let index = 0; index < model.length; index++ ) {
-            if ( model[ index ] === value ) {
+        let _keys = Object.keys( parent.model ?? [] )
+
+        for ( let index = 0; index < _keys.length; index++ ) {
+            let keyName = _keys[ index ]
+            if ( parseInt( keyName ) === value ) {
                 preSelected = index
                 currentIndex = index
                 break
             }
         }
-        displayText = `${parent.placeholder ?? ""}: ` + Object.keys( parent.model ?? {} )[ currentIndex ]
+
+        displayText = `${parent.placeholder ?? ""}: ` + ( model[ preSelected ] ?? "" )
     }
 
     onModelChanged: find()
     onCurrentIndexChanged: {
         if ( preSelected === currentIndex ) return
-        let key = Object.keys( parent.model ?? [] )[ currentIndex ]
-        parent.updateField( key )
-        preSelected = currentIndex
-        parent.value = key
-        find()
+        let keys = Object.keys( parent.model ?? {} )
+
+        for ( let index = 0; index < keys.length; index++ ) {
+            let currentValue = keys[ index ]
+            if ( parent.model[ currentValue ] === model[ currentIndex ] ) {
+                parent.updateField( currentValue )
+                preSelected = currentIndex
+                parent.value = currentValue
+                find()
+
+                return
+            }
+        }
     }
 
     Component.onCompleted: {

@@ -46,11 +46,23 @@ export class ContentItem
     }
 }
 
+function escapePrecision( value ) {
+    return parseInt( parseFloat( value ).toPrecision(12) )
+}
+
 export function byHundredZeroOne( value, reverse = false )
 {
     return reverse
             ? parseFloat( value ).toFixed(2) / 0.01
             : value * 0.01
+}
+
+export function divideByFour( value, reverse = false )
+{
+    value = value.toString().split( "C10" )[0]
+    return reverse
+            ? escapePrecision( parseFloat( value ).toFixed(2) * 4 )
+            : value / 4
 }
 
 export function verySpecificWrapper( value, reverse = false )
@@ -63,17 +75,17 @@ export function verySpecificWrapper( value, reverse = false )
 
 export function divideByTen( value, reverse = false ) {
     return reverse
-            ? parseFloat( value ).toFixed(1) * 10
+            ? escapePrecision( parseFloat( value ).toFixed(1) * 10 )
             : value / 10
 }
 export function divideByHundred( value, reverse = false ) {
     return reverse
-            ? parseFloat( value ).toFixed(2) * 100
+            ? escapePrecision( parseFloat( value ).toFixed(2) * 100 )
             : value / 100
 }
 export function divideByThousand( value, reverse = false ){
     return reverse
-            ? parseFloat( value ).toFixed(3) * 1000
+            ? escapePrecision( parseFloat( value ).toFixed(3) * 1000 )
             : value / 1000
 }
 export function secondsToMinutes( value, reverse = false ){
@@ -91,13 +103,8 @@ export function getFieldValue( field, value ) {
         else if ( value === "false" ) return 0;
         return value ? 1 : 0;
     }
-    if ( field[ "type" ] === RowTypes.COMBOBOX ) {
-        for ( let index = 0; index < Object.keys( field[ "model" ] ).length; index++ ) {
-            let fieldKey = Object.keys( field[ "model" ] )[ index ]
-            let fieldValue = field[ "model" ][ fieldKey ]
-            if ( fieldKey == value ) return fieldValue
-        }
-    }
+    if ( field[ "type" ] === RowTypes.COMBOBOX )
+        return parseInt( value )
     // if ( field[ "type" ] !== RowTypes.CHECKBOX && field[ "type" ] !== RowTypes.COUNTER )
     return value
     // else return parseFloat( value ).toFixed(1)

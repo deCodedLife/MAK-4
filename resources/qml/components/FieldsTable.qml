@@ -22,6 +22,7 @@ Rectangle
 
     property bool loaded
     property bool autoUpdate: true
+    property bool hideSeparators: false
     property string header: ""
     property string hashRoot
     property list<Item> headers
@@ -191,14 +192,20 @@ Rectangle
 
 
                 Repeater {
+                    enabled: !hideSeparators
+                    visible: !hideSeparators
                     model: rowsCount
                     Item {
+                        enabled: !hideSeparators
+                        visible: !hideSeparators
                         Layout.row: (index + 1) * 2
                         width: 0
                         height: 0
-                        // CroppedLine {
-                            // width: gridLayout.width
-                        // }
+                        CroppedLine {
+                            enabled: !hideSeparators
+                            visible: !hideSeparators
+                            width: gridLayout.width
+                        }
                     }
                 }
 
@@ -213,22 +220,23 @@ Rectangle
 
                         Item {
                             id: item
-                            height: itemText.contentHeight
+                            height: _height
 
                             Layout.row: (row.currentRow + 1) * 2 + 1
                             Layout.column: index
                             Layout.fillWidth: headers[ index ][ "expand" ]
                             Layout.minimumWidth: headers[ index ][ "expand" ] === false ? itemText.implicitWidth : null
 
-                            Layout.preferredHeight: {
+                            property int _height: {
                                 if ( itemText.visible ) return itemText.contentHeight
                                 if ( checkbox.visible ) return checkbox.height
                                 if ( switchValue.visible ) return switchValue.height
-
                                 return 0
                             }
 
+                            Layout.preferredHeight: _height
                             Layout.preferredWidth: headers[ index ][ "expand" ]  === false ? itemText.contentWidth : null
+                            onWidthChanged: height = itemText.contentHeight
 
                             Layout.leftMargin: index === 0 ? 20 : 0
                             Layout.rightMargin: (index === headers.length - 1) ? 20 : 0
@@ -239,12 +247,11 @@ Rectangle
                                 return item.currentVar[ "type" ]
                             }
 
-                            onWidthChanged: height = itemText.contentHeight
-
                             CustomSwitch {
                                 id: switchValue
                                 width: item.width
                                 visible: item.type === 5
+                                anchors.centerIn: parent
                                 property bool previousState: item.currentVar[ "value" ] === 1
 
                                 toggled: {
@@ -279,10 +286,10 @@ Rectangle
                             Text {
                                 id: itemText
                                 width: item.width
+                                anchors.centerIn: parent
 
                                 visible: item.type === 0 || item.type === 1
                                 text: item.currentVar[ "value" ]
-
                                 color: "black"
 
                                 horizontalAlignment: Text.AlignLeft

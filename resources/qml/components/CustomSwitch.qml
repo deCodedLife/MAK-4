@@ -14,15 +14,19 @@ Item
     signal contentChanged( int value )
     state: toggled ? "enabled" : "disabled"
 
+    width: parent.width
+    height: content.height
+
     Layout.fillWidth: true
     Layout.alignment: Qt.AlignVCenter
 
-    anchors.fill: parent
     anchors.centerIn: parent
 
     RowLayout {
         id: content
-        anchors.fill: parent
+
+        width: parent.width
+        height: implicitHeight
         anchors.centerIn: parent
 
         spacing: dobbled ? 10 : 5
@@ -108,7 +112,8 @@ Item
         cursorShape: Qt.PointingHandCursor
         onClicked: {
             toggled = !toggled
-            control.parent.updateField( toggled )
+            if ( control.parent.updateField )
+                control.parent.updateField( toggled )
             contentChanged( toggled )
         }
     }

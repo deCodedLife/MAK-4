@@ -5,11 +5,22 @@ import QtQuick.Controls.Material
 
 import "../Components"
 import "../Globals"
+import "../wrappers.mjs" as Wrappers
 
 Page
 {
     property var configuration: ConfigManager.get()[ "main" ]
     contentHeight: pageContent.implicitHeight + 20
+
+    Connections
+    {
+        target: SNMP
+
+        function onSettingsChanged()
+        {
+            configuration = ConfigManager.get()[ "main" ]
+        }
+    }
 
     ColumnLayout {
         id: pageContent
@@ -43,7 +54,7 @@ Page
                 ]
                 onFieldUpdated: ( field, value ) => {
                     let newConfig = ConfigManager.current
-                    console.log( field, value )
+                    value = Wrappers.getFieldValue( configuration[ field ], value )
                     configuration[ field ][ "value" ] = value
                     newConfig[ "main" ] = configuration
                     ConfigManager.current = newConfig
@@ -65,12 +76,13 @@ Page
             CardComponent {
                 header: "SNMP v2C (Community)"
                 fields: [
-                    configuration[ "v2_write" ],
+                    configuration[ "v2_read" ],
                     configuration[ "v2_write" ],
                 ]
 
                 onFieldUpdated: ( field, value ) => {
                     let newConfig = ConfigManager.current
+                    value = Wrappers.getFieldValue( configuration[ field ], value )
                     configuration[ field ][ "value" ] = value
                     newConfig[ "main" ] = configuration
                     ConfigManager.current = newConfig
@@ -79,7 +91,7 @@ Page
 
             CardComponent {
                 header: "SNMP v3"
-                // TODO find value from array in combobox
+
                 fields: [
                     configuration[ "stSNMPAdministratorName" ],
                     configuration[ "authMethod" ],
@@ -91,6 +103,7 @@ Page
 
                 onFieldUpdated: ( field, value ) => {
                     let newConfig = ConfigManager.current
+                    value = Wrappers.getFieldValue( configuration[ field ], value )
                     configuration[ field ][ "value" ] = value
                     newConfig[ "main" ] = configuration
                     ConfigManager.current = newConfig

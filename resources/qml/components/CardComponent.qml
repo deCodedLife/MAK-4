@@ -78,7 +78,7 @@ Rectangle
 
                 delegate: Loader {
                     width: contentList.width
-                    height: 54
+                    height: 52
 
                     id: customItem
                     property var fields: {
@@ -86,7 +86,8 @@ Rectangle
                         3: "CustomField.qml",
                         4: "CustomDropDown.qml",
                         5: "CustomSwitch.qml",
-                        6: "CustomField.qml"
+                        6: "CustomField.qml",
+                        8: "CustomField.qml"
                     }
 
                     property int type: modelData[ "type" ]
@@ -115,7 +116,6 @@ Rectangle
 
                     function updateField( newValue ) {
                         if ( wrapper ) newValue = wrapper( newValue, true )
-                        if ( newValue === value && type != 5 ) return
                         fieldUpdated( objectName, newValue )
                     }
 

@@ -59,19 +59,19 @@ Page
                     let _fields = []
 
                     let floatVoltage = configuration[ "stFloatVoltage" ]
-                    floatVoltage[ "wrapper" ] = Wrappers.byHundredZeroOne
+                    floatVoltage[ "wrapper" ] = Wrappers.divideByHundred
                     _fields.push( floatVoltage )
 
                     let eqVoltage = configuration[ "stEqualizeVoltage" ]
-                    eqVoltage[ "wrapper" ] = Wrappers.byHundredZeroOne
+                    eqVoltage[ "wrapper" ] = Wrappers.divideByHundred
                     _fields.push( eqVoltage )
 
                     let lowVoltage = configuration[ "stCriticalLowVoltage" ]
-                    lowVoltage[ "wrapper" ] = Wrappers.byHundredZeroOne
+                    lowVoltage[ "wrapper" ] = Wrappers.divideByHundred
                     _fields.push( lowVoltage )
 
                     let chargeLimit = configuration[ "stChargeCurrentLimit" ]
-                    chargeLimit[ "wrapper" ] = Wrappers.byHundredZeroOne
+                    chargeLimit[ "wrapper" ] = Wrappers.divideByHundred
                     _fields.push( chargeLimit )
 
                     _fields.push( configuration[ "stEqualizeTime" ] )
@@ -90,7 +90,7 @@ Page
                     fields: {
                         let _fields = []
                         let boostVoltage = configuration[ "stBoostVoltage" ]
-                        boostVoltage[ "wrapper" ] = Wrappers.byHundredZeroOne
+                        boostVoltage[ "wrapper" ] = Wrappers.divideByHundred
                         _fields.push( boostVoltage )
                         _fields.push( configuration[ "stBoostEnable" ] )
                         return _fields
@@ -118,7 +118,7 @@ Page
                     fields: {
                         let _fields = []
                         let endTestVoltage = configuration[ "stEndTestVoltage" ]
-                        endTestVoltage[ "wrapper" ] = Wrappers.byHundredZeroOne
+                        endTestVoltage[ "wrapper" ] = Wrappers.divideByHundred
                         _fields.push( endTestVoltage )
                         _fields.push( configuration[ "stGroupCapacity" ] )
                         return _fields
