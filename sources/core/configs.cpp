@@ -220,7 +220,7 @@ QJsonObject Configs::Default()
     QJsonObject configurationSettings;
     configurationSettings[ "stBatteryGroupsNumber" ] = Field::ToJSON( { FieldCounter, 0, "Количество групп батареи", {}, 0, 4 } );
     configurationSettings[ "stLoadFusesNumber" ] = Field::ToJSON( { FieldCounter, 1, "Количество автоматов нагрузки", {}, 1, 52 } );
-    configurationSettings[ "stLVDsNumber" ] = Field::ToJSON( { FieldCombobox, "None", "Kоличество контакторов", { { "None", 0 }, { "Только BLVD", 1 }, { "2-BLVD и LLVD1", 2 }, { "3-BLVD, LLVD1 и LLVD2", 3 } } } );
+    configurationSettings[ "stLVDsNumber" ] = Field::ToJSON( { FieldCombobox, "Нет", "Kоличество контакторов", { { "Нет", 0 }, { "Только BLVD", 1 }, { "2-BLVD и LLVD1", 2 }, { "3-BLVD, LLVD1 и LLVD2", 3 } } } );
     configurationSettings[ "stVBVNumber" ] = Field::ToJSON( { FieldCounter, 1, "Kоличество ВБВ", {}, 1, 180 } );
 
 

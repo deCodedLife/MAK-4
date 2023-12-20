@@ -26,6 +26,7 @@ Rectangle
     property int columnsCount: headers.length
     property int rowsCount
     property int column
+    property int updateInterval: ConfigManager.get()[ "main" ][ "updateDelay" ][ "value" ] * 1000
 
     property list<Item> headers
 
@@ -318,7 +319,7 @@ Rectangle
         triggeredOnStart: true
         repeat: true
         running: tableOID
-        interval: 20 * 1000
+        interval: updateInterval
         onTriggered: {
             if ( external ) return
             if ( tableOID ) SNMP.getTable( tableOID )
