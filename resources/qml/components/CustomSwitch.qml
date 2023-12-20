@@ -92,7 +92,7 @@ Item
             color: Globals.textColor
 
             font.bold: true
-            font.pointSize: 12
+            font.pointSize: Globals.h6
         }
     }
 

@@ -1,6 +1,8 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+
+
 #include <QFontDatabase>
 
 #include <configs.h>
@@ -17,7 +19,8 @@ int main( int argc, char *argv[] )
     QStringList fontList = QFontDatabase::applicationFontFamilies( fontId );
 
     QGuiApplication::setFont( QFont( fontList.first() ) );
-
+//    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling, false );
+    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling, true);
 
     QJsonObject config;
 
