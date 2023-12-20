@@ -86,7 +86,8 @@ Rectangle
                         3: "CustomField.qml",
                         4: "CustomDropDown.qml",
                         5: "CustomSwitch.qml",
-                        6: "CustomField.qml"
+                        6: "CustomField.qml",
+                        8: "CustomField.qml"
                     }
 
                     property int type: modelData[ "type" ]

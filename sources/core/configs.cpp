@@ -157,7 +157,7 @@ QJsonObject Configs::Default()
      */
     QJsonObject mainSettings;
     mainSettings[ "stSNMPVersion" ] = Field::ToJSON( { FieldCombobox, SNMP_VERSION, "Версия SNMP", { { "1", "snmpV2c" }, { "3", "snmpV3" } } } );
-    mainSettings[ "host" ] = Field::ToJSON( { FieldInput, HOST, "IP адрес" } );
+    mainSettings[ "host" ] = Field::ToJSON( { FieldAdress, HOST, "IP адрес" } );
     mainSettings[ "port" ] = Field::ToJSON( { FieldInput, PORT, "Порт" } );
     mainSettings[ "stSNMPAdministratorName" ] = Field::ToJSON( { FieldInput, USER, "Имя" } );
     mainSettings[ "authMethod" ] = Field::ToJSON( { FieldCombobox, AUTH_METHOD, "Уровень", { { "0", "authPriv" }, { "1", "authNoPriv" } } } );
@@ -198,7 +198,7 @@ QJsonObject Configs::Default()
     for ( int index = 1; index < 4; index++ )
     {
         QString numIndex = QString::number( index );
-        snmpSettings[ "stSNMPTrap" + numIndex + "ServerIP" ] = Field::ToJSON( { FieldInput, "", "IP trap-сервера #" + numIndex } );
+        snmpSettings[ "stSNMPTrap" + numIndex + "ServerIP" ] = Field::ToJSON( { FieldAdress, "", "IP trap-сервера #" + numIndex } );
     }
 
     for ( int index = 1; index < 4; index++ )
@@ -225,9 +225,9 @@ QJsonObject Configs::Default()
      * @brief networkSettings
      */
     QJsonObject networkSettings;
-    networkSettings[ "stIPaddress" ] = Field::ToJSON( { FieldInput, "192.168.000.090", "IP адрес контроллера" } );
-    networkSettings[ "stNetworkMask" ] = Field::ToJSON( { FieldInput, "255.255.255.000", "Маска сети" } );
-    networkSettings[ "stNetworkGateway" ] = Field::ToJSON( { FieldInput, "192.168.000.001", "Шлюз" } );
+    networkSettings[ "stIPaddress" ] = Field::ToJSON( { FieldAdress, "192.168.000.090", "IP адрес контроллера" } );
+    networkSettings[ "stNetworkMask" ] = Field::ToJSON( { FieldAdress, "255.255.255.000", "Маска сети" } );
+    networkSettings[ "stNetworkGateway" ] = Field::ToJSON( { FieldAdress, "192.168.000.001", "Шлюз" } );
 
     /**
      * @brief blvdSettings
