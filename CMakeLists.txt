@@ -44,6 +44,7 @@ qt_add_executable(MAK-4
     ${SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/sources/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/resources/qml.qrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/resources/MAK.rc
 )
 
 if ( APPLE )
