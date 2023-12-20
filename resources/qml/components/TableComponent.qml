@@ -14,14 +14,12 @@ Rectangle
 
     property list<var> headers: []
     property list<var> content
-    property list<string> values
+    property list<string> values: SNMP.getOIDs( content.map( object => object[ "field" ] ) )
 
     property int columnsCount: headers.length
     property int rowsCount: content.length / headers.length
 
     property string header: ""
-
-    onContentChanged: values = SNMP.getOIDs( content.map( object => object[ "field" ] ) )
 
     color: "white"
     radius: 10

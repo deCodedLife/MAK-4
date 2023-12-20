@@ -42,6 +42,7 @@ struct Field
     QVariant value;
     QString description;
     QStringList model;
+    bool isBulk;
     QString field;
 
     static QJsonObject ToJSON( Field f )
@@ -51,6 +52,8 @@ struct Field
         field[ "value" ] = QJsonValue::fromVariant( f.value );
         field[ "description" ] = f.description;
         field[ "model" ] = QJsonValue::fromVariant( f.model );
+        field[ "isBulk" ] = f.isBulk;
+        field[ "filed" ] = f.field;
         return field;
     };
     static Field FromJSON( QJsonObject obj )
@@ -60,6 +63,8 @@ struct Field
         f.value = obj[ "value" ].toVariant();
         f.description = obj[ "description" ].toString();
         f.model = obj[ "model" ].toVariant().toStringList();
+        f.isBulk = obj[ "isBulk" ].toBool();
+        f.field = obj[ "field" ].toString();
         return f;
     }
 };

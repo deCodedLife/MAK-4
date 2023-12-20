@@ -4,7 +4,9 @@ TObject::TObject(QObject *parent)
     : QObject{parent}
 {
     connect( this, &TObject::error_occured, this, &TObject::handleError );
-    m_file = new QFile( QDate::currentDate().toString("yyyy.MM.dd") + LOG_FILE );
+    if ( !QDir( LOG_DIR ).exists() ) QDir().mkdir( LOG_DIR );
+    QList<QString> filePath = { LOG_DIR, QDate::currentDate().toString("yyyy.MM.dd"), LOG_FILE };
+    m_file = new QFile( filePath.join( "/" ) );
 }
 
 TObject::~TObject()

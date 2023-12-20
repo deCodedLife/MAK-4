@@ -33,6 +33,8 @@ void MibParser::parseTree( const tree *node, SNMPpp::OID o )
             (size_t) node->type,
             enums
         };
+
+        OID_TOSTR[ o ] = label;
     }
 
     parseTree( node->child_list, o );
