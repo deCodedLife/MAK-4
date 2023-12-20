@@ -35,18 +35,34 @@ void SNMPConnection::setState( States state )
     emit stateChanged( state );
 }
 
-QVariant SNMPConnection::getOID( QString oid )
+QList<QString> SNMPConnection::getOIDs( QList<QString> objects )
 {
-    QString recivedData = "";
-
     SNMPpp::PDU pdu( SNMPpp::PDU::kGet );
-    oid_object obj = parser.MIB_OBJECTS[ oid ];
 
     try
     {
-        pdu.addNullVar( SNMPpp::OID( obj.oid.toStdString() + ".0" ) );
+        for ( QString objectName : objects )
+        {
+            if ( !parser.MIB_OBJECTS.contains( objectName ) ) continue;
+            oid_object object = parser.MIB_OBJECTS[ objectName ];
+            pdu.addNullVar( SNMPpp::OID( object.oid.toStdString() + ".0" ) );
+        }
+
         pdu = SNMPpp::get( pHandle, pdu );
-        return QString::fromStdString( pdu.varlist().asString() );
+
+        QList<QString> reply;
+
+        for ( QString objectName : objects )
+        {
+            if ( !parser.MIB_OBJECTS.contains( objectName ) ) {
+                reply.append( "" );
+                continue;
+            }
+            oid_object object = parser.MIB_OBJECTS[ objectName ];
+            reply.append( QString::fromStdString( pdu.varlist().asString( object.oid.toStdString() + ".0" ) ) );
+        }
+
+        return reply;
     }
     catch( const std::exception &e )
     {
@@ -54,7 +70,7 @@ QVariant SNMPConnection::getOID( QString oid )
     }
 
     pdu.free();
-    return QVariant::fromValue( nullptr );
+    return QList<QString>{};
 }
 
 void SNMPConnection::setOID( QString oid, QVariant data )
@@ -154,9 +170,9 @@ void SNMPConnection::updateConnection()
             return;
         }
 
-        QVariant reply = getOID( "stSNMPVersion" );
+        QList<QString> reply = getOIDs( { "stSNMPVersion" } );
 
-        if ( reply.isNull() ) {
+        if ( reply.empty() ) {
             _state = Disconnected;
             emit stateChanged( _state );
             emit error_occured( Callback::New( "Не удалось получить данные с устройства", Callback::Warning ) );

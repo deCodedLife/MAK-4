@@ -31,7 +31,7 @@ public:
     Q_INVOKABLE States state();
     Q_INVOKABLE void setState( States );
 
-    Q_INVOKABLE QVariant getOID( QString );
+    Q_INVOKABLE QList<QString> getOIDs( QList<QString> );
     Q_INVOKABLE void setOID( QString, QVariant );
 
     Q_INVOKABLE QString dateToReadable( QString );

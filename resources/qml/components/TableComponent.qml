@@ -7,15 +7,21 @@ import "../Globals"
 
 Rectangle
 {
+    id: root
+
     Layout.fillWidth: true
     height: contentLayout.implicitHeight
 
     property list<var> headers: []
-    property list<var> content: []
+    property list<var> content
+    property list<string> values
+
     property int columnsCount: headers.length
     property int rowsCount: content.length / headers.length
 
     property string header: ""
+
+    onContentChanged: values = SNMP.getOIDs( content.map( object => object[ "field" ] ) )
 
     color: "white"
     radius: 10
@@ -124,24 +130,15 @@ Rectangle
                         width: itemText.contentWidth
 
                         property var currentVar: content[ index + ( row.currentRow * columnsCount ) ]
-                        property var value: SNMP.getOID( currentVar[ "field" ] )
 
                         height: itemText.contentHeight
-
-                        function processValue() {
-                            let objectValue = currentVar[ "value" ]
-                            if ( currentVar[ "type" ] === 5 ) return objectValue
-
-                            if ( typeof( currentVar[ "wrapper" ] ) != "undefined" ) return item.currentVar[ "wrapper" ]( value )
-                            return value
-                        }
 
                         Text {
                             id: itemText
                             width: item.width
 
                             visible: item.currentVar[ "type" ] === 4 || item.currentVar[ "type" ] === 5
-                            text: processValue()
+                            text: item.currentVar[ "type" ] === 5 ? currentVar[ "value" ] : values[ index + ( row.currentRow * columnsCount ) ]
 
                             color: "black"
 
