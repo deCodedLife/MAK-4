@@ -14,7 +14,7 @@ Rectangle
 
     property list<var> headers: []
     property list<var> content
-    property list<string> values: SNMP.getOIDs( content.map( object => object[ "field" ] ) )
+    property list<string> values: SNMP.getOIDs( content.map( object => object[ "field" ] ?? "" ) )
 
     property int columnsCount: headers.length
     property int rowsCount: content.length / headers.length
@@ -136,7 +136,12 @@ Rectangle
                             width: item.width
 
                             visible: item.currentVar[ "type" ] === 4 || item.currentVar[ "type" ] === 5
-                            text: item.currentVar[ "type" ] === 5 ? currentVar[ "value" ] : values[ index + ( row.currentRow * columnsCount ) ]
+                            text: {
+                                if ( item.currentVar[ "type" ] === 5 ) return currentVar[ "value" ]
+                                let wrapper = item.currentVar[ "wrapper" ]
+                                if ( typeof( wrapper ) == "undefined"  ) return values[ index + ( row.currentRow * columnsCount ) ]
+                                return wrapper( values[ index + ( row.currentRow * columnsCount ) ] )
+                            }
 
                             color: "black"
 
