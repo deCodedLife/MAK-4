@@ -68,7 +68,7 @@ Page
                 property string iconOID: "psLightProtStatus"
 
                 state: {
-                    SNMP.getOIDs( iconOID, [ iconOID ] )
+                    SNMP.getOIDs( iconOID, [ iconOID + ".0" ] )
                     return "null"
                 }
 
