@@ -191,6 +191,52 @@ void SNMPConnection::setOID( QString objectName, QVariant data )
 
 }
 
+void SNMPConnection::setMultiple( QJsonObject fields )
+{
+    SNMPpp::PDU pdu( SNMPpp::PDU::kSet );
+
+    for( QString key : fields.keys() ) {
+
+        QVariant value = fields[ key ].toObject()[ "value" ].toVariant();
+        oid_object obj = parser.MIB_OBJECTS[ key ];
+        SNMPpp::OID oid( obj.oid.toStdString() + ".0" );
+
+        switch ( obj.type ) {
+        case TYPE_INTEGER:
+            pdu.addIntegerVar( oid, value.toInt() );
+            qDebug() << pdu.varlist().asString();
+            break;
+        case TYPE_GAUGE:
+            pdu.addGaugeVar( oid, value.toUInt() );
+            break;
+        case TYPE_NULL:
+            pdu.addNullVar( oid );
+            break;
+        case TYPE_OCTETSTR:
+            pdu.addOctetStringVar(
+                oid,
+                (unsigned char *) value.toString().toStdString().c_str(),
+                value.toString().toStdString().size() );
+            break;
+        default:
+            pdu.addNullVar( oid );
+            break;
+        }
+
+    }
+
+    try
+    {
+        pdu = SNMPpp::set( writeSession, pdu );
+    }
+    catch( const std::exception &e )
+    {
+        emit error_occured( Callback::New( e.what(), Callback::Warning ) );
+    }
+
+    pdu.free();
+}
+
 QString SNMPConnection::dateToReadable( QString date )
 {
     return QDateTime::fromString( date, "ddMMyyyyhhmmss" ).toString( "dd-MM-yyyy hh:mm:ss" );

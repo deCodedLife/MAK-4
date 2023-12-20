@@ -4,6 +4,7 @@ import QtQuick.Controls
 import QtQuick.Controls.Material
 
 import "../Globals"
+import "../wrappers.mjs" as Wrappers
 
 Rectangle
 {
@@ -93,6 +94,7 @@ Rectangle
                         value: modelData[ "value" ]
                         onChanged: {
                             if ( !acceptableInput ) return
+                            if ( Wrappers.getFieldValue( modelData, text ) === modelData[ "value" ] ) return
                             fieldUpdated( modelData[ "field" ], text )
                         }
                         echoMode: modelData[ "type" ] === 3 ? TextField.Password : TextField.Normal
@@ -118,9 +120,12 @@ Rectangle
                         anchors.fill: parent
                         visible: modelData[ "type" ] === 5
                         text: modelData[ "description" ]
-                        toggled: modelData[ "value" ]
+                        toggled: modelData[ "value" ] === 1
                         dobbled: true
-                        onContentChanged: value => fieldUpdated( modelData[ "field" ], value )
+                        onContentChanged: value => {
+                                              if ( Wrappers.getFieldValue( modelData, toggled === 1 ) === modelData[ "value" ] ) return
+                                              fieldUpdated( modelData[ "field" ], value )
+                                          }
                     }
                 }
             }
