@@ -13,59 +13,42 @@ Item
         anchors.fill: parent
         color: "transparent"
 
-        ListView {
-            id: list
+        ColumnLayout {
+            id: content
+
             anchors.fill: parent
-
-//            Layout.alignment: Qt.AlignTop
-//            Layout.fillHeight: true
-//            Layout.fillWidth: true
-
             anchors.margins: 10
-            clip: true
-            model: LeftMenuG.currentMenu
-            boundsMovement: Flickable.StopAtBounds
 
-            delegate: LeftMenuItem {
-                width: list.width
-                context: modelData
+            ListView {
+                id: list
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                clip: true
+                model: LeftMenuG.currentMenu
+                boundsMovement: Flickable.StopAtBounds
+
+                delegate: LeftMenuItem {
+                    width: list.width
+                    context: modelData
+                }
+
+                interactive: list.height < list.contentHeight
             }
 
-            interactive: list.height < list.contentHeight
-        }
+            ListView {
+                Layout.fillWidth: true
+                Layout.preferredHeight: contentHeight
+                height: contentHeight
 
-        Flickable
-        {
-            anchors.fill: parent
-            contentHeight: content.implicitHeight
-            interactive: contentHeight > height
+                clip: true
+                interactive: false
+                model: LeftMenuG.menuButtons
 
-            ColumnLayout {
-                id: content
-
-                anchors.fill: parent
-                anchors.margins: 10
-
-
-
-//                ListView {
-
-//                    Layout.alignment: Qt.AlignBottom
-//                    Layout.fillWidth: true
-//                    height: contentHeight
-
-//                    anchors.margins: 10
-//                    clip: true
-//                    model: LeftMenuG.menuButtons
-//                    boundsMovement: Flickable.StopAtBounds
-
-//                    delegate: LeftMenuItem {
-//                        width: list.width
-//                        context: modelData
-//                    }
-
-//                    interactive: list.height < list.contentHeight
-//                }
+                delegate: LeftMenuItem {
+                    width: list.width
+                    context: modelData
+                }
             }
         }
     }
