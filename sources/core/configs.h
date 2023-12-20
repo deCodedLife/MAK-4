@@ -31,7 +31,8 @@ enum FieldTypes
     FieldInput,
     FieldPassword,
     FieldCombobox,
-    FieldCheckbox
+    FieldCheckbox,
+    FieldText,
 };
 
 struct Field
@@ -60,6 +61,16 @@ struct Field
         return f;
     }
 };
+
+struct oid_object
+{
+    QVariant value;
+    std::string label;
+    std::string oid;
+    std::string description;
+    size_t type;
+};
+
 
 
 class Configs : public TObject

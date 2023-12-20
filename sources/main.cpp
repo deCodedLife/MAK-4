@@ -6,6 +6,8 @@
 #include <configs.h>
 #include <snmpconnection.h>
 
+#include <mibparser.h>
+
 int main( int argc, char *argv[] )
 {
     QGuiApplication app( argc, argv );
@@ -32,7 +34,8 @@ int main( int argc, char *argv[] )
     snmp->SetConfig( cfg );
 
     QQmlContext *ctx = engine.rootContext();
-    ctx->setContextProperty( "Config", cfg );
+    ctx->setContextProperty( "ConfigManager", cfg );
+    ctx->setContextProperty( "Config", cfg->get() );
     ctx->setContextProperty( "SNMP", snmp );
 
 

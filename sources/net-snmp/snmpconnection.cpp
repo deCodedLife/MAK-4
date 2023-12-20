@@ -16,6 +16,7 @@ SNMPConnection::~SNMPConnection()
 void SNMPConnection::SetConfig( Configs *configs )
 {
     pConfigs = configs;
+    initFields();
 }
 
 States SNMPConnection::state()
@@ -29,16 +30,42 @@ void SNMPConnection::setState( States state )
     emit stateChanged( state );
 }
 
-void SNMPConnection::getOID( QString oid, QString** reply )
+QVariant SNMPConnection::getOID( QString oid )
 {
+    QString recivedData = "";
+
     SNMPpp::PDU pdu( SNMPpp::PDU::kGet );
+    oid_object obj = parser.MIB_OBJECTS[ oid ];
 
     try
     {
-        pdu.addNullVar( SNMPpp::OID( oid.toStdString() ) );
+        pdu.addNullVar( SNMPpp::OID( obj.oid + ".0" ) );
         pdu = SNMPpp::get( pHandle, pdu );
-        *reply = new QString();
-        **reply = QString::fromStdString( pdu.varlist().asString() );
+
+        switch ( pdu.varlist().asnType() )
+        {
+        case ASN_BOOLEAN:
+            return (bool) pdu.varlist().at( obj.oid + ".0" )->data;
+
+        case ASN_INTEGER:
+            return QVariant::fromValue( *pdu.varlist().at( obj.oid + ".0" )->val.integer );
+
+        case ASN_BIT_STR:
+            return QVariant::fromValue( pdu.varlist().at( obj.oid + ".0" )->val.string );
+
+        case ASN_NULL:
+            return QVariant::fromValue( nullptr );
+
+        case ASN_OBJECT_ID:
+            return QVariant::fromValue( *pdu.varlist().at( obj.oid + ".0" )->val.objid );
+
+        case ASN_COUNTER:
+            counter64 *counter = pdu.varlist().at( obj.oid + ".0" )->val.counter64;
+            QList<u_long> array = { counter->low, counter->high };
+            return QVariant::fromValue( array );
+        }
+
+        return QVariant::fromValue( pdu.varlist().asString() );
     }
     catch( const std::exception &e )
     {
@@ -46,10 +73,46 @@ void SNMPConnection::getOID( QString oid, QString** reply )
     }
 
     pdu.free();
+    return QVariant::fromValue( nullptr );
 }
 
 void SNMPConnection::setOID( QString oid, QVariant data )
 {
+    SNMPpp::PDU pdu( SNMPpp::PDU::kGet );
+    oid_object obj = parser.MIB_OBJECTS[ oid ];
+
+    switch ( obj.type ) {
+    case TYPE_INTEGER:
+        pdu.addIntegerVar( SNMPpp::OID( obj.oid ), data.toInt() );
+        break;
+    case TYPE_GAUGE:
+        pdu.addGaugeVar( SNMPpp::OID( obj.oid ), data.toUInt() );
+        break;
+    case TYPE_NULL:
+        pdu.addNullVar( SNMPpp::OID( obj.oid ) );
+        break;
+    case TYPE_OCTETSTR:
+        pdu.addOctetStringVar(
+            SNMPpp::OID( obj.oid),
+            (unsigned char *) data.toString().toStdString().c_str(),
+            data.toString().toStdString().size() );
+        break;
+    default:
+        pdu.addNullVar( SNMPpp::OID( obj.oid ) );
+        break;
+    }
+
+    try
+    {
+        pdu.addNullVar( SNMPpp::OID( obj.oid + ".0" ) );
+        pdu = SNMPpp::set( pHandle, pdu );
+    }
+    catch( const std::exception &e )
+    {
+        emit error_occured( Callback::New( e.what(), Callback::Warning ) );
+    }
+
+    pdu.free();
 
 }
 
@@ -105,10 +168,9 @@ void SNMPConnection::updateConnection()
             return;
         }
 
-        QString *reply = nullptr;
-        getOID( ".1.3.6.1", &reply );
+        QVariant reply = getOID( "stSNMPVersion" );
 
-        if ( reply == nullptr ) {
+        if ( reply.isNull() ) {
             _state = Disconnected;
             emit stateChanged( _state );
             emit error_occured( Callback::New( "Не удалось получить данные с устройства", Callback::Warning ) );
@@ -131,4 +193,34 @@ void SNMPConnection::dropConnection()
     _state = Disconnected;
     emit stateChanged( _state );
     SNMPpp::closeSession( pHandle );
+}
+
+QVariant SNMPConnection::getFieldValue( QString object ) {
+    QJsonObject fields = pConfigs->get()[ "fields" ].toObject();
+    if ( !fields.contains( object ) ) return QVariant::fromValue( nullptr );
+    QJsonObject field = fields[ object ].toObject();
+    if ( !field.contains( "value" ) ) return QVariant::fromValue( nullptr );
+    return field[ "value" ].toVariant();
+}
+
+void SNMPConnection::initFields()
+{
+    QJsonObject fields;
+    fields[ "deviceInfo0" ] = Field::ToJSON( { FieldText, "Серийный номер источника питания", "" } );
+    fields[ "psSerial" ] = Field::ToJSON( { FieldText, getFieldValue( "psSerial" ), "Серийный номер источника питания" } );
+
+    fields[ "deviceInfo1" ] = Field::ToJSON( { FieldText, "Описание источника питания", "" } );
+    fields[ "psDescription" ] = Field::ToJSON( { FieldText, getFieldValue( "psDescription" ), "Описание источника питания" } );
+
+    fields[ "deviceInfo2" ] = Field::ToJSON( { FieldText, "Версия ПО контроллера", "" } );
+    fields[ "psFWRevision" ] = Field::ToJSON( { FieldText, getFieldValue( "psFWRevision" ), "Версия ПО контроллера" } );
+
+    fields[ "deviceInfo3" ] = Field::ToJSON( { FieldText, "Текущее время MAK-4 UTC", "" } );
+    fields[ "psTime" ] = Field::ToJSON( { FieldText, getFieldValue( "psTime" ), "Текущее время MAK-4 UTC" } );
+
+    QJsonObject newConfig;
+    newConfig[ "main" ] = pConfigs->get()[ "main" ].toObject();
+    newConfig[ "fields" ] = fields;
+
+    pConfigs->write( newConfig );
 }

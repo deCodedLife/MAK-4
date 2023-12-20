@@ -9,7 +9,7 @@ QtObject
 
     property list<Item> mainList: [
         MenuItemM { icon: "lan.svg"; title: "Соединение"; page: "Pages/Connection.qml" },
-        MenuItemM { icon: "info.svg"; title: "Об устройстве"; page: "Pages/Info.qml" },
+        MenuItemM { icon: "info.svg"; title: "Об устройстве"; page: "Pages/DeviceInfo.qml" },
         MenuItemM { icon: "emergency.svg"; title: "Аварии"; page: "Pages/Emergency.qml" },
         MenuItemM { icon: "switch.svg"; title: "Сигнальные реле"; page: "Pages/SignalRelays.qml" },
         MenuItemM { icon: "contract.svg"; title: "Журнал событий"; page: "Pages/Journal.qml" },
