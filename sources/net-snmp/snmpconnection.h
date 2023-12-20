@@ -63,7 +63,7 @@ public:
 
 public slots:
     Q_INVOKABLE void updateConnection( bool sync = false );
-    Q_INVOKABLE void dropConnection();
+    Q_INVOKABLE void dropConnection( bool = true );
     void proceed( AsyncSNMP* );
     void handleSNMPRequest( QString, QMap<SNMPpp::OID, QJsonObject> );
     void handleSNMPFinished( int );
@@ -80,6 +80,7 @@ private:
 
     Configs *pConfigs;
     States _state;
+    int _currentVersion;
     MibParser parser;
 
     bool isBusy;

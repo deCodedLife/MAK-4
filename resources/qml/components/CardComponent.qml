@@ -78,7 +78,7 @@ Rectangle
 
                 delegate: Loader {
                     width: contentList.width
-                    height: 54
+                    height: 52
 
                     id: customItem
                     property var fields: {
@@ -115,7 +115,6 @@ Rectangle
 
                     function updateField( newValue ) {
                         if ( wrapper ) newValue = wrapper( newValue, true )
-                        if ( newValue === value && type != 5 ) return
                         fieldUpdated( objectName, newValue )
                     }
 

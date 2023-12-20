@@ -37,7 +37,6 @@ ApplicationWindow
             if ( fileMode == FileDialog.OpenFile ) ConfigManager.openFile( file )
             else ConfigManager.saveFile( file )
 
-            SNMP.dropConnection()
             SNMP.sendConfigsChangedEvent()
         }
         Component.onCompleted: LeftMenuG.fileDialog = fileDialog

@@ -46,6 +46,10 @@ export class ContentItem
     }
 }
 
+function escapePrecision( value ) {
+    return parseInt( parseFloat( value ).toPrecision(12) )
+}
+
 export function byHundredZeroOne( value, reverse = false )
 {
     return reverse
@@ -63,17 +67,17 @@ export function verySpecificWrapper( value, reverse = false )
 
 export function divideByTen( value, reverse = false ) {
     return reverse
-            ? parseFloat( value ).toFixed(1) * 10
+            ? escapePrecision( parseFloat( value ).toFixed(1) * 10 )
             : value / 10
 }
 export function divideByHundred( value, reverse = false ) {
     return reverse
-            ? parseFloat( value ).toFixed(2) * 100
+            ? escapePrecision( parseFloat( value ).toFixed(2) * 100 )
             : value / 100
 }
 export function divideByThousand( value, reverse = false ){
     return reverse
-            ? parseFloat( value ).toFixed(3) * 1000
+            ? escapePrecision( parseFloat( value ).toFixed(3) * 1000 )
             : value / 1000
 }
 export function secondsToMinutes( value, reverse = false ){

@@ -35,17 +35,30 @@ Page
                 Layout.fillWidth: true
                 height: 38
 
+                function updateField( value ) {
+                    let newConfig = ConfigManager.current
+                    let field = contactorsConfigs[ handControl.switchOID ]
+                    contactorsConfigs[ handControl.switchOID ][ "value" ] = Wrappers.getFieldValue( field, value )
+                    newConfig[ "blvd" ] = contactorsConfigs
+                    ConfigManager.current = newConfig
+                    SNMP.setOID( handControl.switchOID, Wrappers.getFieldValue( field, value ) )
+                }
+
                 CustomSwitch {
+                    property string switchOID: "stContactorControl"
+
                     id: handControl
-                    toggled: contactorsConfigs[ "stContactorControl" ] === 1
-                    onContentChanged: (value) => {
-                        let newConfig = ConfigManager.current
-                        contactorsConfigs[ "stContactorControl" ] = value
-                        newConfig[ "blvd" ] = contactorsConfigs
-                        ConfigManager.current = newConfig
-                        SNMP.setOID( "stContactorControl", contactorsConfigs[ "stContactorControl" ] )
+                    toggled: contactorsConfigs[ switchOID ] === 1
+                    text: "Ручное управление"                    
+
+                    Connections {
+                        target: SNMP
+                        function onGotRowsContent( root: string, data: object ) {
+                            if ( root !== handControl.switchOID ) return
+                            handControl.toggled = data[ handControl.switchOID ][ "num" ] === 1
+                        }
                     }
-                    text: "Ручное управление"
+                    Component.onCompleted: SNMP.getOIDs( switchOID, [ switchOID + ".0" ] )
                 }
             }
 
@@ -67,18 +80,25 @@ Page
                 ]
 
                 fields: [
-                    new Wrappers.ContentItem( null, "Синхронизация положения" ),
                     new Wrappers.ContentItem( null, "Батарейный (BLVD)" ),
                     new Wrappers.ContentItem( null, "Нагрузочный 1 (LLVD 1)" ),
                     new Wrappers.ContentItem( null, "Нагрузочный 2 (LLVD 2)" ),
                     new Wrappers.ContentItem( null, "Нагрузочный 2 (LLVD 3)" ),
 
-                    new Wrappers.ContentItem( "psContactorSycnro", "", Wrappers.RowTypes.SWITCH, "num" ),
                     new Wrappers.ContentItem( "psContactorBLVDState", "", Wrappers.RowTypes.SWITCH, "num" ),
                     new Wrappers.ContentItem( "psContactorL1VDState", "", Wrappers.RowTypes.SWITCH, "num" ),
                     new Wrappers.ContentItem( "psContactorL2VDState", "", Wrappers.RowTypes.SWITCH, "num" ),
                     new Wrappers.ContentItem( "psContactorL3VDState", "", Wrappers.RowTypes.SWITCH, "num" )
                 ]
+            }
+
+            Button
+            {
+                highlighted: true
+                Material.accent: Globals.accentColor
+                text: "Синхронизировать положение"
+                font.pointSize: Globals.h6
+                onClicked: SNMP.setOID( "psContactorSycnro", 1 )
             }
         }
     }

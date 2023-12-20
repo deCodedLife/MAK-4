@@ -11,10 +11,10 @@ TextField
     id: control
     anchors.fill: parent
 
+    property string initValue
     property var counterValidator: CustomDoubleValidator {
         bottom: parent.minValue
         top: parent.maxValue
-
     }
 
     placeholderText: parent.placeholder ?? ""
@@ -41,7 +41,10 @@ TextField
 
         // if ( text === "" ) focus = false
         if ( text === "" ) return
-        if ( text === value ) return
+        if ( !initValue ) {
+            initValue = text
+            return
+        }
 
         parent.updateField( text )
     }
