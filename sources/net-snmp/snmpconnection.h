@@ -26,12 +26,16 @@ public:
     explicit SNMPConnection(QObject *parent = nullptr);
     ~SNMPConnection();
     void SetConfig( Configs* );
+    MibParser* GetParser();
 
     Q_INVOKABLE States state();
     Q_INVOKABLE void setState( States );
 
     Q_INVOKABLE QVariant getOID( QString );
     Q_INVOKABLE void setOID( QString, QVariant );
+
+    Q_INVOKABLE QString dateToReadable( QString );
+    Q_INVOKABLE QJsonArray getGroup( QString );
 
 public slots:
     Q_INVOKABLE void updateConnection();

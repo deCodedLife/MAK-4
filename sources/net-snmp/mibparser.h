@@ -6,6 +6,8 @@
 
 #include <QDir>
 #include <QFile>
+#include <QMap>
+#include <QJsonArray>
 #include <SNMPpp/Varlist.hpp>
 
 #include <net-snmp/net-snmp-config.h>
@@ -20,12 +22,12 @@ class MibParser : public TObject
 public:
     explicit MibParser(QString file_path = MIB_PATH, QObject *parent = nullptr);
     ~MibParser();
-
+    Q_INVOKABLE QJsonObject getObject( QString );
     QMap<QString, oid_object> MIB_OBJECTS;
 
 private:
-    void parse_tree( tree *mib, bool isChild);
-    std::string get_parent_id( tree *parent, std::string oid = "");
-
-
+    void parseTree( const tree *mib, SNMPpp::OID oid );
+    tree* findModule( tree *mib, char *module );
+    SNMPpp::OID root;
+    std::string get_parent_id( const tree *parent, std::string oid = "");
 };

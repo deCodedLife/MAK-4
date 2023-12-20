@@ -37,6 +37,7 @@ int main( int argc, char *argv[] )
     ctx->setContextProperty( "ConfigManager", cfg );
     ctx->setContextProperty( "Config", cfg->get() );
     ctx->setContextProperty( "SNMP", snmp );
+    ctx->setContextProperty( "MIB", snmp->GetParser() );
 
 
     engine.load( QUrl( "qrc:/qml/Main.qml" ) );

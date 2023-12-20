@@ -33,6 +33,7 @@ enum FieldTypes
     FieldCombobox,
     FieldCheckbox,
     FieldText,
+    FieldDescription
 };
 
 struct Field
@@ -41,6 +42,7 @@ struct Field
     QVariant value;
     QString description;
     QStringList model;
+    QString field;
 
     static QJsonObject ToJSON( Field f )
     {
@@ -65,10 +67,22 @@ struct Field
 struct oid_object
 {
     QVariant value;
-    std::string label;
-    std::string oid;
-    std::string description;
+    QString label;
+    QString oid;
+    QString description;
     size_t type;
+    QMap<QString, int> enums;
+
+    static QJsonObject ToJSON( oid_object f )
+    {
+        QJsonObject field;
+        field[ "value" ] = f.value.toJsonValue();
+        field[ "label" ] = f.label;
+        field[ "oid" ] = f.oid;
+        field[ "description" ] = f.description;
+        field[ "type" ] = (int) f.type;
+        return field;
+    };
 };
 
 
