@@ -5,6 +5,9 @@ import QtQuick.Controls.Material
 
 import "../Components"
 import "../Globals"
+import "../Models"
+
+import "../wrappers.mjs" as Wrappers
 
 Page
 {
@@ -27,32 +30,27 @@ Page
         TableComponent {
             Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
             Layout.maximumWidth: 1200
+            tableOID: "psLineEntry"
 
             headers: [
-                { "title": "№ Фазы", "expand": true },
-                { "title": "Напряжение, В", "expand": true },
-                { "title": "Состояние", "expand": true }
+                TableHeaderM {
+                    title: "№ Фазы"
+                    expand: true
+                },
+                TableHeaderM {
+                    title: "Напряжение, В"
+                    expand: true
+                },
+                TableHeaderM {
+                    title: "Состояние"
+                    expand: true
+                }
             ]
 
-            content: {
-                let objects = SNMP.getBulk( "psLineEntry" )
-                let fields = []
-                let middle = objects.length / 3
-
-                for ( let index = 0; index < middle; index++ ) {
-                    fields.push( { type: 5, value: objects[ index ] } )
-                    fields.push( { type: 5, value: objects[ middle * 1 + index  ] } )
-                    fields.push( addWrapper( { type: 5, value: objects[ middle * 2 + index  ] }, value => {
-                        if ( parseInt( value ) === 0 ) return "Норма"
-                        if ( parseInt( value ) === 1 ) return "Напряжение понижено"
-                        if ( parseInt( value ) === 2 ) return "Напряжение повышено"
-                        if ( parseInt( value ) === 3 ) return "Ошибка"
-                        if ( parseInt( value ) === 4 ) return "Авария"
-                        if ( parseInt( value ) === 5 ) return "Авария"
-                        return value
-                    } ) )
-                }
-                return fields
+            rows: {
+                "psLineNumber": new Wrappers.RowItem(),
+                "psLineVoltage": new Wrappers.RowItem(),
+                "psLineStatus": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.parseErrors, "str" ),
             }
         }
 
@@ -62,20 +60,25 @@ Page
             Layout.maximumWidth: 1200
             Layout.fillWidth: true
 
-
             IconLabel {
                 id: powerDefence
                 color: Globals.textColor
                 Layout.alignment: Qt.AlignLeft
 
-                state: "disabled"
+                property string iconOID: "psLightProtStatus"
+
+                state: {
+                    SNMP.getOIDs( iconOID, [ iconOID ] )
+                    return "null"
+                }
+
                 states: [
                     State {
                         name: "enabled"
                         PropertyChanges {
                             target: powerDefence
                             icon.source: "qrc:/images/icons/flash_on.svg"
-                            icon.color: "F1DD23"
+                            icon.color: Globals.yellow
                             text: "Грозозащита: Норма"
                         }
                     },
@@ -91,10 +94,15 @@ Page
 
                 ]
 
-                Component.onCompleted: {
-                    let state = SNMP.getOIDs( ["psLightProtStatus"] )
-                    if ( parseInt( state ) !== 0 ) powerDefence.state = "disabled"
-                    else powerDefence.state = "enabled"
+                Connections
+                {
+                    target: SNMP
+
+                    function onGotRowsContent( root: string, data: object )
+                    {
+                        if ( root !== powerDefence.iconOID ) return
+                        powerDefence.state = data[ powerDefence.iconOID ][ "num" ] === 1 ? "enabled" : "disabled"
+                    }
                 }
             }
 

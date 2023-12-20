@@ -3,11 +3,15 @@ import QtQuick.Layouts
 
 import "../Components"
 import "../Globals"
+import "../Models"
+
+import "../wrappers.mjs" as Wrappers
 
 Page
 {
     id: root
     contentHeight: content.implicitHeight
+    property string buttonOID: "psEqChargeControl"
 
     function addWrapper( config, wrapper ) {
         config[ "wrapper" ] = wrapper
@@ -15,10 +19,21 @@ Page
     }
 
     state: {
-        let oid = SNMP.getOIDs( [ "psEqChargeControl" ] )
-        if ( parseInt( oid ) === 1 ) return "started"
-        else return "stopped"
+        SNMP.getOIDs( buttonOID, [ buttonOID ] )
+        return "null"
     }
+
+    Connections
+    {
+        target: SNMP
+
+        function onGotRowsContent( root: string, data: object )
+        {
+            if ( root !== buttonOID ) return
+            state = data[ buttonOID ][ "num" ] === 1 ? "started" : "stopped"
+        }
+    }
+
     states: [
         State {
             name: "stopped"
@@ -41,10 +56,10 @@ Page
     onActionButtonTriggered: {
         if ( state === "stopped" ) {
             state = "started"
-            SNMP.setOID( "psEqChargeControl", 1 )
+            SNMP.setOID( buttonOID, 1 )
             return
         }
-        SNMP.setOID( "psEqChargeControl", 2 )
+        SNMP.setOID( buttonOID, 2 )
         state = "stopped"
     }
 
@@ -63,69 +78,38 @@ Page
             Layout.maximumWidth: 1200
             spacing: 10
 
-            TableComponent {
+            FieldsTable {
                 Layout.alignment: Qt.AlignTop
 
                 headers: [
-                    { "title": "Суммарный ток батареи, А", "expand": true },
-                    { "title": "Состояние батареи", "expand": true },
+                    TableHeaderM { title: "Суммарный ток батареи, А"; expand: true },
+                    TableHeaderM { title: "Состояние батареи"; expand: true }
                 ]
 
-                content: [
-                    addWrapper( { type: 4, field: "psBatterySummCurrent" }, value => { return parseFloat( value ) / 1000 } ),
-                    addWrapper( { type: 4, field: "psBatteryStatus" }, value => {
-                        if ( parseInt(value) === 0 ) return "Заряжается"
-                        if ( parseInt(value) === 1 ) return "Плавает"
-                        if ( parseInt(value) === 2 ) return "Быстрая зарядка"
-                        if ( parseInt(value) === 3 ) return "Зарядка эквалайзер"
-                        if ( parseInt(value) === 4 ) return "разрядка"
-                        if ( parseInt(value) === 5 ) return "Низкий заряд"
-                        if ( parseInt(value) === 6 ) return "Тестирование"
-                        if ( parseInt(value) === 7 ) return "Отсутствует"
-                        if ( parseInt(value) === 8 ) return "Ошибка"
-                        return value
-                    } )
+                fields: [
+                    new Wrappers.ContentItem( "psBatterySummCurrent", "", Wrappers.RowTypes.TEXT, "num", Wrappers.divideByThousand ),
+                    new Wrappers.ContentItem( "psBatteryStatus", "", Wrappers.RowTypes.TEXT, "str", Wrappers.parseErrors ),
                 ]
-
             }
 
             TableComponent {
                 Layout.alignment: Qt.AlignTop
+                tableOID: "psGroupEntry"
 
                 headers: [
-                    { "title": "№ группы", "expand": true },
-                    { "title": "Напряжение, В", "expand": true },
-                    { "title": "Ток, А", "expand": true },
-                    { "title": "Состояние группы", "expand": true },
-                    { "title": "Состояние аппарата защиты", "expand": true }
+                    TableHeaderM { title: "№ группы"; expand: true },
+                    TableHeaderM { title: "Напряжение, В"; expand: true },
+                    TableHeaderM { title: "Ток, А"; expand: true },
+                    TableHeaderM { title: "Состояние группы"; expand: true },
+                    TableHeaderM { title: "Состояние аппарата защиты"; expand: true }
                 ]
 
-                content: {
-                    let objects = SNMP.getBulk( "psGroupEntry" )
-                    let fields = []
-                    let middle = objects.length / 5
-
-                    for ( let index = 0; index < middle; index++ ) {
-                        fields.push( { type: 5, value: objects[ index ] } )
-                        fields.push( addWrapper( { type: 5, value: objects[ index * middle + 1 ] }, value => parseFloat( value ) / 100 ) )
-                        fields.push( addWrapper( { type: 5, value: objects[ index * middle + 2 ] }, value => parseFloat( value ) / 1000 ) )
-                        fields.push( addWrapper( { type: 5, value: objects[ index * middle + 3 ] }, value => {
-                            if ( parseInt(value) === 0 ) return "Подключено"
-                            if ( parseInt(value) === 1 ) return "Отключено"
-                            if ( parseInt(value) === 2 ) return "Ошибка"
-                            return value
-
-                        } ) )
-                        fields.push( addWrapper( { type: 5, value: objects[ index * middle + 4 ] }, value => {
-                            if ( parseInt(value) === 0 ) return "Включено"
-                            if ( parseInt(value) === 1 ) return "Выключено"
-                            if ( parseInt(value) === 2 ) return "Неизвестно"
-                            if ( parseInt(value) === 3 ) return "Ошибка"
-                            return value
-
-                        } ) )
-                    }
-                    return fields
+                rows: {
+                    "psGroupNumber": new Wrappers.RowItem(),
+                    "psGroupCurrent": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByThousand ),
+                    "psGroupVoltage": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByHundred ),
+                    "psGroupFuseStatus": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.parseErrors, "str" ),
+                    "psGroupStatus": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.parseErrors, "str" )
                 }
             }
 

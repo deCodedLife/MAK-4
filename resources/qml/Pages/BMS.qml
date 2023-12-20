@@ -3,75 +3,39 @@ import QtQuick.Layouts
 
 import "../Components"
 import "../Globals"
+import "../Models"
+
+import "../wrappers.mjs" as Wrappers
 
 Page
 {
     id: root
     contentHeight: content.implicitHeight + 20
 
-    function addWrapper( config, wrapper ) {
-        config[ "wrapper" ] = wrapper
-        return config
+    property string columnOID: "psBMSNumber"
+    property string tableName: "psBMSEntry"
+    property int tablesCount: 0
+
+    Timer
+    {
+        interval: 20 * 1000
+        triggeredOnStart: true
+        running: true
+        repeat: true
+        onTriggered: {
+            SNMP.getTable( columnOID )
+            SNMP.getTable( tableName )
+        }
     }
 
-    property list<var> tables: []
-    property list<var> headers: [
-        { "title": "Параметр", "expand": false },
-        { "title": "Значение", "expand": false },
-    ]
+    Connections
+    {
+        target: SNMP
 
-    Component.onCompleted: {
-        let objects = SNMP.getBulk( "psBMSEntry" )
-        let fields = []
-        let middle = 4
-
-        for ( let index = 0; index < middle; index++ ) {
-            let table = []
-            table.push( { type: 5, value: "Напряжение, В" } )
-            table.push( { type: 5, value: parseFloat( parseInt( objects[ middle * 1 + index  ] ) / 100 ) } )
-            table.push( { type: 5, value: "Ток, А" } )
-            table.push( { type: 5, value: parseFloat( parseInt( objects[ middle * 2 + index  ] ) / 100 ) } )
-            table.push( { type: 5, value: "Статус" } )
-            table.push( addWrapper( { type: 5, value: objects[ middle * 3 + index  ] }, value => {
-                if ( parseInt( value ) === 0 ) return "Норма"
-                if ( parseInt( value ) === 1 ) return "Авария"
-                if ( parseInt( value ) === 2 ) return "Отключено"
-                return value
-            } ) )
-            table.push( { type: 5, value: "Состояние" } )
-            table.push( addWrapper( { type: 5, value: objects[ middle * 4 + index  ] }, value => {
-                if ( parseInt( value ) === 0 ) return "Поддержка"
-                if ( parseInt( value ) === 1 ) return "Заряд"
-                if ( parseInt( value ) === 2 ) return "Разряд"
-                return value
-            } ) )
-            table.push( { type: 5, value: "Температура 1, °C" } )
-            table.push( { type: 5, value: parseInt( objects[ middle * 5 + index  ] ) } )
-            table.push( { type: 5, value: "Температура 2, °C" } )
-            table.push( { type: 5, value: parseInt( objects[ middle * 6 + index  ] ) } )
-
-            table.push( { type: 5, value: "Емкость, Ач" } )
-            table.push( { type: 5, value: parseFloat( parseInt( objects[ middle * 7 + index  ] ) / 100 ) } )
-            table.push( { type: 5, value: "Оставшаяся\nЕмкость Ач" } )
-            table.push( { type: 5, value: parseFloat( parseInt( objects[ middle * 8 + index  ] ) / 100 ) } )
-            table.push( { type: 5, value: "Циклы" } )
-            table.push( { type: 5, value: objects[ middle * 9 + index  ] } )
-            table.push( { type: 5, value: "Количество ячеек" } )
-            table.push( { type: 5, value: objects[ middle * 10 + index  ] } )
-            table.push( { type: 5, value: "MIN напряжение, В" } )
-            table.push( { type: 5, value: parseFloat( parseInt( objects[ middle * 11 + index  ] ) / 1000 ) } )
-            table.push( { type: 5, value: "MAX напряжение, В" } )
-            table.push( { type: 5, value: parseFloat( parseInt( objects[ middle * 12 + index  ] ) / 1000 ) } )
-            table.push( { type: 5, value: "MIN-MAX\nнапряжение, В" } )
-            table.push( { type: 5, value: parseFloat( parseInt( objects[ middle * 13 + index  ] ) / 1000 ) } )
-
-
-            for ( let cell = 14; cell < 30; cell++ ) {
-                table.push( { type: 5, value: `Ячейка ${cell - 13}, В` } )
-                table.push( { type: 5, value: parseFloat( parseInt( objects[ middle * cell + index  ] ) / 1000 ) } )
-            }
-
-            tables.push( table )
+        function onGotRowsContent( root: string, data: object )
+        {
+            if ( root !== columnOID ) return
+            tablesCount = Object.keys( data[ columnOID ] ).length
         }
     }
 
@@ -107,15 +71,44 @@ Page
             Component.onCompleted: calcRows()
 
             Repeater {
-
-                model: 4
+                id: repeater
+                model: tablesCount
 
                 TableComponent {
                     Layout.alignment: Qt.AlignTop
                     header: "BMS" + (index + 1)
+                    tableOID: "psBMSEntry"
+                    reversed: true
+                    external: true
+                    column: index + 1
 
-                    headers: root.headers
-                    content: tables[ index ]
+                    headers: [
+                        TableHeaderM { title: "Параметр"; expand: false },
+                        TableHeaderM { title: "Значение"; expand: false }
+                    ]
+
+                    rows: {
+                        let rows = {}
+
+                        rows[ "psBMSVoltage"] = new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByHundred, "num", "Напряжение, В" )
+                        rows[ "psBMSCurrent"] = new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByHundred, "num", "Ток, А" )
+                        rows[ "psBMSStatus"] = new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.parseErrors, "str", "Статус" )
+                        rows[ "psBMSSubStatus"] = new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.parseErrors, "str", "Состояние" )
+                        rows[ "psBMSIntTemperature"] = new Wrappers.RowItem( Wrappers.RowTypes.TEXT, (v) => v, "num", "Температура 1, °C" )
+                        rows[ "psBMSExtTemperature"] = new Wrappers.RowItem( Wrappers.RowTypes.TEXT, (v) => v, "num", "Температура 2, °C" )
+                        rows[ "psBMSCap"] = new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByHundred, "num", "Емкость, Ач" )
+                        rows[ "psBMSRemainCap"] = new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByHundred, "num", "Оставшаяся\nЕмкость Ач" )
+                        rows[ "psBMSCycles"] = new Wrappers.RowItem( Wrappers.RowTypes.TEXT, (v) => v, "num", "Циклы" )
+                        rows[ "psBMSCells"] = new Wrappers.RowItem( Wrappers.RowTypes.TEXT, (v) => v, "num", "Количество ячеек" )
+                        rows[ "psBMSCellVoltMin"] = new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByThousand, "num", "MIN напряжение, В" )
+                        rows[ "psBMSCellVoltMax"] = new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByThousand, "num", "MAX напряжение, В" )
+                        rows[ "psBMSCellVoltDiff"] = new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByThousand, "num", "MIN-MAX\nнапряжение, В" )
+
+                        for ( let cell = 14; cell < 30; cell++ )
+                            rows[ `psBMSCell${cell - 13}Voltage` ] = new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByThousand, "num", `Ячейка${cell - 13}, B` )
+
+                        return rows
+                    }
                 }
             }
         }

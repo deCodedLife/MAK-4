@@ -65,10 +65,12 @@ Rectangle
             let startFrom = headers.indexOf( foundHeaders[0] ) * rowPerCol
 
 
-            for ( let fieldIndex = startFrom; fieldIndex < fields.length; fieldIndex++ )
+            for ( let fieldIndex = startFrom; fieldIndex < (startFrom + rowPerCol); fieldIndex++ )
             {
                 let field = fields[ fieldIndex ]
                 let row = data[ field.oid ]
+                row[ "oid" ] = field.oid
+                row[ "type" ] = field.type
                 row[ "value" ] = field.wrapper( row[ field.key ] )
 
                 content.push( row )
@@ -243,24 +245,21 @@ Rectangle
                             CustomSwitch {
                                 id: switchValue
                                 width: item.width
-                                visible: item.type === 6
+                                visible: item.type === 5
 
                                 toggled: {
-                                    if (item.type !== 6) return false
-                                    else parseInt( values[ index + ( row.currentRow * columnsCount ) ] ) === 1
+                                    if (item.type !== 5) return false
+                                    else item.currentVar[ "value" ] === 1
                                 }
 
-                                onContentChanged: value => {
-                                    let wrapper = item.currentVar[ "wrapper" ]
-                                    wrapper( value )
-                                }
+                                onContentChanged: value => SNMP.setOID( item.currentVar[ "oid" ], value )
                             }
 
                             Text {
                                 id: itemText
                                 width: item.width
 
-                                visible: item.type === 1 || item.type === 2
+                                visible: item.type === 0 || item.type === 1
                                 text: item.currentVar[ "value" ]
 
                                 color: "black"

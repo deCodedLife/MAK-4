@@ -3,11 +3,15 @@ import QtQuick.Layouts
 
 import "../Components"
 import "../Globals"
+import "../Models"
+
+import "../wrappers.mjs" as Wrappers
 
 Page
 {
     id: root
     contentHeight: content.implicitHeight
+    property string buttonOID: "psShortTestControl"
 
     function addWrapper( config, wrapper ) {
         config[ "wrapper" ] = wrapper
@@ -15,10 +19,21 @@ Page
     }
 
     state: {
-        let oid = SNMP.getOIDs( [ "psShortTestControl" ] )
-        if ( parseInt( oid ) === 1 ) return "started"
-        else return "stopped"
+        SNMP.getOIDs( buttonOID, [ buttonOID ] )
+        return "null"
     }
+
+    Connections
+    {
+        target: SNMP
+
+        function onGotRowsContent( root: string, data: object )
+        {
+            if ( root !== buttonOID ) return
+            state = data[ buttonOID ][ "num" ] === 1 ? "started" : "stopped"
+        }
+    }
+
     states: [
         State {
             name: "stopped"
@@ -41,10 +56,10 @@ Page
     onActionButtonTriggered: {
         if ( state === "stopped" ) {
             state = "started"
-            SNMP.setOID( "psShortTestControl", 1 )
+            SNMP.setOID( buttonOID, 1 )
             return
         }
-        SNMP.setOID( "psShortTestControl", 2 )
+        SNMP.setOID( buttonOID, 2 )
         state = "stopped"
     }
 
@@ -65,73 +80,36 @@ Page
 
             TableComponent {
                 Layout.alignment: Qt.AlignTop
+                tableOID: "psShortTestEntry"
 
                 headers: [
-                    { "title": "№ разряда", "expand": false },
-                    { "title": "Время теста", "expand": false },
-                    { "title": "Результат теста", "expand": false },
-                    { "title": "Длительность\n(мин)", "expand": false },
-                    { "title": "Емкость\nАч", "expand": false },
-                    { "title": "Конечное\nнапряжение, В", "expand": false },
-                    { "title": "группа1", "expand": false },
-                    { "title": "группа2", "expand": false },
-                    { "title": "группа3", "expand": false },
-                    { "title": "группа4", "expand": false },
+                    TableHeaderM { title: "№ разряда"; expand: false },
+                    TableHeaderM { title: "Время теста"; expand: false },
+                    TableHeaderM { title: "Результат теста"; expand: false },
+                    TableHeaderM { title: "Длительность\n(мин)"; expand: false },
+                    TableHeaderM { title: "Емкость\nАч"; expand: false },
+                    TableHeaderM { title: "Конечное\nнапряжение, В"; expand: false },
+                    TableHeaderM { title: "группа1"; expand: false },
+                    TableHeaderM { title: "группа2"; expand: false },
+                    TableHeaderM { title: "группа3"; expand: false },
+                    TableHeaderM { title: "группа4"; expand: false }
                 ]
 
-                content: {
-                    let objects = SNMP.getBulk( "psShortTestEntry" )
-                    let fields = []
-                    let middle = objects.length / 14
-
-                    for ( let index = 0; index < middle; index++ ) {
-                        fields.push( { type: 5, value: objects[ index ] } )
-                        fields.push( addWrapper( { type: 5, value: objects[ middle * 1 + index ] }, value => {
-                            let dateTime = SNMP.dateToReadable( value ).split( " " )
-                            return `${dateTime[0]}\n${dateTime[1]}`
-                        } ) )
-                        fields.push( addWrapper( { type: 5, value: objects[ middle * 2 + index ] }, value => {
-                            if ( parseInt( value ) === 0 ) return "Успешно"
-                            if ( parseInt( value ) === 1 ) return "Неизвестно"
-                            if ( parseInt( value ) === 2 ) return "Остановлено"
-                            if ( parseInt( value ) === 3 ) return "Низкий ток"
-                            if ( parseInt( value ) === 4 ) return "Идёт заряд"
-                            if ( parseInt( value ) === 5 ) return "Батарея выкл"
-                            if ( parseInt( value ) === 6 ) return "Таймаут"
-                            if ( parseInt( value ) === 7 ) return "Ошибка измерения"
-                            if ( parseInt( value ) === 8 ) return "Пусто"
-                            if ( parseInt( value ) === 9 ) return "Ошибка"
-                            return value
-                        } ) )
-                        fields.push( { type: 5, value: parseFloat( parseInt(objects[ middle * 3 + index ]) / 60 ).toFixed(2) } )
-                        fields.push( { type: 5, value: (parseFloat( objects[ middle * 3 + index ] ) / 1000) } )
-                        fields.push( { type: 5, value: (parseFloat( objects[ middle * 4 + index ] ) / 100) } )
-                        fields.push( addWrapper( { type: 5, value: objects[ middle * 5 + index ] }, value => {
-                            if ( parseInt(value) === 0 ) return "Подключено"
-                            if ( parseInt(value) === 1 ) return "Отключено"
-                            return value
-
-                        } ) )
-                        fields.push( addWrapper( { type: 5, value: objects[ middle * 6 + index ] }, value => {
-                            if ( parseInt(value) === 0 ) return "Подключено"
-                            if ( parseInt(value) === 1 ) return "Отключено"
-                            return value
-
-                        } ) )
-                        fields.push( addWrapper( { type: 5, value: objects[ middle * 7 + index ] }, value => {
-                            if ( parseInt(value) === 0 ) return "Подключено"
-                            if ( parseInt(value) === 1 ) return "Отключено"
-                            return value
-
-                        } ) )
-                        fields.push( addWrapper( { type: 5, value: objects[ middle * 8 + index ] }, value => {
-                            if ( parseInt(value) === 0 ) return "Подключено"
-                            if ( parseInt(value) === 1 ) return "Отключено"
-                            return value
-
-                        } ) )
-                    }
-                    return fields
+                rows: {
+                    "psShortTestNumber": new Wrappers.RowItem(),
+                    "psShortTestStartTime": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, (value) =>
+                    {
+                        let dateTime = SNMP.dateToReadable( value ).split( " " )
+                        return `${dateTime[0]}\n${dateTime[1]}`
+                    }, "str" ),
+                    "psShortTestResult": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.parseErrors, "str" ),
+                    "psShortTestLength": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.secondsToMinutes ),
+                    "psShortTestCapacity": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByThousand ),
+                    "psShortTestFinalVoltage": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByHundred ),
+                    "psShortTestGroup1": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.parseErrors, "str" ),
+                    "psShortTestGroup2": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.parseErrors, "str" ),
+                    "psShortTestGroup3": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.parseErrors, "str" ),
+                    "psShortTestGroup4": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.parseErrors, "str" )
                 }
             }
 
