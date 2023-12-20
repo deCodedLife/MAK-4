@@ -163,7 +163,11 @@ Rectangle
                             Layout.fillWidth: headers[ index ][ "expand" ]
                             Layout.minimumWidth: headers[ index ][ "expand" ] === false ? itemText.implicitWidth : null
 
-                            Layout.preferredHeight: itemText.contentHeight
+                            Layout.preferredHeight: {
+                                if ( itemText.visible ) return itemText.contentHeight
+                                if ( switchValue.visible ) return switchValue.height
+                            }
+
                             Layout.preferredWidth: headers[ index ][ "expand" ]  === false ? itemText.contentWidth : null
 
                             Layout.leftMargin: index === 0 ? 20 : 0
@@ -176,6 +180,18 @@ Rectangle
                             }
 
                             onWidthChanged: height = itemText.contentHeight
+
+                            CustomSwitch {
+                                id: switchValue
+                                width: item.width
+                                visible: item.type === 6
+
+                                toggled: parseInt( values[ index + ( row.currentRow * columnsCount ) ] ) === 1
+                                onContentChanged: value => {
+                                    let wrapper = item.currentVar[ "wrapper" ]
+                                    wrapper( value )
+                                }
+                            }
 
                             Text {
                                 id: itemText
@@ -207,5 +223,13 @@ Rectangle
                 }
             }
         }
+    }
+
+    Rectangle {
+        anchors.fill: parent
+        color: Globals.grayScale
+        radius: 10
+        opacity: .6
+        visible: !root.enabled
     }
 }

@@ -6,11 +6,18 @@ import "../Globals"
 
 Page
 {
+    id: root
     contentHeight: content.implicitHeight
 
     function addWrapper( config, wrapper ) {
         config[ "wrapper" ] = wrapper
         return config
+    }
+
+    actionButtonIcon: "qrc:/images/icons/save.svg"
+    actionButtonTitle: "Экспортировать"
+
+    onActionButtonTriggered: {
     }
 
     ColumnLayout {

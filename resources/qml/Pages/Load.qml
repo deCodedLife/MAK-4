@@ -56,7 +56,7 @@ Page
                 Layout.alignment: Qt.AlignTop
 
                 headers: [
-                    { "title": "№ АЗН", "expand": false },
+                    { "title": "№ АЗН", "expand": true },
                     { "title": "Состояние АЗН", "expand": true }
                 ]
 
