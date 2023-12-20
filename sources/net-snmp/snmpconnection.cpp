@@ -164,11 +164,21 @@ void SNMPConnection::setOID( QString objectName, QVariant data )
 
 void SNMPConnection::setMultiple( QJsonObject fields )
 {
-    SNMPpp::PDU pdu( SNMPpp::PDU::kSet );
+    int limit {10};
+    int counter {0};
 
-    for( QString key : fields.keys() ) {
+    for( QString key : fields.keys() )
+    {
+        SNMPpp::PDU pdu( SNMPpp::PDU::kSet );
 
+        QJsonObject field = fields[ key ].toObject();
         QVariant value = fields[ key ].toObject()[ "value" ].toVariant();
+
+        if ( field[ "type" ] == FieldCombobox )
+        {
+            value = field[ "model" ].toObject()[ field[ "value" ].toString() ].toInt();
+        }
+
         oid_object obj = parser.MIB_OBJECTS[ key ];
         SNMPpp::OID oid( obj.oid.toStdString() + ".0" );
 
@@ -183,7 +193,7 @@ void SNMPConnection::setMultiple( QJsonObject fields )
         case TYPE_NULL:
             pdu.addNullVar( oid );
             break;
-        case TYPE_OCTETSTR:
+        case TYPE_OCTETSTR: case TYPE_NETADDR: case TYPE_IPADDR: case TYPE_NSAPADDRESS:
             pdu.addOctetStringVar(
                 oid,
                 (unsigned char *) value.toString().toStdString().c_str(),
@@ -194,18 +204,18 @@ void SNMPConnection::setMultiple( QJsonObject fields )
             break;
         }
 
-    }
+        try
+        {
+            pdu = SNMPpp::set( writeSession, pdu );
+        }
+        catch( const std::exception &e )
+        {
+            emit error_occured( Callback::New( e.what(), Callback::Warning ) );
+        }
 
-    try
-    {
-        pdu = SNMPpp::set( writeSession, pdu );
+        pdu.free();
     }
-    catch( const std::exception &e )
-    {
-        emit error_occured( Callback::New( e.what(), Callback::Warning ) );
-    }
-
-    pdu.free();
+    emit settingsChanged();
 }
 
 void SNMPConnection::updateConfigs()
@@ -277,7 +287,7 @@ void SNMPConnection::updateConfigs()
             fullConfig[ root ] = config;
             pConfigs->write( fullConfig );
 
-            emit gotSettings();
+            emit settingsChanged();
         } );
         connect( request, &AsyncSNMP::finished, this, &SNMPConnection::handleSNMPFinished );
         proceed( request );

@@ -30,7 +30,7 @@ Page
     {
         target: SNMP
 
-        function onGotSettings()
+        function onSettingsChanged()
         {
             configuration = ConfigManager.get()[ "power" ]
         }
