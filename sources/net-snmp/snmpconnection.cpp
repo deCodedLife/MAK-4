@@ -183,6 +183,8 @@ QString SNMPConnection::dateToReadable( QString date )
 
 void SNMPConnection::updateConnection()
 {
+    SOCK_STARTUP;
+
     QJsonObject configs = pConfigs->get()[ "main" ].toObject();
     SNMPpp::closeSession( pHandle );
 
@@ -245,6 +247,7 @@ void SNMPConnection::updateConnection()
 
 void SNMPConnection::dropConnection()
 {
+    SOCK_CLEANUP;
     _state = Disconnected;
     emit stateChanged( _state );
     SNMPpp::closeSession( pHandle );
