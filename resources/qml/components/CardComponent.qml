@@ -114,6 +114,7 @@ Rectangle
                     }
 
                     CustomSwitch {
+                        id: customSwitch
                         anchors.fill: parent
                         visible: modelData[ "type" ] === 5
                         text: modelData[ "description" ]

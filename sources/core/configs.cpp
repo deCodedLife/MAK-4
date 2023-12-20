@@ -166,10 +166,10 @@ QJsonObject Configs::Default()
      * @brief blvdSettings
      */
     QJsonObject blvdSettings;
-    blvdSettings[ "stBLVDDisconnectedVoltage" ] = Field::ToJSON( { FieldCounter, 5100, "Напряжение отключения батарейного контактора, В:" } );
-    blvdSettings[ "stLLVD1DisconnectedVoltage" ] = Field::ToJSON( { FieldCounter, 5100, "Напряжение отключения контактора низкоприоритетной нагрузки 1, В" } );
-    blvdSettings[ "stLLVD2DisconnectedVoltage" ] = Field::ToJSON( { FieldCounter, 5100, "Напряжение отключения контактора низкоприоритетной нагрузки 2, В" } );
-    blvdSettings[ "stLLVD3DisconnectedVoltage" ] = Field::ToJSON( { FieldCounter, 5100, "Напряжение отключения контактора низкоприоритетной нагрузки 3, В" } );
+    blvdSettings[ "stBLVDDisconnectedVoltage" ] = Field::ToJSON( { FieldCounter, 5100, "Напряжение отключения батарейного контактора, В:", {}, 0 } );
+    blvdSettings[ "stLLVD1DisconnectedVoltage" ] = Field::ToJSON( { FieldCounter, 5100, "Напряжение отключения контактора низкоприоритетной нагрузки 1, В", {}, 0 } );
+    blvdSettings[ "stLLVD2DisconnectedVoltage" ] = Field::ToJSON( { FieldCounter, 5100, "Напряжение отключения контактора низкоприоритетной нагрузки 2, В", {}, 0 } );
+    blvdSettings[ "stLLVD3DisconnectedVoltage" ] = Field::ToJSON( { FieldCounter, 5100, "Напряжение отключения контактора низкоприоритетной нагрузки 3, В", {}, 0 } );
     blvdSettings[ "stBLVDDisconnectedTime" ] = Field::ToJSON( { FieldCounter, 0, "Время отключения батарейного контактора, мин", {}, 0, 720 } );
     blvdSettings[ "stLLVD1DisconnectedTime" ] = Field::ToJSON( { FieldCounter, 0, "Время отключения контактора низкоприоритетной нагрузки 1, мин", {}, 0, 720 } );
     blvdSettings[ "stLLVD2DisconnectedTime" ] = Field::ToJSON( { FieldCounter, 0, "Время отключения контактора низкоприоритетной нагрузки 2, мин", {}, 0, 720 } );
@@ -180,12 +180,40 @@ QJsonObject Configs::Default()
     blvdSettings[ "stLLVD3DisconnectedCapacity" ] = Field::ToJSON( { FieldCounter, 0, "Ёмкость отключения контактора низкоприоритетной нагрузки 3, А⋅ч", {}, 0, 99 } );
     blvdSettings[ "stContactorControl" ] = Field::ToJSON( { FieldCheckbox, 0, "Ручное управление" } );
 
+
+    /**
+     * @brief batterySettings
+     */
+    QJsonObject batterySettings;
+    batterySettings[ "stFloatVoltage" ] = Field::ToJSON( { FieldCounter, 6660, "Напряжение содержания, В", {}, 0 } );
+    batterySettings[ "stBoostVoltage" ] = Field::ToJSON( { FieldCounter, 6690, "Напряжение ускоренного заряда, В", {}, 0 } );
+    batterySettings[ "stBoostEnable" ] = Field::ToJSON( { FieldCheckbox, 0, "Ускоренный заряд" } );
+    batterySettings[ "stEqualizeVoltage" ] = Field::ToJSON( { FieldCounter, 6900, "Напряжение выравнивающего заряда, В", {}, 0 } );
+    batterySettings[ "stEndTestVoltage" ] = Field::ToJSON( { FieldCounter, 5400, "Напряжение окончания теста, В", {}, 0 } );
+    batterySettings[ "stCriticalLowVoltage" ] = Field::ToJSON( { FieldCounter, 5100, "Напряжение глубокого разряда, В", {}, 0 } );
+    batterySettings[ "stTermocompensationEnable" ] = Field::ToJSON( { FieldCheckbox, 1, "Термокомпенсация" } );
+    batterySettings[ "stTermocompensationCoefficient" ] = Field::ToJSON( { FieldCounter, 35, "Коээфициэнт термокомпенсации, мВ/эл/°C", {}, 1 } );
+    batterySettings[ "stChargeCurrentLimit" ] = Field::ToJSON( { FieldCounter, 10, "Ограничение тока заряда, C10", {}, 0 } );
+    batterySettings[ "stGroupCapacity" ] = Field::ToJSON( { FieldCounter, 100, "Ёмкость группы, Ач", {}, 0 } );
+    batterySettings[ "stEqualizeTime" ] = Field::ToJSON( { FieldCounter, 1, "Время выравнивающего заряда", {}, 1, 24 } );
+
+    /**
+     * @brief temperatureSettings
+     */
+    QJsonObject temperatureSettings;
+    temperatureSettings[ "stNumberTemperatureSensors" ] = Field::ToJSON( { FieldCounter, 0, "Количество датчиков температуры", {}, 1, 2 } );
+    temperatureSettings[ "stLowTemperatureTherehold" ] = Field::ToJSON( { FieldCounter, 0, "Нижний порог температуры, °С:", {}, 0 } );
+    temperatureSettings[ "stHightTemperatureTherehold" ] = Field::ToJSON( { FieldCounter, 0, "Верхний порог температуры, °С", {}, 0 } );
+    temperatureSettings[ "stTemperatureGisteresis" ] = Field::ToJSON( { FieldCounter, 0, "Гистерезис, °С", {}, 0 } );
+
     data[ "main" ] = mainSettings;
     data[ "snmp" ] = snmpSettings;
     data[ "power" ] = powerSettings;
     data[ "overall" ] = overallSettings;
     data[ "network" ] = networkSettings;
+    data[ "battery" ] = batterySettings;
     data[ "blvd" ] = blvdSettings;
+    data[ "temperature" ] = temperatureSettings;
 
     for ( QString settingsLayer : data.keys() )
     {
