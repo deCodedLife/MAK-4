@@ -1,12 +1,5 @@
-set (
-    CORE_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/tobject.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/tobject.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/config.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/config.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/callback.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/callback.cpp
-)
+FILE ( GLOB CORE_SOURCES *.cpp *.h )
+LIST ( SORT CORE_SOURCES )
 
 add_library(
     Core STATIC

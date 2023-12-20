@@ -1,3 +1,4 @@
+#include <QString>
 #include <QApplication>
 #include <QQmlApplicationEngine>
 
@@ -7,7 +8,19 @@
 #include <net-snmp/net-snmp-includes.h>
 #include <string.h>
 
-#define HOST "185.51.21.124:16190"
+#define HOST "udp:185.51.21.124:16190"
+#define USER "user000001"
+#define AUTH_PASSWORD "0000000001"
+#define PRIV_PASSWORD "0000000011"
+
+#include <mibparser.h>
+
+#include <SNMPpp/SNMPpp.hpp>
+#include <SNMPpp/Session.hpp>
+#include <SNMPpp/Get.hpp>
+#include <iomanip>
+
+typedef void * SessionHandle;
 
 int main(int argc, char *argv[])
 {
@@ -25,125 +38,31 @@ int main(int argc, char *argv[])
         cfg.Write( config );
     }
 
-    qDebug() << config;
+    MibParser parser;
+    SNMPpp::SessionHandle sessionHandle = NULL;
 
-    netsnmp_pdu *pdu;
-    netsnmp_pdu *response;
+    try
+    {
+        SNMPpp::openSessionV3( sessionHandle, "udp:185.51.21.124:16190", "user000001", "0000000001", "0000000011", "authPriv", "MD5", "AES", 3, 1000000 );
 
-    oid anOID[MAX_OID_LEN];
-    size_t anOID_len;
+        SNMPpp::PDU pdu( SNMPpp::PDU::kGet );
+        pdu.addNullVar( ".1.3.6.1.4.1.36032.1.10.11.1.0" );
 
-    netsnmp_variable_list *vars;
-    int status;
-    int count=1;
+        pdu = SNMPpp::get( sessionHandle, pdu );
 
-    init_snmp("MAK-4");
+        qDebug() << pdu.varlist().asString();
 
-    snmp_session session, *ss;
-    snmp_sess_init(&session);
+        pdu.free();
 
-    session.version = SNMP_VERSION_2c;
-    session.community = (u_char *) "public";
-    session.community_len = strlen("public");
-    session.peername = strdup(HOST);
-    session.remote_port = (u_short) '16190';
-
-//    session.peername = HOST;
-
-//    session.securityName = strdup( "MD5User" );
-//    session.securityNameLen = strlen( "MD5User" );
-
-//    session.securityAuthKey = "";
-
-//    session.securityLevel = SNMP_SEC_LEVEL_AUTHPRIV;
-//    session.securityAuthProto = (oid *) netsnmp_memdup(
-//        usmAESPrivProtocol,
-//        sizeof(usmAESPrivProtocol)
-//    );
-//    session.securityAuthProtoLen = sizeof( usmAESPrivProtocol ) / sizeof( oid );
-//    session.securityAuthKeyLen = USM_AUTH_KU_LEN;
-
-//    session.securityPrivProto = (oid *) netsnmp_memdup(
-//        usmAESPrivProtocol,
-//        sizeof(usmAESPrivProtocol)
-//    );
-//    session.securityPrivProtoLen = sizeof( usmAESPrivProtocol ) / sizeof( oid );
-
-    /*if ( generate_Ku(session.securityAuthProto,
-                    session.securityAuthProtoLen,
-                    (const u_char *) "0000000001",
-                    strlen("0000000001"),
-                    session.securityAuthKey,
-                    &session.securityAuthKeyLen
-    ) != SNMPERR_SUCCESS) {
-        snmp_perror(argv[0]);
-        snmp_log(LOG_ERR,
-                 "Error generating Ku from authentication pass phrase. \n");
-        exit(1);
-    }*/
-
-    SOCK_STARTUP;
-
-    ss = snmp_open(&session);
-
-    if (!ss) {
-        snmp_sess_perror("ack", &session);
-        SOCK_CLEANUP;
-        exit(1);
+        SNMPpp::closeSession( sessionHandle );
+    }
+    catch ( const std::exception &e )
+    {
+        qDebug() << e.what();
+        assert( sessionHandle == NULL );
     }
 
-    pdu = snmp_pdu_create(SNMP_MSG_GET);
-    anOID_len = MAX_OID_LEN;
-    if (!snmp_parse_oid("1.3.6.1.4.1.36032.1.10.8.1.0", anOID, &anOID_len)) {
-        snmp_perror("1.3.6.1.4.1.36032.1.10.8.1.0");
-        SOCK_CLEANUP;
-        exit(1);
-    }
-
-    read_objid("1.3.6.1.4.1.36032.1.10.8.1.0", anOID, &anOID_len);
-    get_node("sysDescr.0", anOID, &anOID_len);
-    read_objid("system.sysDescr.0", anOID, &anOID_len);
-
-    status = snmp_synch_response(ss, pdu, &response);
-
-    if (status == STAT_SUCCESS && response->errstat == SNMP_ERR_NOERROR) {
-        /*
-       * SUCCESS: Print the result variables
-       */
-        printf( "Yeeeeeah\n" );
-
-        for(vars = response->variables; vars; vars = vars->next_variable)
-            print_variable(vars->name, vars->name_length, vars);
-
-        /* manipuate the information ourselves */
-        for(vars = response->variables; vars; vars = vars->next_variable) {
-            if (vars->type == ASN_OCTET_STR) {
-                char *sp = (char *)malloc(1 + vars->val_len);
-                memcpy(sp, vars->val.string, vars->val_len);
-                sp[vars->val_len] = '\0';
-                printf("value #%d is a string: %s\n", count++, sp);
-                free(sp);
-            }
-            else
-                printf("value #%d is NOT a string! Ack!\n", count++);
-        }
-    } else {
-        /*
-       * FAILURE: print what went wrong!
-       */
-
-        if (status == STAT_SUCCESS)
-            fprintf(stderr, "Error in packet\nReason: %s\n",
-                    snmp_errstring(response->errstat));
-        else if (status == STAT_TIMEOUT)
-            fprintf(stderr, "Timeout: No response from %s.\n",
-                    session.peername);
-        else
-            snmp_sess_perror("snmpdemoapp", ss);
-
-    }
-
-
+    SNMPpp::closeSession( sessionHandle );
     engine.load(QUrl(QStringLiteral("qrc:/qml/Main.qml")));
     return app.exec();
 }
