@@ -84,6 +84,10 @@ void SNMPConnection::handleSNMPRequest( QString root, QMap<SNMPpp::OID, QJsonObj
 {
     if ( rows.empty() ) return;
 
+    if ( _state == Disconnected ) {
+        emit notify( 0, "Подключено", 3000 );
+    }
+
     _state = Connected;
     emit stateChanged( _state );
 
@@ -388,9 +392,13 @@ void SNMPConnection::updateConnection()
         SOCK_CLEANUP;
         SNMPpp::closeSession( readSession );
 
+        QString error = QString::fromStdString( e.what() );
+
         _state = Disconnected;
         emit stateChanged( _state );
-        emit error_occured( Callback::New( e.what(), Callback::Error ) );
+        emit error_occured( Callback::New( error, Callback::Error ) );
+
+        emit notify( -1, "Ошибка SNMP: " + error, 3000 );
     }
 }
 
@@ -400,6 +408,7 @@ void SNMPConnection::dropConnection()
     _state = Disconnected;
     emit stateChanged( _state );
     SNMPpp::closeSession( readSession );
+    emit notify( -1, "Соединение сброшено", 3000 );
 }
 
 QVariant SNMPConnection::getFieldValue( QString object ) {
