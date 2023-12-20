@@ -108,7 +108,9 @@ QList<QString> SNMPConnection::getBulk( QString object )
                     shouldBreak = true;
                     break;
                 };
-                objects.append( QString::number( *itemIterator->second->val.integer ) );
+                if ( itemIterator->second->type == ASN_INTEGER ) objects.append( QString::number( *itemIterator->second->val.integer ) );
+                else objects.append( QString::fromStdString( pdu.varlist().asString( itemIterator->first ) ) );
+//                objects.append( QString::number( *itemIterator->second->val.integer ) );
                 lastOID = itemIterator->first;
             }
 
