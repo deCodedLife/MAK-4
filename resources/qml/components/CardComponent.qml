@@ -7,6 +7,8 @@ import "../Globals"
 
 Rectangle
 {
+    id: root
+
     property string header: ""
     property var fields: []
     property var buttons: []
@@ -79,26 +81,45 @@ Rectangle
                     height: textfield.implicitHeight
 
                     CustomField {
+                        property var counterValidator: IntValidator {
+                            bottom: modelData[ "min" ] === -1 ? -2147483648 : modelData[ "min" ]
+                            top: modelData[ "max" ] === -1 ? 2147483647 : modelData[ "max" ]
+                        }
+
                         id: textfield
                         anchors.fill: parent
-                        visible: modelData[ "type" ] === 0 || modelData[ "type" ] === 1
+                        visible: modelData[ "type" ] === 2 || modelData[ "type" ] === 3 || modelData[ "type" ] === 6
                         placeholderText: modelData[ "description" ]
                         value: modelData[ "value" ]
-                        onChanged: fieldUpdated( modelData[ "field" ], text )
-                        echoMode: modelData[ "type" ] === 1 ? TextField.Password : TextField.Normal
+                        onChanged: {
+                            if ( !acceptableInput ) return
+                            fieldUpdated( modelData[ "field" ], text )
+                        }
+                        echoMode: modelData[ "type" ] === 3 ? TextField.Password : TextField.Normal
+                        validator: modelData[ "type" ] === 6 ? counterValidator : null
+                        color: modelData[ "type" ] === 6 ? acceptableInput ? Globals.textColor : Globals.errorColor : Globals.textColor
                     }
 
                     CustomDropDown {
                         anchors.fill: parent
-                        visible: modelData[ "type" ] === 2
-                        displayText: `${modelData[ "description" ]}: ${modelData[ "model" ][ currentIndex ]}`
+                        visible: modelData[ "type" ] === 4
+                        displayText: `${modelData[ "description" ]}: ` + Object.keys( modelData[ "model" ] )[ currentIndex ]
                         value: modelData[ "value" ]
-                        model: modelData[ "model" ]
+                        model: Object.keys( modelData[ "model" ] )
                         onCurrentIndexChanged: {
                             if ( preSelected === currentIndex ) return
                             preSelected = currentIndex
-                            fieldUpdated( modelData[ "field" ], modelData[ "model" ][ currentIndex ] )
+                            fieldUpdated( modelData[ "field" ], Object.keys( modelData[ "model" ] )[ currentIndex ] )
                         }
+                    }
+
+                    CustomSwitch {
+                        anchors.fill: parent
+                        visible: modelData[ "type" ] === 5
+                        text: modelData[ "description" ]
+                        toggled: modelData[ "value" ]
+                        dobbled: true
+                        onContentChanged: value => fieldUpdated( modelData[ "field" ], value )
                     }
                 }
             }
@@ -136,5 +157,11 @@ Rectangle
         }
     }
 
-
+    Rectangle {
+        anchors.fill: parent
+        color: Globals.grayScale
+        radius: 10
+        opacity: .6
+        visible: !root.enabled
+    }
 }

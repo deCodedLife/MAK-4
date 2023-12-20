@@ -89,13 +89,13 @@ QJsonObject Configs::Default()
      * @brief mainSettings
      */
     QJsonObject mainSettings;
-    mainSettings[ "snmpVersion" ] = Field::ToJSON( { FieldCombobox, SNMP_VERSION, "Версия SNMP", { "snmpV2c", "snmpV3" } } );
+    mainSettings[ "snmpVersion" ] = Field::ToJSON( { FieldCombobox, SNMP_VERSION, "Версия SNMP", { {"snmpV2c", 2}, {"snmpV3", 3 } } } );
     mainSettings[ "host" ] = Field::ToJSON( { FieldInput, HOST, "IP адрес" } );
     mainSettings[ "port" ] = Field::ToJSON( { FieldInput, PORT, "Порт" } );
     mainSettings[ "user" ] = Field::ToJSON( { FieldInput, USER, "Имя" } );
-    mainSettings[ "authMethod" ] = Field::ToJSON( { FieldCombobox, AUTH_METHOD, "Уровень", { "authPriv", "authNoPriv" } } );
-    mainSettings[ "authProtocol" ] = Field::ToJSON( { FieldCombobox, AUTH_PROTOCOL, "Протокол аутентификации", { "SHA1", "MD5" } } );
-    mainSettings[ "privProtocol" ] = Field::ToJSON( { FieldCombobox, PRIV_PROTOCOL, "Протокол приватноси", { "DES", "AES" } } );
+    mainSettings[ "authMethod" ] = Field::ToJSON( { FieldCombobox, AUTH_METHOD, "Уровень", { { "authPriv", 0 }, { "authNoPriv", 0 } } } );
+    mainSettings[ "authProtocol" ] = Field::ToJSON( { FieldCombobox, AUTH_PROTOCOL, "Протокол аутентификации", { { "SHA1", 0 }, { "MD5", 0 } } } );
+    mainSettings[ "privProtocol" ] = Field::ToJSON( { FieldCombobox, PRIV_PROTOCOL, "Протокол приватноси", { {"DES", 0}, {"AES", 0} } } );
     mainSettings[ "authPassword" ] = Field::ToJSON( { FieldPassword, AUTH_PASSWORD, "Пароль аутентификации" } );
     mainSettings[ "privPassword" ] = Field::ToJSON( { FieldPassword, PRIV_PASSWORD, "Пароль приватности" } );
 
@@ -104,12 +104,102 @@ QJsonObject Configs::Default()
 
     mainSettings[ "updateDelay" ] = Field::ToJSON( { FieldInput, UPDATE_DELAY, "Период опроса" } );
 
-    for ( QString field : mainSettings.keys() ) {
-        QJsonObject fieldObj = mainSettings[ field ].toObject();
-        fieldObj[ "field" ] = field;
-        mainSettings[ field ] = fieldObj;
+    /**
+     * @brief snmpSettings
+     */
+    QJsonObject snmpSettings;
+    snmpSettings[ "stSNMPVersion" ] = Field::ToJSON( { FieldCombobox, ST_SNMP_VERSION, "Версия протокола Snmp", { { "snmpV2c", 2 }, { "snmpV3", 3 } } } );
+
+    snmpSettings[ "stSNMPAdministratorName" ] = Field::ToJSON( { FieldInput, "Admin", "Имя администратора" } );
+    snmpSettings[ "stSNMPAdministratorAuthPassword" ] = Field::ToJSON( { FieldPassword, "*****", "Пароль аутентификации администратора" } );
+    snmpSettings[ "stSNMPAdministratorPrivPassword" ] = Field::ToJSON( { FieldPassword, "*****", "Приватный пароль администратора" } );
+
+    snmpSettings[ "stSNMPEngineerName" ] = Field::ToJSON( { FieldInput, "Engineer", "Имя инженера" } );
+    snmpSettings[ "stSNMPEngineerAuthPassword" ] = Field::ToJSON( { FieldInput, "*****", "Пароль аутентификации инженера" } );
+    snmpSettings[ "stSNMPEngineerPrivPassword" ] = Field::ToJSON( { FieldInput, "*****", "Приватный пароль инженера" } );
+
+    snmpSettings[ "stSNMPOperatorName" ] = Field::ToJSON( { FieldInput, "Operator", "Имя оператора" } );
+    snmpSettings[ "stSNMPOperatorAuthPassword" ] = Field::ToJSON( { FieldInput, "*****", "Пароль аутентификации оператора" } );
+    snmpSettings[ "stSNMPOperatorPrivPassword" ] = Field::ToJSON( { FieldInput, "*****", "Приватный пароль оператора" } );
+
+    snmpSettings[ "stSNMPSAuthAlgo" ] = Field::ToJSON( { FieldCombobox, ST_SNMP_AUTH_ALGO, "Способ защиты данных", { { "Нет", 0 }, { "MD5", 1 }, { "SHA1", 2 } } } );
+    snmpSettings[ "stSNMPSPrivAlgo" ] = Field::ToJSON( { FieldCombobox, ST_SNMP_PRIV_ALGO, "Способ шифрования", { { "Нет", 0 }, { "DES", 1 }, { "AES128", 2 } } } );
+
+    snmpSettings[ "stSNMPReadComunity" ] = Field::ToJSON( { FieldPassword, "*****", "Коммьюнити для чтения" } );
+    snmpSettings[ "stSNMPWriteComunity" ] = Field::ToJSON( { FieldPassword, "*****", "Коммьюнити для записи" } );
+
+    for ( int index = 1; index < 4; index++ )
+    {
+        QString numIndex = QString::number( index );
+        snmpSettings[ "stSNMPTrap" + numIndex + "ServerIP" ] = Field::ToJSON( { FieldInput, "", "IP trap-сервера #" + numIndex } );
     }
+
+    for ( int index = 1; index < 4; index++ )
+    {
+        QString numIndex = QString::number( index );
+        snmpSettings[ "stSNMPTrap" + numIndex + "Enable" ] = Field::ToJSON( { FieldCheckbox, 0, "Ip Trap №" + numIndex + " вкл" } );
+    }
+
+    /**
+     * @brief power
+     */
+    QJsonObject powerSettings;
+    powerSettings[ "stLowMainsVoltageTherehold" ] = Field::ToJSON( { FieldCounter, 170, "Нижний порог напряжения сети, В", {}, 170, 210 } );
+    powerSettings[ "stHightMainsVoltageTherehold" ] = Field::ToJSON( { FieldCounter, 230, "Верхний порог напряжения сети, В", {}, 230, 290 } );
+
+    /**
+     * @brief overallSettings
+     */
+    QJsonObject overallSettings;
+    overallSettings[ "psTimeZone" ] = Field::ToJSON( { FieldCounter, 12, "Часовой пояс", {}, -48, 52 } );
+    overallSettings[ "psBuzzerEnable" ] = Field::ToJSON( { FieldCheckbox, 0, "Звук включен" } );
+
+    /**
+     * @brief networkSettings
+     */
+    QJsonObject networkSettings;
+    networkSettings[ "stIPaddress" ] = Field::ToJSON( { FieldInput, "192.168.000.090", "IP адрес контроллера" } );
+    networkSettings[ "stNetworkMask" ] = Field::ToJSON( { FieldInput, "255.255.255.000", "Маска сети" } );
+    networkSettings[ "stNetworkGateway" ] = Field::ToJSON( { FieldInput, "192.168.000.001", "Шлюз" } );
+
+    /**
+     * @brief blvdSettings
+     */
+    QJsonObject blvdSettings;
+    blvdSettings[ "stBLVDDisconnectedVoltage" ] = Field::ToJSON( { FieldCounter, 5100, "Напряжение отключения батарейного контактора, В:" } );
+    blvdSettings[ "stLLVD1DisconnectedVoltage" ] = Field::ToJSON( { FieldCounter, 5100, "Напряжение отключения контактора низкоприоритетной нагрузки 1, В" } );
+    blvdSettings[ "stLLVD2DisconnectedVoltage" ] = Field::ToJSON( { FieldCounter, 5100, "Напряжение отключения контактора низкоприоритетной нагрузки 2, В" } );
+    blvdSettings[ "stLLVD3DisconnectedVoltage" ] = Field::ToJSON( { FieldCounter, 5100, "Напряжение отключения контактора низкоприоритетной нагрузки 3, В" } );
+    blvdSettings[ "stBLVDDisconnectedTime" ] = Field::ToJSON( { FieldCounter, 0, "Время отключения батарейного контактора, мин", {}, 0, 720 } );
+    blvdSettings[ "stLLVD1DisconnectedTime" ] = Field::ToJSON( { FieldCounter, 0, "Время отключения контактора низкоприоритетной нагрузки 1, мин", {}, 0, 720 } );
+    blvdSettings[ "stLLVD2DisconnectedTime" ] = Field::ToJSON( { FieldCounter, 0, "Время отключения контактора низкоприоритетной нагрузки 2, мин", {}, 0, 720 } );
+    blvdSettings[ "stLLVD3DisconnectedTime" ] = Field::ToJSON( { FieldCounter, 0, "Время отключения контактора низкоприоритетной нагрузки 3, мин", {}, 0, 720 } );
+    blvdSettings[ "stBLVDDisconnectedCapacity" ] = Field::ToJSON( { FieldCounter, 0, "Ёмкость отключения батарейного контактора, А⋅ч:", {}, 0, 99 } );
+    blvdSettings[ "stLLVD1DisconnectedCapacity" ] = Field::ToJSON( { FieldCounter, 0, "Ёмкость отключения контактора низкоприоритетной нагрузки 1, А⋅ч", {}, 0, 99 } );
+    blvdSettings[ "stLLVD2DisconnectedCapacity" ] = Field::ToJSON( { FieldCounter, 0, "Ёмкость отключения контактора низкоприоритетной нагрузки 2, А⋅ч", {}, 0, 99 } );
+    blvdSettings[ "stLLVD3DisconnectedCapacity" ] = Field::ToJSON( { FieldCounter, 0, "Ёмкость отключения контактора низкоприоритетной нагрузки 3, А⋅ч", {}, 0, 99 } );
+    blvdSettings[ "stContactorControl" ] = Field::ToJSON( { FieldCheckbox, 0, "Ручное управление" } );
+
     data[ "main" ] = mainSettings;
+    data[ "snmp" ] = snmpSettings;
+    data[ "power" ] = powerSettings;
+    data[ "overall" ] = overallSettings;
+    data[ "network" ] = networkSettings;
+    data[ "blvd" ] = blvdSettings;
+
+    for ( QString settingsLayer : data.keys() )
+    {
+        QJsonObject layer = data[ settingsLayer ].toObject();
+
+        for ( QString field : layer.keys() )
+        {
+            QJsonObject fieldObj = layer[ field ].toObject();
+            fieldObj[ "field" ] = field;
+            layer[ field ] = fieldObj;
+        }
+
+        data[ settingsLayer ] = layer;
+    }
 
     return data;
 }
