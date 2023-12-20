@@ -50,20 +50,35 @@ Page
             Layout.alignment: Qt.AlignHCenter| Qt.AlignTop
             Layout.fillWidth: true
 
-            fields: [
-                configuration[ "stBLVDDisconnectedVoltage" ],
-                configuration[ "stLLVD1DisconnectedVoltage" ],
-                configuration[ "stLLVD2DisconnectedVoltage" ],
-                configuration[ "stLLVD3DisconnectedVoltage" ],
-                configuration[ "stBLVDDisconnectedTime" ],
-                configuration[ "stLLVD1DisconnectedTime" ],
-                configuration[ "stLLVD2DisconnectedTime" ],
-                configuration[ "stLLVD3DisconnectedTime" ],
-                configuration[ "stBLVDDisconnectedCapacity" ],
-                configuration[ "stLLVD1DisconnectedCapacity" ],
-                configuration[ "stLLVD2DisconnectedCapacity" ],
-                configuration[ "stLLVD3DisconnectedCapacity" ]
-            ]
+            fields: {
+                let _fields = []
+
+                let blvd0 = configuration[ "stBLVDDisconnectedVoltage" ]
+                blvd0[ "wrapper" ] = Wrappers.divideByHundred
+                _fields.push( blvd0 )
+                let blvd1 = configuration[ "stLLVD1DisconnectedVoltage" ]
+                blvd1[ "wrapper" ] = Wrappers.divideByHundred
+                _fields.push( blvd1 )
+                let blvd2 = configuration[ "stLLVD1DisconnectedVoltage" ]
+                blvd1[ "wrapper" ] = Wrappers.divideByHundred
+                _fields.push( blvd2 )
+                let blvd3 = configuration[ "stLLVD1DisconnectedVoltage" ]
+                blvd1[ "wrapper" ] = Wrappers.divideByHundred
+                _fields.push( blvd3 )
+
+
+                _fields.push( configuration[ "stBLVDDisconnectedTime" ] )
+                _fields.push( configuration[ "stLLVD1DisconnectedTime" ] )
+                _fields.push( configuration[ "stLLVD2DisconnectedTime" ] )
+                _fields.push( configuration[ "stLLVD3DisconnectedTime" ] )
+
+                _fields.push( configuration[ "stBLVDDisconnectedCapacity" ] )
+                _fields.push( configuration[ "stLLVD1DisconnectedCapacity" ] )
+                _fields.push( configuration[ "stLLVD2DisconnectedCapacity" ] )
+                _fields.push( configuration[ "stLLVD3DisconnectedCapacity" ] )
+
+                return _fields
+            }
             onFieldUpdated: ( field, value ) => updateConfig( field, value )
         }
     }

@@ -79,7 +79,6 @@ Page
                     header: "УПКБ" + (index + 1)
                     tableOID: "psBlockEntry"
                     external: true
-                    // column: index + 1
 
                     headers: [
                         TableHeaderM { title: "Номер"; expand: false },

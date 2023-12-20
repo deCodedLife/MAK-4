@@ -14,3 +14,4 @@ endif()
 
 add_subdirectory(core)
 add_subdirectory(net-snmp)
+add_subdirectory(gui)

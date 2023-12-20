@@ -60,7 +60,7 @@ void SNMPConnection::getOIDs( QString uid, QList<QString> objects )
     if ( readSession == NULL ) return;
 
     QList< SNMPpp::OID > oids;
-    AsyncSNMP *request = new AsyncSNMP( readSession, SNMPpp::PDU::kGet );
+    AsyncSNMP *request = new AsyncSNMP( &readSession, SNMPpp::PDU::kGet );
 
     for ( QString objectName : objects )
     {
@@ -153,7 +153,7 @@ void SNMPConnection::getTable( QString objectName )
     if ( readSession == NULL ) return;
 
     SNMPpp::OID start = parser.ToOID( objectName );
-    AsyncSNMP *request = new AsyncSNMP( readSession, SNMPpp::PDU::kGetBulk );
+    AsyncSNMP *request = new AsyncSNMP( &readSession, SNMPpp::PDU::kGetBulk );
     request->setBounds( start );
     request->setUID( objectName );
 
@@ -272,7 +272,7 @@ void SNMPConnection::updateConfigs()
 
     for ( QString key : configs.keys() )
     {
-        if ( key == "main" ) continue;
+        if ( key == "main" || key == "errors" ) continue;
 
         QJsonObject config = configs[ key ].toObject();
         QList<SNMPpp::OID> oids;
@@ -284,7 +284,7 @@ void SNMPConnection::updateConfigs()
 
         if ( oids.empty() ) continue;
 
-        AsyncSNMP *request = new AsyncSNMP( readSession, SNMPpp::PDU::kGet );
+        AsyncSNMP *request = new AsyncSNMP( &readSession, SNMPpp::PDU::kGet );
         request->setUID( key );
         request->setOIDs( oids );
 
@@ -295,7 +295,7 @@ void SNMPConnection::updateConfigs()
 
             for ( SNMPpp::OID oid : rows.keys() )
             {
-                QString fieldName = parser.OID_TOSTR[ oid.parent() ];
+                QString fieldName = parser.FromOID( oid.parent() );
                 QJsonObject field = config[ fieldName ].toObject();
                 int fieldValue = rows[ oid ][ "num" ].toInt();
 
@@ -421,7 +421,7 @@ void SNMPConnection::updateConnection( bool sync )
         if ( sync )
         {
             QEventLoop loop;
-            AsyncSNMP *request = new AsyncSNMP( readSession, SNMPpp::PDU::kGet );
+            AsyncSNMP *request = new AsyncSNMP( &readSession, SNMPpp::PDU::kGet );
 
             QList< SNMPpp::OID > oids;
 

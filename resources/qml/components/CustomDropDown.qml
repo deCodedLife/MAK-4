@@ -11,10 +11,12 @@ ComboBox
     property MaterialTextContainer pComboBack: background
     property T.TextField pTextItem: contentItem
 
-    property var value: null
+    property var value: parent.value
     property int preSelected: -1
     currentIndex: -1
 
+    displayText: ""
+    model: Object.keys( parent.model ?? [] )
     Material.accent: Globals.accentColor
 
     function find() {
@@ -26,9 +28,14 @@ ComboBox
                 break
             }
         }
+        displayText = `${parent.placeholder ?? ""}: ` + Object.keys( parent.model ?? {} )[ currentIndex ]
     }
 
     onModelChanged: find()
+    onCurrentIndexChanged: {
+        if ( preSelected === currentIndex ) return
+        parent.updateField( Object.keys( parent.model ?? [] )[ currentIndex ] )
+    }
 
     Component.onCompleted: {
         pTextItem.color = Globals.textColor

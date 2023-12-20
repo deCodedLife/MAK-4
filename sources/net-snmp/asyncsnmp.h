@@ -19,7 +19,7 @@ signals:
     void rows( QString, QMap<SNMPpp::OID, QJsonObject> );
 
 public:
-    explicit AsyncSNMP( SNMPpp::SessionHandle&, SNMPpp::PDU::EType = SNMPpp::PDU::kGet, QObject *parent = nullptr );
+    explicit AsyncSNMP( SNMPpp::SessionHandle*, SNMPpp::PDU::EType = SNMPpp::PDU::kGet, QObject *parent = nullptr );
     void setBounds( SNMPpp::OID from, SNMPpp::OID to = "" );
     void setOIDs( QList<SNMPpp::OID> );
     void setUID( QString );
@@ -28,7 +28,7 @@ public:
     void run() override;
 
 private:
-    SNMPpp::SessionHandle session;
+    SNMPpp::SessionHandle *session;
     SNMPpp::PDU::EType type;
 
     SNMPpp::OID startFrom;

@@ -62,7 +62,7 @@ Rectangle
             id: content
             Layout.leftMargin: 20
             Layout.rightMargin: 20
-            spacing: 10
+            spacing: 20
 
             Layout.fillWidth: true
             height: implicitHeight
@@ -76,57 +76,50 @@ Rectangle
 
                 model: fields
 
-                delegate: Item
-                {
+                delegate: Loader {
                     width: contentList.width
-                    height: textfield.implicitHeight
+                    height: 54
 
-                    CustomField {
-                        property var counterValidator: IntValidator {
-                            bottom: modelData[ "min" ] === -1 ? -2147483648 : modelData[ "min" ]
-                            top: modelData[ "max" ] === -1 ? 2147483647 : modelData[ "max" ]
-                        }
-
-                        id: textfield
-                        anchors.fill: parent
-                        visible: modelData[ "type" ] === 2 || modelData[ "type" ] === 3 || modelData[ "type" ] === 6
-                        placeholderText: modelData[ "description" ]
-                        value: modelData[ "value" ]
-                        onChanged: {
-                            if ( !acceptableInput ) return
-                            if ( Wrappers.getFieldValue( modelData, text ) === textfield.value ) return
-                            fieldUpdated( modelData[ "field" ], text )
-                        }
-                        echoMode: modelData[ "type" ] === 3 ? TextField.Password : TextField.Normal
-                        validator: modelData[ "type" ] === 6 ? counterValidator : null
-                        color: modelData[ "type" ] === 6 ? acceptableInput ? Globals.textColor : Globals.errorColor : Globals.textColor
+                    id: customItem
+                    property var fields: {
+                        2: "CustomField.qml",
+                        3: "CustomField.qml",
+                        4: "CustomDropDown.qml",
+                        5: "CustomSwitch.qml",
+                        6: "CustomField.qml"
                     }
 
-                    CustomDropDown {
-                        anchors.fill: parent
-                        visible: modelData[ "type" ] === 4
-                        displayText: `${modelData[ "description" ]}: ` + Object.keys( modelData[ "model" ] )[ currentIndex ]
-                        value: modelData[ "value" ]
-                        model: Object.keys( modelData[ "model" ] )
-                        onCurrentIndexChanged: {
-                            if ( preSelected === currentIndex ) return
-                            preSelected = currentIndex
-                            fieldUpdated( modelData[ "field" ], Object.keys( modelData[ "model" ] )[ currentIndex ] )
-                        }
+                    property int type: modelData[ "type" ]
+                    property var value: modelData[ "value" ]
+                    property var wrapper: modelData[ "wrapper" ]
+                    property var model: modelData[ "model" ]
+
+                    property int maxValue: {
+                        let maxValue = modelData[ "max" ] ?? 2147483647
+                        if ( wrapper )
+                            return wrapper( maxValue )
+                        return maxValue
                     }
 
-                    CustomSwitch {
-                        id: customSwitch
-                        anchors.fill: parent
-                        visible: modelData[ "type" ] === 5
-                        text: modelData[ "description" ]
-                        toggled: modelData[ "value" ] === 1
-                        dobbled: true
-                        onContentChanged: value => {
-                                              if ( Wrappers.getFieldValue( modelData, toggled === 1 ) === modelData[ "value" ] ) return
-                                              fieldUpdated( modelData[ "field" ], value )
-                                          }
+                    property int minValue: {
+                        let minValue = modelData[ "min" ] ?? -2147483647
+                        if ( wrapper )
+                            return wrapper( minValue )
+                        return minValue
                     }
+
+                    property string objectName: modelData[ "field" ]
+                    property string placeholder: modelData[ "description" ]
+
+                    property bool dobbledSwitch: true
+
+                    function updateField( newValue ) {
+                        if ( wrapper ) newValue = wrapper( newValue, true )
+                        if ( newValue === value ) return
+                        fieldUpdated( objectName, newValue )
+                    }
+
+                    source: fields[ type ]
                 }
             }
 
