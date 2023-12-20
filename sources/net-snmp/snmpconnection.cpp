@@ -173,7 +173,11 @@ void SNMPConnection::getTable( QString objectName )
 
 void SNMPConnection::setOID( QString objectName, QVariant data )
 {
-    setMultiple( { { objectName, { { "value", data.toJsonValue() } } } } );
+    QJsonObject request;
+    QJsonObject value;
+    value[ "value" ] = QJsonValue::fromVariant( data );
+    request[ objectName ] = value;
+    setMultiple( request );
 }
 
 void SNMPConnection::setMultiple( QJsonObject fields )
@@ -187,7 +191,7 @@ void SNMPConnection::setMultiple( QJsonObject fields )
         SNMPpp::PDU pdu( SNMPpp::PDU::kSet );
 
         QJsonObject field = fields[ key ].toObject();
-        QVariant value = fields[ key ].toObject()[ "value" ].toVariant();
+        QVariant value = field[ "value" ].toVariant();
 
         if ( field[ "type" ] == FieldCombobox )
         {
@@ -200,7 +204,6 @@ void SNMPConnection::setMultiple( QJsonObject fields )
         switch ( obj.type ) {
         case TYPE_INTEGER:
             pdu.addIntegerVar( oid, value.toInt() );
-            qDebug() << pdu.varlist().asString();
             break;
         case TYPE_GAUGE:
             pdu.addGaugeVar( oid, value.toUInt() );
@@ -215,7 +218,7 @@ void SNMPConnection::setMultiple( QJsonObject fields )
                 value.toString().toStdString().size() );
             break;
         default:
-            // pdu.addNullVar( oid );
+            pdu.addIntegerVar( oid, value.toInt() );
             break;
         }
 

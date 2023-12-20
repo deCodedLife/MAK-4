@@ -253,7 +253,9 @@ Rectangle
                                     else item.currentVar[ "value" ] === 1
                                 }
 
-                                onContentChanged: value => SNMP.setOID( item.currentVar[ "oid" ], value )
+                                onContentChanged:
+                                    value =>
+                                    SNMP.setOID( item.currentVar[ "oid" ], value )
                             }
 
                             Text {

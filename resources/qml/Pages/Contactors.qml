@@ -39,7 +39,7 @@ Page
                     contactorsConfigs[ "stContactorControl" ] = value
                     newConfig[ "blvd" ] = contactorsConfigs
                     ConfigManager.current = newConfig
-                    SNMP.setMultiple( [ { "stContactorControl": contactorsConfigs[ "stContactorControl" ] } ] )
+                    SNMP.setOID( "stContactorControl", contactorsConfigs[ "stContactorControl" ] )
                 }
                 text: "Ручное управление"
             }
