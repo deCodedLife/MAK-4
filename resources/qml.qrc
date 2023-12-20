@@ -73,5 +73,18 @@
         <file>qml/Pages/BMS.qml</file>
         <file>qml/Pages/Contactors.qml</file>
         <file>qml/Components/CustomSwitch.qml</file>
+        <file>qml/Pages/Settings.Masks.qml</file>
+        <file>qml/Pages/Settings.Overall.qml</file>
+        <file>qml/Pages/Settings.Battery.qml</file>
+        <file>qml/Pages/Settings.Contactors.qml</file>
+        <file>qml/Pages/Settings.Power.qml</file>
+        <file>qml/Pages/Settings.Temperature.qml</file>
+        <file>qml/Pages/Settings.Configuration.qml</file>
+        <file>qml/Pages/Settings.Network.qml</file>
+        <file>qml/Pages/Settings.Security.qml</file>
+        <file>qml/Pages/Settings.SNMP.qml</file>
+        <file>qml/Components/wrappers.mjs</file>
+        <file>qml/Components/TableHeaderM.qml</file>
+        <file>qml/Components/TableRowM.qml</file>
     </qresource>
 </RCC>

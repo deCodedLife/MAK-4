@@ -1,5 +1,12 @@
 #pragma once
 
+#include <QThread>
+#include <QFuture>
+#include <QPromise>
+
+#include <QThreadPool>
+#include <QtConcurrent/QtConcurrent>
+
 #include <tobject.h>
 #include <configs.h>
 
@@ -8,6 +15,7 @@
 #include <SNMPpp/Set.hpp>
 
 #include "mibparser.h"
+#include "asyncsnmp.h"
 
 enum States {
     Disconnected,
@@ -22,6 +30,11 @@ class SNMPConnection : public TObject
 signals:
     void stateChanged( States );
 
+    void gotTablesCount( QString, int );
+    void gotRowsContent( QString, QJsonObject );
+
+    void launchThreadPool();
+
 public:
     explicit SNMPConnection(QObject *parent = nullptr);
     ~SNMPConnection();
@@ -32,7 +45,8 @@ public:
     Q_INVOKABLE void setState( States );
 
     Q_INVOKABLE QList<QString> getOIDs( QList<QString> );
-    Q_INVOKABLE QList<QString> getBulk( QString oid );
+    Q_INVOKABLE void getTable( QString oid );
+    Q_INVOKABLE void getRows( QString oid );
     Q_INVOKABLE void setOID( QString, QVariant );
 
     Q_INVOKABLE QString dateToReadable( QString );
@@ -54,5 +68,7 @@ private:
     Configs *pConfigs;
     States _state;
     MibParser parser;
+
+    QList<QThread *> backgroundThreads;
 
 };

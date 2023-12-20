@@ -12,17 +12,71 @@ Rectangle
     Layout.fillWidth: true
     Layout.preferredHeight: contentLayout.implicitHeight + ( flickable.width < flickable.contentWidth ? 20 : 0 )
 
-    property list<var> headers: []
-    property list<var> content
-    property list<string> values: SNMP.getOIDs( content.map( object => object[ "field" ] ?? "" ) )
+    property var rows
+    property var content
+
+    property list<Item> headers: []
+//    property list<string> values: SNMP.getOIDs( content.map( object => object[ "-" ] ?? "" ) )
+    property string tableOID
 
     property int columnsCount: headers.length
-    property int rowsCount: content.length / headers.length
+    property int rowsCount
 
     property string header: ""
 
     color: "white"
     radius: 10
+
+    Connections
+    {
+        target: SNMP
+        function onGotTablesCount( root, rows ) {
+            if ( root !== tableOID ) return
+//            console.log( rows )
+//            rowsCount = parseInt( rows )
+        }
+
+        function onGotRowsContent( root: string, data: object ) {
+            if ( root !== tableOID ) return
+
+            let _rowsCount = data[ Object.keys( rows )[ 0 ] ].length
+            let _rowsNames = Object.keys( rows )
+
+            console.log( JSON.stringify( content ) )
+
+            for ( let columnIndex  = 0; columnIndex < _rowsCount; columnIndex++ )
+            {
+
+                for ( let rowIndex = 0; rowIndex < _rowsNames.length; rowIndex++ )
+                {
+                    let rowName = _rowsNames[ rowIndex ]
+                    let row = data[ rowName ][ columnIndex ]
+
+                    row[ "type" ] = 5
+
+                    let rowData = row[ rows[ rowName ][ "key" ] ]
+                    let rowDataWrapper = rows[ rowName ][ "wrapper" ]
+                    if ( rowDataWrapper ) rowData = rowDataWrapper( rowData )
+
+                    row[ "value" ] = rowData
+                    content[ rowName ].push( row )
+                }
+
+            }
+
+            rowsCount = _rowsCount
+        }
+    }
+
+    Component.onCompleted: {
+        let rowNames = Object.keys( rows )
+        content = {}
+
+        for ( let rowIndex = 0; rowIndex < rowNames.length; rowIndex++ )
+            content[ rowNames[ rowIndex ] ] = []
+
+        SNMP.getRows( tableOID )
+    }
 
     Flickable
     {
@@ -134,7 +188,7 @@ Rectangle
 
 
                 Repeater {
-                    model: rowsCount
+                    model: content.length
                     Item {
                         Layout.row: (index + 1) * 2
                         width: 0
@@ -173,7 +227,7 @@ Rectangle
                             Layout.leftMargin: index === 0 ? 20 : 0
                             Layout.rightMargin: (index === headers.length - 1) ? 20 : 0
 
-                            property var currentVar: content[ index + ( row.currentRow * columnsCount ) ]
+                            property var currentVar: content[ Object.keys( rows )[ index ] ][ row.currentRow ]
                             property var type: {
                                 if ( typeof( item.currentVar[ "type" ] ) == "undefined" ) return 5
                                 return item.currentVar[ "type" ]
@@ -186,7 +240,11 @@ Rectangle
                                 width: item.width
                                 visible: item.type === 6
 
-                                toggled: parseInt( values[ index + ( row.currentRow * columnsCount ) ] ) === 1
+                                toggled: {
+                                    if (item.type !== 6) return false
+                                    else parseInt( values[ index + ( row.currentRow * columnsCount ) ] ) === 1
+                                }
+
                                 onContentChanged: value => {
                                     let wrapper = item.currentVar[ "wrapper" ]
                                     wrapper( value )
@@ -198,16 +256,7 @@ Rectangle
                                 width: item.width
 
                                 visible: item.type === 4 || item.type === 5
-                                text: {
-                                    let value = item.currentVar[ "value" ] ?? ""
-                                    let wrapper = item.currentVar[ "wrapper" ]
-
-                                    if ( item.type === 5 ) value = item.currentVar[ "value" ]
-                                    else value = values[ index + ( row.currentRow * columnsCount ) ]
-
-                                    if ( typeof( wrapper ) == "undefined" ) return value
-                                    return wrapper( value )
-                                }
+                                text: item.currentVar[ "value" ]
 
                                 color: "black"
 
