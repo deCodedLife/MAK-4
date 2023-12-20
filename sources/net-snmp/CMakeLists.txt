@@ -14,6 +14,7 @@ if ( APPLE )
         ${NETSNMPAGENT_LIBRARY}
         ${NETSNMPMIBS_LIBRARY}
         ${NETSNMPTRAPD_LIBRARY}
+        ${LIBS_FOLDER}/libsnmppp.a
     )
 
 elseif( WIN32 )
