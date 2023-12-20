@@ -34,6 +34,7 @@ Page
             FieldsTable {
                 id: infoTable
                 Layout.alignment: Qt.AlignTop
+                activeColumns: 3
 
                 headers: [
                     TableHeaderM {
