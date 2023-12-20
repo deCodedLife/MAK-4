@@ -122,9 +122,12 @@ void SNMPConnection::handleSNMPFinished( int code )
 {
     if ( code != 0 ) {
         readSession = NULL;
+        writeSession = NULL;
         dropConnection();
     }
-    isBusy = false;    
+    isBusy = false;
+
+    if ( requests.empty() ) return;
     requests.removeFirst();
 
     if ( requests.empty() ) return;
