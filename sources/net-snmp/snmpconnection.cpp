@@ -204,7 +204,7 @@ void SNMPConnection::initFields()
     fields[ "deviceInfo3" ] = Field::ToJSON( { FieldDescription, "Текущее время MAK-4 UTC", "" } );
     fields[ "psTime" ] = Field::ToJSON( { FieldText, getFieldValue( "psTime" ), "Текущее время MAK-4 UTC" } );
 
-    fields[ "psAlarm1Event" ] = Field::ToJSON( { FieldDescription, getFieldValue( "psAlarm1Event" ), "" } );
+    fields[ "psAlarm1Event" ] = Field::ToJSON( { FieldText, getFieldValue( "psAlarm1Event" ), "" } );
 
 
     for ( QString field : fields.keys() ) {

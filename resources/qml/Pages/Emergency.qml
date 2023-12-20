@@ -35,8 +35,11 @@ Page
             ]
 
             content: [
+                configuration[ "psAlarm1Event" ], // psAlarm1Entry
                 configuration[ "psAlarm1Event" ] // psAlarm1Entry
             ]
         }
+
+        Component.onCompleted: console.log( JSON.stringify( configuration[ "psAlarm1Event" ] ) )
     }
 }

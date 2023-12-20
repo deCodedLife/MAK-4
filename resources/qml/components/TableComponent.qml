@@ -33,7 +33,7 @@ Rectangle
             Layout.alignment: Qt.AlignTop
             Layout.fillWidth: true
 
-            spacing: 0
+            spacing: 10
             visible: header != ""
 
             Text {
@@ -52,21 +52,30 @@ Rectangle
             }
         }
 
+        GridLayout {
+            id: gridLayout
 
-        RowLayout {
             Layout.alignment: Qt.AlignTop
-            Layout.fillWidth: true
+            Layout.topMargin: header != "" ? 10 : 0
+            Layout.bottomMargin: 20
 
-            Layout.leftMargin: 20
-            Layout.rightMargin: 20
+            rows: rowsCount * 2 + 1
+            columns: columnsCount
 
-            Layout.topMargin: header != "" ? 20 : 0
+            rowSpacing: 10
+            columnSpacing: 10
 
             Repeater {
                 model: headers
 
                 Text {
                     id: simple
+
+                    Layout.row: 1
+                    Layout.column: index
+
+                    Layout.leftMargin: index === 0 ? 20 : 0
+                    Layout.rightMargin: index === headers.length - 1 ? 20 : 0
 
                     Layout.fillWidth: modelData[ "expand" ]
                     text: modelData[ "title" ]
@@ -80,79 +89,71 @@ Rectangle
                     font.pointSize: 14
                 }
             }
-        }
 
-        ColumnLayout {
-            id: rowGrid
-            Layout.alignment: Qt.AlignTop
-            Layout.topMargin: 20
-            spacing: 10
+
+            Repeater {
+                model: rowsCount
+                Item {
+                    Layout.row: (index + 1) * 2
+                    width: 0
+                    height: 0
+                    CroppedLine {
+                        width: gridLayout.width
+                    }
+                }
+            }
 
             Repeater {
                 model: rowsCount
 
-                ColumnLayout {
+                Repeater {
                     id: row
                     property int currentRow: index
 
-                    CroppedLine {
-                        Layout.alignment: Qt.AlignTop
-                        Layout.fillWidth: true
-                    }
+                    model: columnsCount
 
-                    RowLayout {
+                    Item {
+                        id: item
 
-                        Layout.topMargin: 10
-                        Layout.leftMargin: 20
-                        Layout.rightMargin: 20
+                        Layout.row: (row.currentRow + 1) * 2 + 1
+                        Layout.column: index
 
-                        Repeater {
-                            model: columnsCount
+                        Layout.leftMargin: index === 0 ? 20 : 0
+                        Layout.rightMargin: (index === headers.length - 1) ? 20 : 0
 
-                            Item {
-                                id: item
+                        width: itemText.contentWidth
 
-                                property var currentVar: content[ index + ( row.currentRow * columnsCount ) ]
-                                property var value: SNMP.getOID( currentVar[ "field" ] )
+                        property var currentVar: content[ index + ( row.currentRow * columnsCount ) ]
+                        property var value: SNMP.getOID( currentVar[ "field" ] )
 
-                                height: itemText.contentHeight
-                                Layout.preferredWidth: itemText.contentWidth
-                                Layout.fillWidth: headers[ index ][ "expand" ]
+                        height: itemText.contentHeight
 
-                                function processValue() {
-                                    let objectValue = currentVar[ "value" ]
-                                    if ( currentVar[ "type" ] === 5 ) return objectValue
+                        function processValue() {
+                            let objectValue = currentVar[ "value" ]
+                            if ( currentVar[ "type" ] === 5 ) return objectValue
 
-                                    if ( typeof( currentVar[ "wrapper" ] ) != "undefined" ) return item.currentVar[ "wrapper" ]( value )
-                                    return value
-                                }
+                            if ( typeof( currentVar[ "wrapper" ] ) != "undefined" ) return item.currentVar[ "wrapper" ]( value )
+                            return value
+                        }
 
-                                Text {
-                                    id: itemText
-                                    width: item.width
+                        Text {
+                            id: itemText
+                            width: item.width
 
-                                    visible: item.currentVar[ "type" ] === 4 || item.currentVar[ "type" ] === 5
-                                    text: processValue()
+                            visible: item.currentVar[ "type" ] === 4 || item.currentVar[ "type" ] === 5
+                            text: processValue()
 
-                                    color: "black"
+                            color: "black"
 
-                                    horizontalAlignment: Text.AlignLeft
-                                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                            horizontalAlignment: Text.AlignLeft
+                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
 
-                                    font.bold: true
-                                    font.pointSize: 14
-                                }
-                            }
+                            font.bold: true
+                            font.pointSize: 14
                         }
                     }
                 }
             }
         }
-
-        Item{ Layout.topMargin: 20 }
-    }
-
-    Component.onCompleted: {
-//        console.log( JSON.stringify( MIB.getObject() ) )
     }
 }
