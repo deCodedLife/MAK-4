@@ -22,18 +22,9 @@ void AsyncSNMP::setBounds( SNMPpp::OID from, SNMPpp::OID to )
     endAt = to.empty() ? from : to;
 }
 
-void AsyncSNMP::run()
+void AsyncSNMP::worker( SNMPpp::PDU pdu )
 {
-    SNMPpp::PDU pdu( type );
-
-    QMap<SNMPpp::OID, QJsonObject> fields;
     SNMPpp::OID currentOID = startFrom;
-
-    for ( SNMPpp::OID oid : request )
-    {
-        pdu.addNullVar( oid );
-        endAt = oid;
-    }
 
     try
     {
@@ -66,9 +57,22 @@ void AsyncSNMP::run()
                 }
 
                 QJsonObject field;
+                QString strData = QString::fromStdString( pdu.varlist().asString( currentOID ) );
+
                 field[ "oid" ] = QString::fromStdString( currentOID.to_str() );
                 field[ "num" ] = (qint64) (iter->second->val.integer ? *iter->second->val.integer : 0);
-                field[ "str" ] = QString::fromStdString( pdu.varlist().asString( currentOID ) );
+                field[ "str" ] = strData;
+
+                if ( iter->second->type == TYPE_NETADDR || iter->second->type == TYPE_IPADDR || iter->second->type == TYPE_NSAPADDRESS )
+                {
+                    QStringList rawData = strData.split( "STRING: \"" );
+                    if ( rawData.length() != 0 && rawData.length() != 1 )
+                    {
+                        QString data = rawData.last();
+                        data.truncate( data.lastIndexOf( QChar('"') ) );
+                        field[ "str" ] = data;
+                    }
+                }
 
                 fields[ currentOID ] = field;
             }
@@ -76,6 +80,7 @@ void AsyncSNMP::run()
             if ( list.size() < 2 ) break;
             if ( shouldBreak ) break;
             if ( endAt == currentOID ) break;
+            if ( type == SNMPpp::PDU::kGet ) break;
         }
 
         pdu.free();
@@ -107,6 +112,34 @@ void AsyncSNMP::run()
 
         emit finished( errorCode );
         return;
+    }
+}
+
+void AsyncSNMP::run()
+{
+    SNMPpp::PDU pdu( type );    
+    int counter = 0;
+
+    if ( type == SNMPpp::PDU::kGet )
+    {
+        for ( SNMPpp::OID oid : request )
+        {
+            pdu.addNullVar( oid );
+            counter++;
+
+            if ( counter >= limit )
+            {
+                worker( pdu );
+                counter = 0;
+                pdu = SNMPpp::PDU( type );
+            }
+        }
+
+        if ( request.count() % 10 != 0 ) worker( pdu );
+    }
+    else
+    {
+        worker( pdu );
     }
 
     emit rows( uid, fields );

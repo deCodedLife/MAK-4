@@ -24,6 +24,16 @@ Page
         ConfigManager.current = newConfig
     }
 
+    Connections
+    {
+        target: SNMP
+
+        function onGotSettings()
+        {
+            configuration = ConfigManager.get()[ "blvd" ]
+        }
+    }
+
     ColumnLayout {
         id: pageContent
 
@@ -35,31 +45,10 @@ Page
 
         spacing: 10
 
-
-        CustomSwitch {
-            Layout.maximumWidth: 1200
-            Layout.alignment: Qt.AlignHCenter| Qt.AlignTop
-            Layout.fillWidth: true
-
-            property var field: configuration[ "stContactorControl" ]
-            id: handControl
-            text: field[ "description" ]
-            toggled: field[ "value" ]
-            dobbled: true
-            onContentChanged: value => {
-                let newConfig = ConfigManager.current
-                configuration[ "stContactorControl" ][ "value" ] = value
-                newConfig[ "blvd" ] = configuration
-                ConfigManager.current = newConfig
-            }
-        }
-
         CardComponent {
             Layout.maximumWidth: 1200
             Layout.alignment: Qt.AlignHCenter| Qt.AlignTop
             Layout.fillWidth: true
-
-            enabled: handControl.toggled
 
             fields: [
                 configuration[ "stBLVDDisconnectedVoltage" ],

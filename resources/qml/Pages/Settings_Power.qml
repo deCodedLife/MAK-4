@@ -15,13 +15,25 @@ Page
     actionButtonIcon: "qrc:/images/icons/save.svg"
     actionButtonTitle: "Записать"
 
-    onActionButtonTriggered: SNMP.setMultiple( configuration )
+    onActionButtonTriggered: {
+        SNMP.setMultiple( configuration )
+    }
 
     function updateConfig( field, value ) {
         let newConfig = ConfigManager.current
         configuration[ field ][ "value" ] = Wrappers.getFieldValue( configuration[ field ], value )
         newConfig[ "power" ] = configuration
         ConfigManager.current = newConfig
+    }
+
+    Connections
+    {
+        target: SNMP
+
+        function onGotSettings()
+        {
+            configuration = ConfigManager.get()[ "power" ]
+        }
     }
 
     ColumnLayout {

@@ -40,12 +40,16 @@ void SNMPConnection::setState( States state )
 void SNMPConnection::proceed( AsyncSNMP* request )
 {
     if ( request == nullptr ) return;
-    if ( isBusy )
-    {
+    if ( isBusy ) {
         requests.append( request );
         return;
     }
     else isBusy = true;
+
+    if ( requests.empty() )
+    {
+        requests.append( request );
+    }
 
     QThreadPool::globalInstance()->start( request );
 }
@@ -120,11 +124,11 @@ void SNMPConnection::handleSNMPFinished( int code )
         readSession = NULL;
         dropConnection();
     }
-    isBusy = false;
+    isBusy = false;    
+    requests.removeFirst();
 
     if ( requests.empty() ) return;
     proceed( requests.first() );
-    requests.removeFirst();
 }
 
 void SNMPConnection::getTable( QString objectName )
@@ -152,43 +156,7 @@ void SNMPConnection::getTable( QString objectName )
 
 void SNMPConnection::setOID( QString objectName, QVariant data )
 {
-    SNMPpp::PDU pdu( SNMPpp::PDU::kSet );
-    oid_object obj = parser.MIB_OBJECTS[ objectName ];
-    SNMPpp::OID oid( obj.oid.toStdString() + ".0" );
-
-    switch ( obj.type ) {
-    case TYPE_INTEGER:
-        pdu.addIntegerVar( oid, data.toInt() );
-        qDebug() << pdu.varlist().asString();
-        break;
-    case TYPE_GAUGE:
-        pdu.addGaugeVar( oid, data.toUInt() );
-        break;
-    case TYPE_NULL:
-        pdu.addNullVar( oid );
-        break;
-    case TYPE_OCTETSTR:
-        pdu.addOctetStringVar(
-            oid,
-            (unsigned char *) data.toString().toStdString().c_str(),
-            data.toString().toStdString().size() );
-        break;
-    default:
-        pdu.addNullVar( oid );
-        break;
-    }
-
-    try
-    {
-        pdu = SNMPpp::set( writeSession, pdu );
-    }
-    catch( const std::exception &e )
-    {
-        emit error_occured( Callback::New( e.what(), Callback::Warning ) );
-    }
-
-    pdu.free();
-
+    setMultiple( { { objectName, { { "value", data.toJsonValue() } } } } );
 }
 
 void SNMPConnection::setMultiple( QJsonObject fields )
@@ -235,6 +203,83 @@ void SNMPConnection::setMultiple( QJsonObject fields )
     }
 
     pdu.free();
+}
+
+void SNMPConnection::updateConfigs()
+{
+    QJsonObject configs = pConfigs->get();
+
+    for ( QString key : configs.keys() )
+    {
+        QJsonObject config = configs[ key ].toObject();
+        QList<SNMPpp::OID> oids;
+
+        for ( QString field : config.keys() )
+        {
+            oid_object object = parser.MIB_OBJECTS[ field ];
+            oids.append( SNMPpp::OID( object.oid.toStdString() + ".0" ) );
+        }
+
+        if ( oids.empty() ) continue;
+
+        AsyncSNMP *request = new AsyncSNMP( readSession, SNMPpp::PDU::kGet );
+        request->setUID( key );
+        request->setOIDs( oids );
+
+        connect( request, &AsyncSNMP::rows, this, [&]( QString root, QMap<SNMPpp::OID, QJsonObject> rows )
+        {
+            QJsonObject fullConfig = pConfigs->get();
+            QJsonObject config = fullConfig[ root ].toObject();
+
+            for ( SNMPpp::OID oid : rows.keys() )
+            {
+                QString fieldName = parser.OID_TOSTR[ oid.parent() ];
+                QJsonObject field = config[ fieldName ].toObject();
+                int fieldValue = rows[ oid ][ "num" ].toInt();
+
+                switch ( field[ "type" ].toInt() )
+                {
+                    case FieldCombobox:
+
+                        for ( QString modelKey : field[ "model" ].toObject().keys() ) {
+
+                            int modelValue = field[ "model" ].toObject()[ modelKey ].toInt();
+                            if ( modelValue == fieldValue )
+                            {
+                                field[ "value" ] = modelKey;
+                                config[ fieldName ] = field;
+                                break;
+                            }
+                        }
+
+                        break;
+
+                    case FieldCounter:
+                        field[ "value" ] = fieldValue;
+                        config[ fieldName ] = field;
+                        break;
+
+                    case FieldCheckbox:
+                        field[ "value" ] = fieldValue;
+                        config[ fieldName ] = field;
+                        break;
+
+                    default:
+                        field[ "value" ] = rows[ oid ][ "str" ].toString();
+                        config[ fieldName ] = field;
+                        break;
+                }
+            }
+
+            fullConfig[ root ] = config;
+            pConfigs->write( fullConfig );
+
+            emit gotSettings();
+        } );
+        connect( request, &AsyncSNMP::finished, this, &SNMPConnection::handleSNMPFinished );
+        proceed( request );
+
+    }
 }
 
 QString SNMPConnection::dateToReadable( QString date )

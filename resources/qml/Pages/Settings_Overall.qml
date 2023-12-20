@@ -24,6 +24,16 @@ Page
         ConfigManager.current = newConfig
     }
 
+    Connections
+    {
+        target: SNMP
+
+        function onGotSettings()
+        {
+            configuration = ConfigManager.get()[ "overall" ]
+        }
+    }
+
     ColumnLayout {
         id: pageContent
 

@@ -30,7 +30,7 @@ Item
             height: 16
             radius: width / 2
 
-            color: currentState == 1 ? Globals.succsessColor : Globals.textColor
+            color: currentState == 1 ? Globals.succsessColor : Globals.grayAccent
         }
 
         Text {

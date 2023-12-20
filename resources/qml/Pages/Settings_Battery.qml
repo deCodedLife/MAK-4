@@ -24,6 +24,16 @@ Page
         ConfigManager.current = newConfig
     }
 
+    Connections
+    {
+        target: SNMP
+
+        function onGotSettings()
+        {
+            configuration = ConfigManager.get()[ "battery" ]
+        }
+    }
+
     ColumnLayout {
         id: pageContent
 
