@@ -84,7 +84,7 @@ Rectangle
                         visible: modelData[ "type" ] === 0 || modelData[ "type" ] === 1
                         placeholderText: modelData[ "description" ]
                         value: modelData[ "value" ]
-                        onEditingFinished: fieldUpdated( index, value )
+                        onTextChanged: fieldUpdated( index, text )
                         echoMode: modelData[ "type" ] === 1 ? TextField.Password : TextField.Normal
                     }
 
@@ -120,7 +120,17 @@ Rectangle
                     text: modelData[ "text" ]
                     highlighted: modelData[ "highlited" ]
                     Material.accent: modelData[ "color" ]
-                    onClicked: modelData[ "callback" ]()
+                    onClicked: {
+                        modelData[ "callback" ]()
+                        delay.start()
+                    }
+                    enabled: !delay.running
+
+                    Timer
+                    {
+                        id: delay
+                        interval: 3000
+                    }
                 }
             }
         }
