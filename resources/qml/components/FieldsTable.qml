@@ -22,6 +22,7 @@ Rectangle
 
     property bool loaded
     property bool autoUpdate: true
+    property bool hideSeparators: false
     property string header: ""
     property string hashRoot
     property list<Item> headers
@@ -191,12 +192,18 @@ Rectangle
 
 
                 Repeater {
+                    enabled: !hideSeparators
+                    visible: !hideSeparators
                     model: rowsCount
                     Item {
+                        enabled: !hideSeparators
+                        visible: !hideSeparators
                         Layout.row: (index + 1) * 2
                         width: 0
                         height: 0
                         CroppedLine {
+                            enabled: !hideSeparators
+                            visible: !hideSeparators
                             width: gridLayout.width
                         }
                     }
