@@ -103,6 +103,9 @@ QList<QString> SNMPConnection::getBulk( QString object )
             pdu = SNMPpp::getBulk( pHandle, lastOID );
             SNMPpp::MapOidVarList list = pdu.varlist().getMap();
 
+            if ( pdu.empty() ) break;
+            if ( list.empty() ) break;
+
             for ( SNMPpp::MapOidVarList::iterator itemIterator = list.begin(); itemIterator != list.end(); itemIterator++ )
             {
                 if ( !oid.isParentOf( itemIterator->first ) )
@@ -114,6 +117,8 @@ QList<QString> SNMPConnection::getBulk( QString object )
                 else objects.append( QString::fromStdString( pdu.varlist().asString( itemIterator->first ) ) );
                 lastOID = itemIterator->first;
             }
+
+            if ( list.size() < 2 ) break;
 
             if ( shouldBreak ) break;
         }
