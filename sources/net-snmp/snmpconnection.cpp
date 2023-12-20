@@ -2,7 +2,7 @@
 
 SNMPConnection::SNMPConnection(QObject *parent)
     : TObject{parent},
-    pHandle(NULL),
+    readSession(NULL),
     _state( Disconnected ),
     isBusy(false),
     requests({})
@@ -12,7 +12,7 @@ SNMPConnection::SNMPConnection(QObject *parent)
 
 SNMPConnection::~SNMPConnection()
 {
-    SNMPpp::closeSession( pHandle );
+    SNMPpp::closeSession( readSession );
 }
 
 void SNMPConnection::SetConfig( Configs *configs )
@@ -52,10 +52,10 @@ void SNMPConnection::proceed( AsyncSNMP* request )
 
 void SNMPConnection::getOIDs( QString uid, QList<QString> objects )
 {
-    if ( pHandle == NULL ) return;
+    if ( readSession == NULL ) return;
 
     QList< SNMPpp::OID > oids;
-    AsyncSNMP *request = new AsyncSNMP( pHandle, SNMPpp::PDU::kGet );
+    AsyncSNMP *request = new AsyncSNMP( readSession, SNMPpp::PDU::kGet );
 
     for ( QString objectName : objects )
     {
@@ -117,7 +117,7 @@ void SNMPConnection::handleSNMPRequest( QString root, QMap<SNMPpp::OID, QJsonObj
 void SNMPConnection::handleSNMPFinished( int code )
 {
     if ( code != 0 ) {
-        pHandle = NULL;
+        readSession = NULL;
         dropConnection();
     }
     isBusy = false;
@@ -129,7 +129,7 @@ void SNMPConnection::handleSNMPFinished( int code )
 
 void SNMPConnection::getTable( QString objectName )
 {
-    if ( pHandle == NULL ) return;
+    if ( readSession == NULL ) return;
 
     QList<QString> combinedName = objectName.split( "." );
     QList<QString> combined = objectName.split( combinedName.first() );
@@ -140,7 +140,7 @@ void SNMPConnection::getTable( QString objectName )
         object.oid.toStdString() +
         combined.first().toStdString()
     );
-    AsyncSNMP *request = new AsyncSNMP( pHandle, SNMPpp::PDU::kGetBulk );
+    AsyncSNMP *request = new AsyncSNMP( readSession, SNMPpp::PDU::kGetBulk );
     request->setBounds( start );
     request->setUID( objectName );
 
@@ -180,7 +180,7 @@ void SNMPConnection::setOID( QString objectName, QVariant data )
 
     try
     {
-        pdu = SNMPpp::set( pHandle, pdu );
+        pdu = SNMPpp::set( writeSession, pdu );
     }
     catch( const std::exception &e )
     {
@@ -201,7 +201,7 @@ void SNMPConnection::updateConnection()
     SOCK_STARTUP;
 
     QJsonObject configs = pConfigs->get()[ "main" ].toObject();
-    SNMPpp::closeSession( pHandle );
+    SNMPpp::closeSession( readSession );
 
     Field host = Field::FromJSON( configs[ "host" ].toObject() );
     Field port = Field::FromJSON( configs[ "port" ].toObject() );
@@ -218,9 +218,15 @@ void SNMPConnection::updateConnection()
             Field v2_read = Field::FromJSON(configs[ "v2_read" ].toObject());
 
             SNMPpp::openSession(
-                pHandle,
+                readSession,
                 address.toStdString(),
                 v2_read.value.toString().toStdString(),
+                SNMP_VERSION_2c);
+
+            SNMPpp::openSession(
+                writeSession,
+                address.toStdString(),
+                v2_write.value.toString().toStdString(),
                 SNMP_VERSION_2c);
         }
         else
@@ -234,7 +240,7 @@ void SNMPConnection::updateConnection()
             Field privProtocol = Field::FromJSON( configs[ "privProtocol" ].toObject() );
 
             SNMPpp::openSessionV3(
-                pHandle,
+                readSession,
                 address.toStdString(),
                 user.value.toString().toStdString(),
                 authPassword.value.toString().toStdString(),
@@ -243,9 +249,11 @@ void SNMPConnection::updateConnection()
                 authProtocol.value.toString().toStdString(),
                 privProtocol.value.toString().toStdString()
             );
+
+            writeSession = readSession;
         }
 
-        if ( pHandle == NULL ) {
+        if ( readSession == NULL ) {
             _state = Disconnected;
             emit stateChanged( _state );
             return;
@@ -256,7 +264,7 @@ void SNMPConnection::updateConnection()
     catch ( const std::exception &e )
     {
         SOCK_CLEANUP;
-        SNMPpp::closeSession( pHandle );
+        SNMPpp::closeSession( readSession );
 
         _state = Disconnected;
         emit stateChanged( _state );
@@ -269,7 +277,7 @@ void SNMPConnection::dropConnection()
     SOCK_CLEANUP;
     _state = Disconnected;
     emit stateChanged( _state );
-    SNMPpp::closeSession( pHandle );
+    SNMPpp::closeSession( readSession );
 }
 
 QVariant SNMPConnection::getFieldValue( QString object ) {
