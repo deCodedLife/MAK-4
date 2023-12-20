@@ -152,9 +152,12 @@ void SNMPConnection::getTable( QString objectName )
 {
     if ( readSession == NULL ) return;
 
+
     SNMPpp::OID start = parser.ToOID( objectName );
+
     AsyncSNMP *request = new AsyncSNMP( &readSession, SNMPpp::PDU::kGetBulk );
     request->setBounds( start );
+
     request->setUID( objectName );
 
     connect( request, &AsyncSNMP::rows, this, &SNMPConnection::handleSNMPRequest );
@@ -272,7 +275,7 @@ void SNMPConnection::updateConfigs()
 
     for ( QString key : configs.keys() )
     {
-        if ( key == "main" || key == "errors" || key == "masks" ) continue;
+        if ( key == "main" || key == "errors" || key == "masks" || key == "journal" ) continue;
 
         QJsonObject config = configs[ key ].toObject();
         QList<SNMPpp::OID> oids;

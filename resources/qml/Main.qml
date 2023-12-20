@@ -16,7 +16,7 @@ ApplicationWindow
     minimumHeight: 400
 
     visible: true
-    title: "MAK-4"
+    title: "MAK-4 " + (Globals.windowSuffix != "" ? `[${Globals.windowSuffix}]` : "")
 
     color: Globals.accentColor
     Material.theme: Material.Light
