@@ -286,7 +286,7 @@ QJsonObject Configs::Default()
      */
     QJsonObject configurationSettings;
     configurationSettings[ "stBatteryGroupsNumber" ] = Field::ToJSON( { FieldCounter, 0, "Количество групп батареи", {}, 0, 4 } );
-    configurationSettings[ "stLoadFusesNumber" ] = Field::ToJSON( { FieldCounter, 1, "Количество автоматов нагрузки", {}, 1, 52 } );
+    configurationSettings[ "stLoadFusesNumber" ] = Field::ToJSON( { FieldCounter, 1, "Количество аппаратов нагрузки", {}, 1, 52 } );
     configurationSettings[ "stLVDsNumber" ] = Field::ToJSON( { FieldCombobox, "Нет", "Kоличество контакторов", { { "0", "Нет" }, { "1", "Только BLVD" }, { "2", "2-BLVD и LLVD1" }, { "3", "3-BLVD, LLVD1 и LLVD2" } } } );
     configurationSettings[ "stVBVNumber" ] = Field::ToJSON( { FieldCounter, 1, "Kоличество ВБВ", {}, 1, 180 } );
 
@@ -301,7 +301,7 @@ QJsonObject Configs::Default()
     errors["34"] = "Включена термокомпенсация";
 
     for ( int index = 1; index <= 52; index++ )
-        errors[ QString::number( index + 34) ] = "Отключен автомат защиты нагрузки " + QString::number( index );
+        errors[ QString::number( index + 34) ] = "Отключен аппарат защиты нагрузки " + QString::number( index );
 
     errors["87"] = "Авария устройства дискретных вводов (УКДВ-1М)";
     errors["96"] = "Батарея разряжается";
@@ -316,7 +316,7 @@ QJsonObject Configs::Default()
         errors[ QString::number( index + 102) ] = "Отключен аппарат защиты батереи группы " + QString::number( index );
 
     for ( int index = 1; index <= 4; index++ )
-        errors[ QString::number( index + 110) ] = "Авария моноблока группы " + QString::number( index ) + " батареи (с УПКБ-М)";
+        errors[ QString::number( index + 110) ] = "Авария моноблока группы " + QString::number( index ) + " батареи (с УПКБ)";
 
     errors["119"] = "Ошибка связи с УПКБ (устройство поэлементного контроля батареи)";
     errors["120"] = "Ток заряда меньше 1А";
@@ -349,7 +349,7 @@ QJsonObject Configs::Default()
         errors[ QString::number( index + 415) ] = "Авария сухого контакта " + QString::number( index );
 
     errors["480"] = "Авария Li-Ion АБ";
-    errors["481"] = "Нет связи с БМС";
+    errors["481"] = "Нет связи с BMS";
 
     QJsonObject journal;
     journal = errors;
@@ -391,7 +391,7 @@ QJsonObject Configs::Default()
         for ( int fuseIndex = 1; fuseIndex <= 52; fuseIndex++ )
         {
             masksList.append( {{ preffix + "LoadFuses" + QString::number( fuseIndex ),
-                Field::ToJSON( { FieldCheckbox, 0, "Отключен автомат защиты нагрузки " + QString::number( fuseIndex ) } ) }} );
+                Field::ToJSON( { FieldCheckbox, 0, "Отключен аппарат защиты нагрузки " + QString::number( fuseIndex ) } ) }} );
         }
 
         masksList.append( {{ preffix + "UKDVAlarm", Field::ToJSON( { FieldCheckbox, 0, "Авария устройства дискретных вводов (УКДВ-1М)" } ) }} );
@@ -406,10 +406,10 @@ QJsonObject Configs::Default()
         masksList.append( {{ preffix + "BatteryFuse2Off", Field::ToJSON( { FieldCheckbox, 0, "Отключен аппарат защиты батереи группы 2" } ) }} );
         masksList.append( {{ preffix + "BatteryFuse3Off", Field::ToJSON( { FieldCheckbox, 0, "Отключен аппарат защиты батереи группы 3" } ) }} );
         masksList.append( {{ preffix + "BatteryFuse4Off", Field::ToJSON( { FieldCheckbox, 0, "Отключен аппарат защиты батереи группы 4" } ) }} );
-        masksList.append( {{ preffix + "BatteryBlockElGr1Alarm", Field::ToJSON( { FieldCheckbox, 0, "Авария моноблока группы 1 батареи (с УПКБ-М)" } ) }} );
-        masksList.append( {{ preffix + "BatteryBlockElGr2Alarm", Field::ToJSON( { FieldCheckbox, 0, "Авария моноблока группы 2 батареи (с УПКБ-М)" } ) }} );
-        masksList.append( {{ preffix + "BatteryBlockElGr3Alarm", Field::ToJSON( { FieldCheckbox, 0, "Авария моноблока группы 3 батареи (с УПКБ-М)" } ) }} );
-        masksList.append( {{ preffix + "BatteryBlockElGr4Alarm", Field::ToJSON( { FieldCheckbox, 0, "Авария моноблока группы 4 батареи (с УПКБ-М)" } ) }} );
+        masksList.append( {{ preffix + "BatteryBlockElGr1Alarm", Field::ToJSON( { FieldCheckbox, 0, "Авария моноблока группы 1 батареи (с УПКБ)" } ) }} );
+        masksList.append( {{ preffix + "BatteryBlockElGr2Alarm", Field::ToJSON( { FieldCheckbox, 0, "Авария моноблока группы 2 батареи (с УПКБ)" } ) }} );
+        masksList.append( {{ preffix + "BatteryBlockElGr3Alarm", Field::ToJSON( { FieldCheckbox, 0, "Авария моноблока группы 3 батареи (с УПКБ)" } ) }} );
+        masksList.append( {{ preffix + "BatteryBlockElGr4Alarm", Field::ToJSON( { FieldCheckbox, 0, "Авария моноблока группы 4 батареи (с УПКБ)" } ) }} );
         masksList.append( {{ preffix + "UPKBAlarm", Field::ToJSON( { FieldCheckbox, 0, "Ошибка связи с УПКБ (устройство поэлементного контроля батареи)" } ) }} );
         masksList.append( {{ preffix + "ChargeCurrentLess1A", Field::ToJSON( { FieldCheckbox, 0, "Ток заряда меньше 1А" } ) }} );
         masksList.append( {{ preffix + "ChargeCurrentLess2A", Field::ToJSON( { FieldCheckbox, 0, "Ток заряда меньше 2А" } ) }} );
@@ -448,7 +448,7 @@ QJsonObject Configs::Default()
 
 
         masksList.append( {{ preffix + "BatteryLiIonAlarm", Field::ToJSON( { FieldCheckbox, 0, "Авария Li-Ion АБ" } ) }} );
-        masksList.append( {{ preffix + "BatteryBMSComFail", Field::ToJSON( { FieldCheckbox, 0, "Нет связи с БМС" } ) }} );
+        masksList.append( {{ preffix + "BatteryBMSComFail", Field::ToJSON( { FieldCheckbox, 0, "Нет связи с BMS" } ) }} );
 
     }
 

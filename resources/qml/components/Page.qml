@@ -19,6 +19,33 @@ Flickable
     property string actionButtonTitle
     property string actionButtonState
 
+    Component.onCompleted: {
+        if ( Qt.platform.os !== "windows" ) return
+        flickDeceleration = 10000
+    }
+
+    ScrollBar.vertical: ScrollBar {
+        id: control
+        height: 10
+        anchors.left: parent.left
+        policy: ScrollBar.AsNeeded
+        property Rectangle contentReference: contentItem
+        visible: page.height < page.contentHeight
+
+        Component.onCompleted: {
+            contentReference.radius = 5
+            contentReference.opacity = .6
+        }
+
+        background: Rectangle {
+            implicitWidth: control.interactive ? 16 : 4
+            implicitHeight: control.interactive ? 16 : 4
+            color: "transparent"
+            opacity: .6
+            visible: control.interactive
+        }
+    }
+
     Rectangle {
         width: page.width - 20
         height: page.height
