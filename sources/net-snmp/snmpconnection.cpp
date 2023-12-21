@@ -86,7 +86,7 @@ void SNMPConnection::handleSNMPRequest( QString root, QMap<SNMPpp::OID, QJsonObj
 
     for ( SNMPpp::OID oid : rows.keys() )
     {
-        QString oidName = parser.FromOID( oid.parent() ); //parser.OID_TOSTR[ oid.parent() ];
+        QString oidName = parser.FromOID( oid.parent() );
 
         QJsonArray data;
         QJsonObject row = rows[ oid ];
@@ -347,6 +347,39 @@ void SNMPConnection::sendConfigs()
 void SNMPConnection::sendConfigsChangedEvent()
 {
     emit settingsChanged();
+}
+
+void SNMPConnection::exportTable( QString file, QList<QString> headers, QList<QString> rows, QString separator )
+{
+    QStringList buffer;
+
+    if ( rows.count() % headers.count() != 0 ) return;
+    int columns = headers.count();
+    int rowsCount = rows.count() / headers.count();
+
+    for ( int index = 0; index < headers.count(); index++ )
+    {
+        buffer << headers[ index ] << (index == (headers.count() - 1) ? "\n" : separator);
+    }
+
+    for ( int index = 0; index < rows.count(); index++ )
+    {
+        buffer << rows[ index ];
+
+        if ( (index + 1) % columns ) buffer << separator;
+        else buffer << "\n";
+    }
+
+    QFile tableFile( file );
+
+    if ( !tableFile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
+    {
+        emit error_occured( Callback::New( tableFile.errorString(), Callback::Warning ) );
+        return;
+    }
+
+    tableFile.write( buffer.join("").toUtf8() );
+    tableFile.close();
 }
 
 QString SNMPConnection::dateToReadable( QString date )

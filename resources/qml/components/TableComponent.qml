@@ -129,7 +129,10 @@ Rectangle
 
         ColumnLayout {
             id: contentLayout
-            width: gridLayout.implicitWidth > root.width ? gridLayout.implicitWidth : root.width
+            width: {
+                if ( root.width > gridLayout.implicitWidth ) return root.width
+                return gridLayout.implicitWidth
+            }
             spacing: 0
 
             Item{ Layout.topMargin: 20 }
@@ -164,7 +167,9 @@ Rectangle
                 id: gridLayout
                 clip: true
 
-                width: contentLayout.width
+                width: parent.width
+                Layout.preferredWidth: parent.width
+
                 Layout.alignment: Qt.AlignTop
                 Layout.topMargin: header != "" ? 10 : 0
                 Layout.bottomMargin: 20

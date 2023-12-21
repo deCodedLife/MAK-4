@@ -55,6 +55,7 @@ public:
     Q_INVOKABLE void updateConfigs();
     Q_INVOKABLE void sendConfigs();
     Q_INVOKABLE void sendConfigsChangedEvent();
+    Q_INVOKABLE void exportTable( QString file, QList<QString> headers, QList<QString> rows, QString separator );
 
     Q_INVOKABLE QString dateToReadable( QString );
     Q_INVOKABLE QJsonArray getGroup( QString );

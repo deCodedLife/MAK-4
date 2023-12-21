@@ -5,6 +5,7 @@ import QtQuick.Controls.Material
 
 QtObject
 {
+    property var rootObject
     property string windowSuffix: ""
 
     property string accentColor: "#116FCF"
