@@ -33,7 +33,7 @@ Rectangle
     color: "white"
     radius: 10
 
-    function updateViaTable( data: obejct )
+    function updateViaTable( data )
     {
         rowsCount = 0
         content = {}
@@ -86,7 +86,7 @@ Rectangle
     {
         target: SNMP
 
-        function onGotRowsContent( root: string, data: object )
+        function onGotRowsContent( root, data )
         {
             if ( root !== tableOID ) return
             else updateViaTable( data )

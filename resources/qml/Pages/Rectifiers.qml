@@ -51,8 +51,8 @@ Page {
 
             rows: {
                 "psVbvNumber": new Wrappers.RowItem(),
-                "psVbvInpVoltage": new Wrappers.RowItem( Wrappers.RowTypes.DESCRIPTION, Wrappers.divideByHundred ),
-                "psVbvVoltage": new Wrappers.RowItem(),
+                "psVbvInpVoltage": new Wrappers.RowItem(),
+                "psVbvVoltage": new Wrappers.RowItem( Wrappers.RowTypes.DESCRIPTION, Wrappers.divideByHundred ),
                 "psVbvCurrent": new Wrappers.RowItem( Wrappers.RowTypes.DESCRIPTION, Wrappers.divideByThousand ),
                 "psVbvTemperature": new Wrappers.RowItem(),
                 "psVbvStatus": new Wrappers.RowItem( Wrappers.RowTypes.DESCRIPTION, Wrappers.parseErrors, "str" )

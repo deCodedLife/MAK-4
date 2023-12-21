@@ -160,7 +160,10 @@ QJsonObject Configs::Default()
     mainSettings[ "host" ] = Field::ToJSON( { FieldAdress, HOST, "IP адрес" } );
     mainSettings[ "port" ] = Field::ToJSON( { FieldInput, PORT, "Порт" } );
     mainSettings[ "stSNMPAdministratorName" ] = Field::ToJSON( { FieldInput, USER, "Имя" } );
-    mainSettings[ "authMethod" ] = Field::ToJSON( { FieldCombobox, AUTH_METHOD, "Уровень", { { "0", "authPriv" }, { "1", "authNoPriv" } } } );
+    mainSettings[ "authMethod" ] = Field::ToJSON( { FieldCombobox, AUTH_METHOD, "Уровень", {
+        { "0", "Протокол шифрования none\nПротокол приватности none" },
+        { "1", "Протокол шифрования любой\nПротокол приватности любой" },
+        { "2", "Протокол шифрования любой\nПротокол приватности none" } } } );
     mainSettings[ "stSNMPSAuthAlgo" ] = Field::ToJSON( { FieldCombobox, AUTH_PROTOCOL, "Протокол аутентификации", { { "2", "SHA1" }, { "1", "MD5" } } } );
     mainSettings[ "stSNMPSPrivAlgo" ] = Field::ToJSON( { FieldCombobox, PRIV_PROTOCOL, "Протокол приватноси", { { "1", "DES" }, { "2", "AES" } } } );
     mainSettings[ "stSNMPAdministratorAuthPassword" ] = Field::ToJSON( { FieldPassword, AUTH_PASSWORD, "Пароль аутентификации" } );
@@ -189,8 +192,8 @@ QJsonObject Configs::Default()
     snmpSettings[ "stSNMPOperatorAuthPassword" ] = Field::ToJSON( { FieldPassword, "*****", "Пароль аутентификации оператора" } );
     snmpSettings[ "stSNMPOperatorPrivPassword" ] = Field::ToJSON( { FieldPassword, "*****", "Приватный пароль оператора" } );
 
-    snmpSettings[ "stSNMPSAuthAlgo" ] = Field::ToJSON( { FieldCombobox, AUTH_PROTOCOL, "Протокол приватности", { { "0", "Нет" }, { "1", "MD5" }, { "2", "SHA1" } } } );
-    snmpSettings[ "stSNMPSPrivAlgo" ] = Field::ToJSON( { FieldCombobox, PRIV_PROTOCOL, "Протокол шифрования", { { "0", "Нет" }, { "1", "DES" }, { "2", "AES128" } } } );
+    snmpSettings[ "stSNMPSAuthAlgo" ] = Field::ToJSON( { FieldCombobox, AUTH_PROTOCOL, "Протокол аутентификации", { { "0", "Нет" }, { "1", "MD5" }, { "2", "SHA1" } } } );
+    snmpSettings[ "stSNMPSPrivAlgo" ] = Field::ToJSON( { FieldCombobox, PRIV_PROTOCOL, "Протокол приватности", { { "0", "Нет" }, { "1", "DES" }, { "2", "AES128" } } } );
 
     snmpSettings[ "stSNMPReadComunity" ] = Field::ToJSON( { FieldPassword, "*****", "Коммьюнити для чтения" } );
     snmpSettings[ "stSNMPWriteComunity" ] = Field::ToJSON( { FieldPassword, "*****", "Коммьюнити для записи" } );
@@ -241,10 +244,10 @@ QJsonObject Configs::Default()
     blvdSettings[ "stLLVD1DisconnectedTime" ] = Field::ToJSON( { FieldCounter, 0, "Время отключения контактора низкоприоритетной нагрузки 1, мин", {}, 0, 720 } );
     blvdSettings[ "stLLVD2DisconnectedTime" ] = Field::ToJSON( { FieldCounter, 0, "Время отключения контактора низкоприоритетной нагрузки 2, мин", {}, 0, 720 } );
     blvdSettings[ "stLLVD3DisconnectedTime" ] = Field::ToJSON( { FieldCounter, 0, "Время отключения контактора низкоприоритетной нагрузки 3, мин", {}, 0, 720 } );
-    blvdSettings[ "stBLVDDisconnectedCapacity" ] = Field::ToJSON( { FieldCounter, 0, "Ёмкость отключения батарейного контактора, А⋅ч:", {}, 0, 99 } );
-    blvdSettings[ "stLLVD1DisconnectedCapacity" ] = Field::ToJSON( { FieldCounter, 0, "Ёмкость отключения контактора низкоприоритетной нагрузки 1, А⋅ч", {}, 0, 99 } );
-    blvdSettings[ "stLLVD2DisconnectedCapacity" ] = Field::ToJSON( { FieldCounter, 0, "Ёмкость отключения контактора низкоприоритетной нагрузки 2, А⋅ч", {}, 0, 99 } );
-    blvdSettings[ "stLLVD3DisconnectedCapacity" ] = Field::ToJSON( { FieldCounter, 0, "Ёмкость отключения контактора низкоприоритетной нагрузки 3, А⋅ч", {}, 0, 99 } );
+    blvdSettings[ "stBLVDDisconnectedCapacity" ] = Field::ToJSON( { FieldCounter, 0, "Ёмкость отключения батарейного контактора, %:", {}, 0, 99 } );
+    blvdSettings[ "stLLVD1DisconnectedCapacity" ] = Field::ToJSON( { FieldCounter, 0, "Ёмкость отключения контактора низкоприоритетной нагрузки 1, %", {}, 0, 99 } );
+    blvdSettings[ "stLLVD2DisconnectedCapacity" ] = Field::ToJSON( { FieldCounter, 0, "Ёмкость отключения контактора низкоприоритетной нагрузки 2, %", {}, 0, 99 } );
+    blvdSettings[ "stLLVD3DisconnectedCapacity" ] = Field::ToJSON( { FieldCounter, 0, "Ёмкость отключения контактора низкоприоритетной нагрузки 3, %", {}, 0, 99 } );
     blvdSettings[ "stContactorControl" ] = Field::ToJSON( { FieldSwitch, 0, "Ручное управление" } );
 
 
@@ -277,8 +280,8 @@ QJsonObject Configs::Default()
      * @brief securitySettings
      */
     QJsonObject securitySettings;
-    securitySettings[ "stMonitoringPassword" ] = Field::ToJSON( { FieldPassword, "********", "Пароль для просмотра данных по Modbus, USB, RS485" } );
-    securitySettings[ "stEnableRemouteChangeSetting" ] = Field::ToJSON( { FieldSwitch, 1, "Разрешить изменения по Modbus" } );
+    securitySettings[ "stMonitoringPassword" ] = Field::ToJSON( { FieldPassword, "********", "Пароль для записи данных по Modbus, USB, RS485" } );
+    securitySettings[ "stEnableRemouteChangeSetting" ] = Field::ToJSON( { FieldSwitch, 1, "Разрешить изменения по Modbus и включить Web-интерфейс" } );
     securitySettings[ "stEnableRemouteUpdateFirmware" ] = Field::ToJSON( { FieldSwitch, 0, "Разрешить прошивку удалённо" } );
 
     /**

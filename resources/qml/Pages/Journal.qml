@@ -38,7 +38,7 @@ Page
 
             headers: [
                 TableHeaderM { title: "Номер события"; expand: true },
-                TableHeaderM { title: "Время события"; expand: true },
+                TableHeaderM { title: "Время события UTC"; expand: true },
                 TableHeaderM { title: "Тип события"; expand: true },
                 TableHeaderM { title: "Событие"; expand: true }
             ]

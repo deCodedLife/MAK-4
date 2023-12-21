@@ -401,6 +401,12 @@ void SNMPConnection::updateConnection( bool sync )
             Field privPassword = Field::FromJSON( configs[ "stSNMPAdministratorPrivPassword" ].toObject() );
             Field authMethod = Field::FromJSON( configs[ "authMethod" ].toObject() );
 
+            int methodIndex = authMethod.value.toInt();
+            std::string _authMethod = "noAuthNoPriv";
+
+            if ( methodIndex == 1 ) _authMethod = "authPriv";
+            if ( methodIndex == 2 ) _authMethod = "authNoPriv";
+
             Field authProtocol = Field::FromJSON( configs[ "stSNMPSAuthAlgo" ].toObject() );
             Field privProtocol = Field::FromJSON( configs[ "stSNMPSPrivAlgo" ].toObject() );
 
@@ -410,7 +416,7 @@ void SNMPConnection::updateConnection( bool sync )
                 user.value.toString().toStdString(),
                 authPassword.value.toString().toStdString(),
                 privPassword.value.toString().toStdString(),
-                authMethod.model[ authMethod.value.toString() ].toString().toStdString(),
+                _authMethod,
                 authProtocol.model[ authProtocol.value.toString() ].toString().toStdString(),
                 privProtocol.model[ privProtocol.value.toString() ].toString().toStdString()
             );
