@@ -20,11 +20,6 @@ Page
         return config
     }
 
-    actionButtonIcon: "qrc:/images/icons/save.svg"
-    actionButtonTitle: "Экспортировать"
-
-    onActionButtonTriggered: messageDialog.open()
-
     FileDialog {
         id: fileDialog
 
@@ -174,6 +169,13 @@ Page
             }
 
             Item{ Layout.fillWidth: true }
+
+            Button {
+                highlighted: true
+                text: "Экспортировать"
+                Material.accent: Globals.accentColor
+                onClicked: messageDialog.open()
+            }
         }
     }
 }
