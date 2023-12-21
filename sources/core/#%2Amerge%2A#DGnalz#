@@ -7,11 +7,7 @@
 #define HOST "185.51.21.124"//185.51.21.124
 #define PORT "16190"
 #define USER "user000001"
-<<<<<<< HEAD
 #define AUTH_METHOD 1
-=======
-#define AUTH_METHOD 0
->>>>>>> 67ebf0440430a1b1d2c539f15a23dad86d45bc01
 #define AUTH_PROTOCOL 1
 #define PRIV_PROTOCOL 2
 #define AUTH_PASSWORD "0000000001"

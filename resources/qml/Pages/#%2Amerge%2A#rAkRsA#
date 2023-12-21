@@ -67,7 +67,6 @@ Page
 
                 property string iconOID: "psLightProtStatus"
 
-<<<<<<< HEAD
                 Timer
                 {
                     interval: ConfigManager.get()[ "main" ][ "updateDelay" ][ "value" ] * 1000
@@ -77,12 +76,6 @@ Page
                     onTriggered: SNMP.getOIDs( powerDefence.iconOID, [ powerDefence.iconOID + ".0" ] )
                 }
                 state: "null"
-=======
-                state: {
-                    SNMP.getOIDs( iconOID, [ iconOID + ".0" ] )
-                    return "null"
-                }
->>>>>>> 67ebf0440430a1b1d2c539f15a23dad86d45bc01
 
                 states: [
                     State {
@@ -102,7 +95,6 @@ Page
                             icon.color: Globals.textColor
                             text: "Грозозащита: Авария"
                         }
-<<<<<<< HEAD
                     },
                     State {
                         name: "not_used"
@@ -112,8 +104,6 @@ Page
                             icon.color: Globals.textColor
                             text: "Грозозащита: Не используется"
                         }
-=======
->>>>>>> 67ebf0440430a1b1d2c539f15a23dad86d45bc01
                     }
 
                 ]
@@ -125,7 +115,6 @@ Page
                     function onGotRowsContent( root: string, data: object )
                     {
                         if ( root !== powerDefence.iconOID ) return
-<<<<<<< HEAD
                         let powerDef = powerDefence.state = data[ powerDefence.iconOID ][ "num" ]
                         if ( powerDef === 0 ) {
                             powerDefence.state = "enabled"
@@ -136,9 +125,6 @@ Page
                             return
                         }
                         powerDefence.state = "not_used"
-=======
-                        powerDefence.state = data[ powerDefence.iconOID ][ "num" ] === 1 ? "enabled" : "disabled"
->>>>>>> 67ebf0440430a1b1d2c539f15a23dad86d45bc01
                     }
                 }
             }

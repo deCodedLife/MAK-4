@@ -19,7 +19,6 @@ Flickable
     property string actionButtonTitle
     property string actionButtonState
 
-<<<<<<< HEAD
     Component.onCompleted: {
         if ( Qt.platform.os === "osx" ) return
         flickDeceleration = 10000
@@ -46,8 +45,6 @@ Flickable
         }
     }
 
-=======
->>>>>>> 67ebf0440430a1b1d2c539f15a23dad86d45bc01
     Rectangle {
         width: page.width - 20
         height: page.height

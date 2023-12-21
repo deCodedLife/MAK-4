@@ -93,11 +93,7 @@ Page
                         let rowsObj = {}
                         rowsObj[ `psBlockNumber.${index + 1}` ] = new Wrappers.RowItem( Wrappers.RowTypes.TEXT )
                         rowsObj[ `psBlockVoltage.${index + 1}` ] = new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByHundred, "num" )
-<<<<<<< HEAD
                         rowsObj[ `psBlockTemperature.${index + 1}` ] = new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByTen, "num" )
-=======
-                        rowsObj[ `psBlockTemperature.${index + 1}` ] = new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByHundred, "num" )
->>>>>>> 67ebf0440430a1b1d2c539f15a23dad86d45bc01
                         rowsObj[ `psBlockStatus.${index + 1}` ] = new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.parseErrors, "str" )
                         return rowsObj
                     }

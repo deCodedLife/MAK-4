@@ -33,11 +33,7 @@ Rectangle
     color: "white"
     radius: 10
 
-<<<<<<< HEAD
     function updateViaTable( data )
-=======
-    function updateViaTable( data: obejct )
->>>>>>> 67ebf0440430a1b1d2c539f15a23dad86d45bc01
     {
         rowsCount = 0
         content = {}
@@ -90,11 +86,7 @@ Rectangle
     {
         target: SNMP
 
-<<<<<<< HEAD
         function onGotRowsContent( root, data )
-=======
-        function onGotRowsContent( root: string, data: object )
->>>>>>> 67ebf0440430a1b1d2c539f15a23dad86d45bc01
         {
             if ( root !== tableOID ) return
             else updateViaTable( data )
@@ -137,14 +129,10 @@ Rectangle
 
         ColumnLayout {
             id: contentLayout
-<<<<<<< HEAD
             width: {
                 if ( root.width > gridLayout.implicitWidth ) return root.width
                 return gridLayout.implicitWidth
             }
-=======
-            width: gridLayout.implicitWidth > root.width ? gridLayout.implicitWidth : root.width
->>>>>>> 67ebf0440430a1b1d2c539f15a23dad86d45bc01
             spacing: 0
 
             Item{ Layout.topMargin: 20 }
@@ -179,13 +167,9 @@ Rectangle
                 id: gridLayout
                 clip: true
 
-<<<<<<< HEAD
                 width: parent.width
                 Layout.preferredWidth: parent.width
 
-=======
-                width: contentLayout.width
->>>>>>> 67ebf0440430a1b1d2c539f15a23dad86d45bc01
                 Layout.alignment: Qt.AlignTop
                 Layout.topMargin: header != "" ? 10 : 0
                 Layout.bottomMargin: 20

@@ -22,7 +22,6 @@ Page
         }
     }
 
-<<<<<<< HEAD
     function updateConfigs( field, value ) {
         let newConfig = ConfigManager.current
         value = Wrappers.getFieldValue( configuration[ field ], value )
@@ -31,8 +30,6 @@ Page
         ConfigManager.current = newConfig
     }
 
-=======
->>>>>>> 67ebf0440430a1b1d2c539f15a23dad86d45bc01
     ColumnLayout {
         id: pageContent
 
@@ -63,17 +60,7 @@ Page
                     { highlited: true, color: Globals.accentColor, text: "Соединить", callback: () => { SNMP.updateConnection() } },
                     { highlited: true, color: Globals.errorColor, text: "Отключить", callback: () => { SNMP.dropConnection() } }
                 ]
-<<<<<<< HEAD
                 onFieldUpdated: ( field, value ) => updateConfigs( field, value )
-=======
-                onFieldUpdated: ( field, value ) => {
-                    let newConfig = ConfigManager.current
-                    value = Wrappers.getFieldValue( configuration[ field ], value )
-                    configuration[ field ][ "value" ] = value
-                    newConfig[ "main" ] = configuration
-                    ConfigManager.current = newConfig
-                }
->>>>>>> 67ebf0440430a1b1d2c539f15a23dad86d45bc01
             }
 
             Item{ Layout.fillWidth: true }
@@ -95,17 +82,7 @@ Page
                     configuration[ "v2_write" ],
                 ]
 
-<<<<<<< HEAD
                 onFieldUpdated: ( field, value ) => updateConfigs( field, value )
-=======
-                onFieldUpdated: ( field, value ) => {
-                    let newConfig = ConfigManager.current
-                    value = Wrappers.getFieldValue( configuration[ field ], value )
-                    configuration[ field ][ "value" ] = value
-                    newConfig[ "main" ] = configuration
-                    ConfigManager.current = newConfig
-                }
->>>>>>> 67ebf0440430a1b1d2c539f15a23dad86d45bc01
             }
 
             CardComponent {
@@ -120,17 +97,7 @@ Page
                     configuration[ "stSNMPSPrivAlgo" ],
                 ]
 
-<<<<<<< HEAD
                 onFieldUpdated: ( field, value ) => updateConfigs( field, value )
-=======
-                onFieldUpdated: ( field, value ) => {
-                    let newConfig = ConfigManager.current
-                    value = Wrappers.getFieldValue( configuration[ field ], value )
-                    configuration[ field ][ "value" ] = value
-                    newConfig[ "main" ] = configuration
-                    ConfigManager.current = newConfig
-                }
->>>>>>> 67ebf0440430a1b1d2c539f15a23dad86d45bc01
             }
         }
     }

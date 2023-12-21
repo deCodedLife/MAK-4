@@ -46,11 +46,7 @@ Page
                 new Wrappers.ContentItem( null, "Серийный номер источника питания" ),
                 new Wrappers.ContentItem( null, "Описание источника питания" ),
                 new Wrappers.ContentItem( null, "Версия ПО контроллера" ),
-<<<<<<< HEAD
                 new Wrappers.ContentItem( null, "Время UTC" ),
-=======
-                new Wrappers.ContentItem( null, "Время" ),
->>>>>>> 67ebf0440430a1b1d2c539f15a23dad86d45bc01
 
                 new Wrappers.ContentItem( "psSerial", "", Wrappers.RowTypes.TEXT, "str" ),
                 new Wrappers.ContentItem( "psDescription", "", Wrappers.RowTypes.TEXT, "str" ),

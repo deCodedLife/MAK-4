@@ -5,10 +5,7 @@ import QtQuick.Controls.Material
 
 QtObject
 {
-<<<<<<< HEAD
     property var rootObject
-=======
->>>>>>> 67ebf0440430a1b1d2c539f15a23dad86d45bc01
     property string windowSuffix: ""
 
     property string accentColor: "#116FCF"

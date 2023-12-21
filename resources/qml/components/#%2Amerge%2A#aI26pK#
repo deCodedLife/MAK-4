@@ -45,17 +45,12 @@ TextField
 
     onTextChanged: {
         if ( !acceptableInput ) return
-<<<<<<< HEAD
-=======
-
->>>>>>> 67ebf0440430a1b1d2c539f15a23dad86d45bc01
         // if ( text === "" ) focus = false
         if ( text === "" ) return
         if ( !initValue ) {
             initValue = text
             return
         }
-<<<<<<< HEAD
         parent.updateField( text )
     }
 
@@ -63,11 +58,4 @@ TextField
         pBackground.fillColor = Globals.backgroundColor
         if ( parent.objectName === "stMonitoringPassword" ) maximumLength = 6
     }
-=======
-
-        parent.updateField( text )
-    }
-
-    Component.onCompleted: pBackground.fillColor = Globals.backgroundColor
->>>>>>> 67ebf0440430a1b1d2c539f15a23dad86d45bc01
 }

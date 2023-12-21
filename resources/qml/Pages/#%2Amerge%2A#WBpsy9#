@@ -1,10 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
-<<<<<<< HEAD
 import QtQuick.Controls
 import QtQuick.Dialogs
-=======
->>>>>>> 67ebf0440430a1b1d2c539f15a23dad86d45bc01
 
 import "../Components"
 import "../Globals"
@@ -21,7 +18,6 @@ Page
     actionButtonIcon: "qrc:/images/icons/save.svg"
     actionButtonTitle: "Экспортировать"
 
-<<<<<<< HEAD
     FileDialog {
         id: fileDialog
 
@@ -112,9 +108,6 @@ Page
 
     onActionButtonTriggered: {
         messageDialog.open()
-=======
-    onActionButtonTriggered: {
->>>>>>> 67ebf0440430a1b1d2c539f15a23dad86d45bc01
     }
 
     ColumnLayout {
@@ -133,10 +126,7 @@ Page
             spacing: 10
 
             TableComponent {
-<<<<<<< HEAD
                 id: bateryCharging
-=======
->>>>>>> 67ebf0440430a1b1d2c539f15a23dad86d45bc01
                 Layout.alignment: Qt.AlignTop
                 tableOID: "psDischargeEntry"
 

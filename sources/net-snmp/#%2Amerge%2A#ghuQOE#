@@ -55,10 +55,7 @@ public:
     Q_INVOKABLE void updateConfigs();
     Q_INVOKABLE void sendConfigs();
     Q_INVOKABLE void sendConfigsChangedEvent();
-<<<<<<< HEAD
     Q_INVOKABLE void exportTable( QString file, QList<QString> headers, QList<QString> rows, QString separator );
-=======
->>>>>>> 67ebf0440430a1b1d2c539f15a23dad86d45bc01
 
     Q_INVOKABLE QString dateToReadable( QString );
     Q_INVOKABLE QJsonArray getGroup( QString );
