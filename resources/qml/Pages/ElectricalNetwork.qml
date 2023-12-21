@@ -95,6 +95,15 @@ Page
                             icon.color: Globals.textColor
                             text: "Грозозащита: Авария"
                         }
+                    },
+                    State {
+                        name: "not_used"
+                        PropertyChanges {
+                            target: powerDefence
+                            icon.source: "qrc:/images/icons/flash_off.svg"
+                            icon.color: Globals.textColor
+                            text: "Грозозащита: Не используется"
+                        }
                     }
 
                 ]
@@ -106,7 +115,16 @@ Page
                     function onGotRowsContent( root: string, data: object )
                     {
                         if ( root !== powerDefence.iconOID ) return
-                        powerDefence.state = data[ powerDefence.iconOID ][ "num" ] === 0 ? "enabled" : "disabled"
+                        let powerDef = powerDefence.state = data[ powerDefence.iconOID ][ "num" ]
+                        if ( powerDef === 0 ) {
+                            powerDefence.state = "enabled"
+                            return
+                        }
+                        if ( powerDef !== 3 ) {
+                            powerDefence.state = "disabled"
+                            return
+                        }
+                        powerDefence.state = "not_used"
                     }
                 }
             }
