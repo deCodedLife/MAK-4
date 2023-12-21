@@ -86,11 +86,7 @@ void SNMPConnection::handleSNMPRequest( QString root, QMap<SNMPpp::OID, QJsonObj
 
     for ( SNMPpp::OID oid : rows.keys() )
     {
-<<<<<<< HEAD
         QString oidName = parser.FromOID( oid.parent() );
-=======
-        QString oidName = parser.FromOID( oid.parent() ); //parser.OID_TOSTR[ oid.parent() ];
->>>>>>> 67ebf0440430a1b1d2c539f15a23dad86d45bc01
 
         QJsonArray data;
         QJsonObject row = rows[ oid ];
@@ -353,7 +349,6 @@ void SNMPConnection::sendConfigsChangedEvent()
     emit settingsChanged();
 }
 
-<<<<<<< HEAD
 void SNMPConnection::exportTable( QString file, QList<QString> headers, QList<QString> rows, QString separator )
 {
     QStringList buffer;
@@ -387,8 +382,6 @@ void SNMPConnection::exportTable( QString file, QList<QString> headers, QList<QS
     tableFile.close();
 }
 
-=======
->>>>>>> 67ebf0440430a1b1d2c539f15a23dad86d45bc01
 QString SNMPConnection::dateToReadable( QString date )
 {
     return QDateTime::fromString( date, "ddMMyyyyhhmmss" ).toString( "dd-MM-yyyy hh:mm:ss" );
@@ -441,15 +434,12 @@ void SNMPConnection::updateConnection( bool sync )
             Field privPassword = Field::FromJSON( configs[ "stSNMPAdministratorPrivPassword" ].toObject() );
             Field authMethod = Field::FromJSON( configs[ "authMethod" ].toObject() );
 
-<<<<<<< HEAD
             int methodIndex = authMethod.value.toInt();
             std::string _authMethod = "noAuthNoPriv";
 
             if ( methodIndex == 1 ) _authMethod = "authPriv";
             if ( methodIndex == 2 ) _authMethod = "authNoPriv";
 
-=======
->>>>>>> 67ebf0440430a1b1d2c539f15a23dad86d45bc01
             Field authProtocol = Field::FromJSON( configs[ "stSNMPSAuthAlgo" ].toObject() );
             Field privProtocol = Field::FromJSON( configs[ "stSNMPSPrivAlgo" ].toObject() );
 
@@ -459,11 +449,7 @@ void SNMPConnection::updateConnection( bool sync )
                 user.value.toString().toStdString(),
                 authPassword.value.toString().toStdString(),
                 privPassword.value.toString().toStdString(),
-<<<<<<< HEAD
                 _authMethod,
-=======
-                authMethod.model[ authMethod.value.toString() ].toString().toStdString(),
->>>>>>> 67ebf0440430a1b1d2c539f15a23dad86d45bc01
                 authProtocol.model[ authProtocol.value.toString() ].toString().toStdString(),
                 privProtocol.model[ privProtocol.value.toString() ].toString().toStdString()
             );

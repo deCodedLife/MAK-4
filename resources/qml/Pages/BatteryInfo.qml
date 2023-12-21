@@ -106,13 +106,8 @@ Page
 
                 rows: {
                     "psGroupNumber": new Wrappers.RowItem(),
-<<<<<<< HEAD
                     "psGroupVoltage": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByHundred ),
                     "psGroupCurrent": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByThousand ),
-=======
-                    "psGroupCurrent": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByThousand ),
-                    "psGroupVoltage": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByHundred ),
->>>>>>> 67ebf0440430a1b1d2c539f15a23dad86d45bc01
                     "psGroupFuseStatus": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.parseErrors, "str" ),
                     "psGroupStatus": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.parseErrors, "str" )
                 }

@@ -31,10 +31,7 @@ Page
         }
 
         SNMP.setMultiple( changes )
-<<<<<<< HEAD
         SNMP.getOIDs( "initSession", [ "stSNMPVersion.0" ] )
-=======
->>>>>>> 67ebf0440430a1b1d2c539f15a23dad86d45bc01
     }
 
     function updateConfig( field, value ) {
