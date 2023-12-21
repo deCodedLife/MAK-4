@@ -23,7 +23,7 @@ Page
 
         property list<string> headers
         property list<string> rows
-        property string sep
+        property string sep: ";"
 
         nameFilters: ["CSV table (*.csv)"]
         fileMode: FileDialog.SaveFile
@@ -70,19 +70,6 @@ Page
                 placeholderText: "Выгрузить до"
                 color: acceptableInput ? Globals.textColor : Globals.errorColor
             }
-
-
-            TextField {
-                validator: RegularExpressionValidator{
-                    regularExpression: /[;,.|\ \t]/
-                }
-                Layout.fillWidth: true
-                id: separator
-                maximumLength: 1
-                placeholderText: "Разделитель"
-                text: ";"
-                color: acceptableInput ? Globals.textColor : Globals.errorColor
-            }
         }
 
         onOpened: rowsEnd.text = bateryCharging.rowsCount
@@ -95,7 +82,6 @@ Page
 
             if ( !rowsStart.acceptableInput ) return
             if ( !rowsEnd.acceptableInput ) return
-            if ( !separator.acceptableInput ) return
 
             let startFrom = parseInt( rowsStart.text ) - 1
             let endAt = parseInt( rowsEnd.text )
@@ -113,7 +99,6 @@ Page
 
             fileDialog.headers = headers
             fileDialog.rows = rows
-            fileDialog.sep = separator.text
             fileDialog.open()
         }
 
