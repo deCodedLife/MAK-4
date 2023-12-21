@@ -20,14 +20,13 @@ Flickable
     property string actionButtonState
 
     Component.onCompleted: {
-        if ( Qt.platform.os !== "windows" ) return
+        if ( Qt.platform.os === "osx" ) return
         flickDeceleration = 10000
     }
 
     ScrollBar.vertical: ScrollBar {
         id: control
         height: 10
-        anchors.left: parent.left
         policy: ScrollBar.AsNeeded
         property Rectangle contentReference: contentItem
         visible: page.height < page.contentHeight

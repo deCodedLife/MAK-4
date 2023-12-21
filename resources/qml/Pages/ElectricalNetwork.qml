@@ -67,10 +67,15 @@ Page
 
                 property string iconOID: "psLightProtStatus"
 
-                state: {
-                    SNMP.getOIDs( iconOID, [ iconOID + ".0" ] )
-                    return "null"
+                Timer
+                {
+                    interval: ConfigManager.get()[ "main" ][ "updateDelay" ][ "value" ] * 1000
+                    repeat: true
+                    running: true
+                    triggeredOnStart: true
+                    onTriggered: SNMP.getOIDs( powerDefence.iconOID, [ powerDefence.iconOID + ".0" ] )
                 }
+                state: "null"
 
                 states: [
                     State {
@@ -101,7 +106,7 @@ Page
                     function onGotRowsContent( root: string, data: object )
                     {
                         if ( root !== powerDefence.iconOID ) return
-                        powerDefence.state = data[ powerDefence.iconOID ][ "num" ] === 1 ? "enabled" : "disabled"
+                        powerDefence.state = data[ powerDefence.iconOID ][ "num" ] === 0 ? "enabled" : "disabled"
                     }
                 }
             }
