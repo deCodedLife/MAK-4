@@ -361,6 +361,7 @@ QJsonObject Configs::Default()
     journal["514"] = "Установка часов";
     journal["515"] = "Запуск батарейного теста";
     journal["516"] = "Запуск выравнивающего заряда";
+    journal["517"] = "Запуск короткого теста";
 
 
     data[ "main" ] = mainSettings;

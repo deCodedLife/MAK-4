@@ -93,7 +93,11 @@ Page
             for ( let row = startFrom; row < endAt; row++ ) {
 
                 for( let index = 0; index < contentKeys.length; index++ ) {
-                    let fieldValue = journalTable.content[ contentKeys[ index ] ][ row ].value.toString()
+                    let value = ""
+                    if ( journalTable.content[ contentKeys[ index ] ][ row ].value )
+                        value = journalTable.content[ contentKeys[ index ] ][ row ].value
+                    else ""
+                    let fieldValue = value.toString()
                     rows.push( fieldValue.replace( "\n", " " ) )
                 }
 
