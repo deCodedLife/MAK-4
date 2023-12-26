@@ -60,19 +60,24 @@ void SNMPConnection::getOIDs( QString uid, QList<QString> objects )
     if ( readSession == NULL ) return;
 
     QList< SNMPpp::OID > oids;
-    AsyncSNMP *request = new AsyncSNMP( &readSession, SNMPpp::PDU::kGet );
+    SNMPpp::PDU pdu( SNMPpp::PDU::kGet );
 
     for ( QString objectName : objects )
     {
-        oids.append( parser.ToOID( objectName ) );
+        pdu.addNullVar( parser.ToOID( objectName ) );
     }
 
-    request->setUID( uid );
-    request->setOIDs( oids );
+    RequestConfig config = {
+        &readSession,
+        pdu
+    };
 
-    connect( request, &AsyncSNMP::rows, this, &SNMPConnection::handleSNMPRequest);
-    connect( request, &AsyncSNMP::rows, this, &SNMPConnection::validateConnection);
-    connect( request, &AsyncSNMP::finished, this, &SNMPConnection::handleSNMPFinished );
+    AsyncSNMP *request = new AsyncSNMP( uid, config );
+
+    connect( request, &AsyncSNMP::finished, this, &SNMPConnection::validateConnection);
+    connect( request, &AsyncSNMP::finished, this, &SNMPConnection::handleSNMPRequest);
+    connect( request, &AsyncSNMP::finished, this, &SNMPConnection::pushNextRequest);
+    connect( request, &AsyncSNMP::gotError, this, &SNMPConnection::snmpError );
 
     proceed( request );
 }
@@ -86,12 +91,15 @@ void SNMPConnection::handleSNMPRequest( QString root, QMap<SNMPpp::OID, QJsonObj
 
     for ( SNMPpp::OID oid : rows.keys() )
     {
-        QString oidName = parser.FromOID( oid.parent() ); //parser.OID_TOSTR[ oid.parent() ];
+        QString oidName = parser.FromOID( oid.parent() );
 
         QJsonArray data;
         QJsonObject row = rows[ oid ];
 
         row[ "field" ] = oidName;
+        if ( row[ "str" ].toString().split( "No Such Object avilible on this agent" ).length() >= 2 ) {
+            row[ "str" ] = "Недоступно";
+        }
 
         if ( fields.contains( oidName ) )
         {
@@ -116,14 +124,8 @@ void SNMPConnection::handleSNMPRequest( QString root, QMap<SNMPpp::OID, QJsonObj
     emit gotRowsContent( root, fields );
 }
 
-void SNMPConnection::handleSNMPFinished( int code )
+void SNMPConnection::pushNextRequest()
 {
-    if ( code != 0 )
-    {
-        readSession = NULL;
-        writeSession = NULL;
-        dropConnection();
-    }
     isBusy = false;
 
     if ( requests.empty() ) return;
@@ -133,17 +135,36 @@ void SNMPConnection::handleSNMPFinished( int code )
     proceed( requests.first() );
 }
 
+
+void SNMPConnection::snmpError( int code )
+{
+    if ( code == 0 ) return;
+    readSession = NULL;
+    writeSession = NULL;
+    dropConnection();
+}
+
 void SNMPConnection::validateConnection( QString root, QMap<SNMPpp::OID, QJsonObject> rows )
 {
     if ( root == "initSession" )
     {
-        SNMPpp::OID snmpVersionOID = parser.ToOID( "stSNMPVersion.0" );
+        SNMPpp::OID snmpVersionOID = parser.ToOID( "psFWRevision.0" );
         int snmpVersion = rows[ snmpVersionOID ][ "num" ].toInt();
-        if ( snmpVersion != 1 && snmpVersion != 3 ) return;
+        if ( rows[ snmpVersionOID][ "num" ].isNull() )
+        {
+            if ( _retryAttempts <= 5 )
+            {
+                _retryAttempts++;
+                getOIDs( "initSession", { "psFWRevision.0" } );
+            }
+            return;
+        }
+        if ( snmpVersion < 400 && snmpVersion > 499 ) return;
     }
 
     if ( _state != Disconnected ) return;
 
+    _retryAttempts = 0;
     emit notify( 0, "Подключено", 3000 );
     _state = Connected;
     emit stateChanged( _state );
@@ -154,15 +175,18 @@ void SNMPConnection::getTable( QString objectName )
     if ( readSession == NULL ) return;
 
 
-    SNMPpp::OID start = parser.ToOID( objectName );
+    SNMPpp::PDU pdu( SNMPpp::PDU::kGetBulk );
+    RequestConfig config {
+        &readSession,
+        pdu,
+        parser.ToOID( objectName )
+    };
 
-    AsyncSNMP *request = new AsyncSNMP( &readSession, SNMPpp::PDU::kGetBulk );
-    request->setBounds( start );
+    AsyncSNMP *request = new AsyncSNMP( objectName, config );
 
-    request->setUID( objectName );
-
-    connect( request, &AsyncSNMP::rows, this, &SNMPConnection::handleSNMPRequest );
-    connect( request, &AsyncSNMP::finished, this, &SNMPConnection::handleSNMPFinished );
+    connect( request, &AsyncSNMP::finished, this, &SNMPConnection::handleSNMPRequest );
+    connect( request, &AsyncSNMP::finished, this, &SNMPConnection::pushNextRequest);
+    connect( request, &AsyncSNMP::gotError, this, &SNMPConnection::snmpError );
 
     proceed( request );
 }
@@ -176,14 +200,22 @@ void SNMPConnection::setOID( QString objectName, QVariant data )
     setMultiple( request );
 }
 
+void SNMPConnection::PDUAddString( SNMPpp::PDU *pdu, QString key, QJsonObject fields )
+{
+    if ( !fields.contains( key ) ) return;
+    QString _authPassw = fields[ key ].toObject()[ "value" ].toString();
+    pdu->addOctetStringVar(
+        parser.ToOID( key + ".0" ),
+        (unsigned char *) _authPassw.toStdString().c_str(),
+        _authPassw.toStdString().size() );
+}
+
 void SNMPConnection::setMultiple( QJsonObject fields )
 {
-    bool hasError = false;
-    bool hasConectionSettings = false;
-
+    QJsonObject _fields = fields;
     QJsonObject settings = pConfigs->get();
-    QJsonObject connectionsSettings = settings[ "main" ].toObject();
-
+    QJsonObject connectionsSettings = settings[ "snmp" ].toObject();
+    bool snmpSettings = false;
 
     for( QString key : fields.keys() )
     {
@@ -191,45 +223,87 @@ void SNMPConnection::setMultiple( QJsonObject fields )
 
         QJsonObject field = fields[ key ].toObject();
         QVariant value = field[ "value" ].toVariant();
-
-        if ( connectionsSettings.contains( key ) )
-        {
-            hasConectionSettings = true;
-            QJsonObject field = connectionsSettings[ key ].toObject();
-            field[ "value" ] = QJsonValue::fromVariant( value );
-            connectionsSettings[ key ] = field;
-            settings[ "main" ] = connectionsSettings;
-            pConfigs->write( settings );
-        }
+        bool hasAuthData = false;
 
         oid_object obj = parser.MIB_OBJECTS[ key ];
         SNMPpp::OID oid( parser.ToOID( key + ".0" ) );
 
-        switch ( obj.type ) {
-        case TYPE_INTEGER:
-            pdu.addIntegerVar( oid, value.toInt() );
-            break;
-        case TYPE_GAUGE:
-            pdu.addGaugeVar( oid, value.toUInt() );
-            break;
-        case TYPE_NULL:
-            pdu.addNullVar( oid );
-            break;
-        case TYPE_OCTETSTR: case TYPE_NETADDR: case TYPE_IPADDR: case TYPE_NSAPADDRESS:
-            pdu.addOctetStringVar(
-                oid,
-                (unsigned char *) value.toString().toStdString().c_str(),
-                value.toString().toStdString().size() );
-            break;
-        default:
-            if ( value.isNull() ) pdu.addNullVar( oid );
-            else pdu.addIntegerVar( oid, value.toInt() );
-            break;
+        if ( !_fields.contains( key ) )
+            continue;
+
+        if ( connectionsSettings.contains( key ) )
+        {
+            snmpSettings = true;
+        }
+
+
+        if ( key == "stSNMPAdministratorName" || key == "stSNMPAdministratorAuthPassword" || key == "stSNMPAdministratorPrivPassword" )
+        {
+            PDUAddString( &pdu, "stSNMPAdministratorName", fields );
+            PDUAddString( &pdu, "stSNMPAdministratorAuthPassword", fields );
+            PDUAddString( &pdu, "stSNMPAdministratorPrivPassword", fields );
+            _fields.remove( "stSNMPAdministratorName" );
+            _fields.remove( "stSNMPAdministratorAuthPassword" );
+            _fields.remove( "stSNMPAdministratorPrivPassword" );
+            hasAuthData = true;
+        }
+
+        if ( key == "stSNMPEngineerName" || key == "stSNMPEngineerAuthPassword" || key == "stSNMPEngineerPrivPassword" )
+        {
+            PDUAddString( &pdu, "stSNMPEngineerName", fields );
+            PDUAddString( &pdu, "stSNMPEngineerAuthPassword", fields );
+            PDUAddString( &pdu, "stSNMPEngineerPrivPassword", fields );
+            _fields.remove( "stSNMPEngineerName" );
+            _fields.remove( "stSNMPEngineerAuthPassword" );
+            _fields.remove( "stSNMPEngineerPrivPassword" );
+            hasAuthData = true;
+        }
+
+        if ( key == "stSNMPOperatorName" || key == "stSNMPOperatorAuthPassword" || key == "stSNMPOperatorPrivPassword" )
+        {
+            PDUAddString( &pdu, "stSNMPOperatorName", fields );
+            PDUAddString( &pdu, "stSNMPOperatorAuthPassword", fields );
+            PDUAddString( &pdu, "stSNMPOperatorPrivPassword", fields );
+            _fields.remove( "stSNMPOperatorName" );
+            _fields.remove( "stSNMPOperatorAuthPassword" );
+            _fields.remove( "stSNMPOperatorPrivPassword" );
+            hasAuthData = true;
+        }
+
+        if ( hasAuthData )
+        {
+            PDUAddString( &pdu, "stSNMPSAuthAlgo", fields );
+            PDUAddString( &pdu, "stSNMPSPrivAlgo", fields );
+        }
+
+        if ( !hasAuthData )
+        {
+            switch ( obj.type ) {
+            case TYPE_INTEGER:
+                pdu.addIntegerVar( oid, value.toInt() );
+                break;
+            case TYPE_GAUGE:
+                pdu.addGaugeVar( oid, value.toUInt() );
+                break;
+            case TYPE_NULL:
+                pdu.addNullVar( oid );
+                break;
+            case TYPE_OCTETSTR: case TYPE_NETADDR: case TYPE_IPADDR: case TYPE_NSAPADDRESS:
+                pdu.addOctetStringVar(
+                    oid,
+                    (unsigned char *) value.toString().toStdString().c_str(),
+                    value.toString().toStdString().size() );
+                break;
+            default:
+                if ( value.isNull() ) pdu.addNullVar( oid );
+                else pdu.addIntegerVar( oid, value.toInt() );
+                break;
+            }
         }
 
         try
         {
-            pdu = SNMPpp::set( writeSession, pdu );
+            // pdu = SNMPpp::set( writeSession, pdu );
         }
         catch( const std::exception &e )
         {
@@ -245,23 +319,19 @@ void SNMPConnection::setMultiple( QJsonObject fields )
             }
 
             emit notify(-1, "Не удалось записать объект " + objectName, 3000 );
-            hasError = true;
+            return;
         }
 
         pdu.free();
-
-        if ( !hasError && hasConectionSettings )
-        {
-            updateConnection( true );
-        }
-    }
-    if ( hasError )
-    {
-         return;
     }
 
     emit notify( 0, "Все настройки успешно записаны", 3000 );
     emit settingsChanged();
+
+    if( !snmpSettings )
+    {
+        getOIDs( "initSession", { "psFWRevision.0" } );
+    }
 }
 
 void SNMPConnection::updateConfigs()
@@ -270,23 +340,26 @@ void SNMPConnection::updateConfigs()
 
     for ( QString key : configs.keys() )
     {
-        if ( key == "main" || key == "errors" || key == "masks" || key == "journal" ) continue;
+        if ( key == "main" || key == "errors" || key == "masks" || key == "journal" || key == "fields" ) continue;
 
         QJsonObject config = configs[ key ].toObject();
         QList<SNMPpp::OID> oids;
 
+        SNMPpp::PDU pdu( SNMPpp::PDU::kGet );
+
         for ( QString field : config.keys() )
         {
-            oids.append( parser.ToOID( field + ".0" ) );
+            pdu.addNullVar( parser.ToOID( field + ".0" ) );
         }
 
-        if ( oids.empty() ) continue;
+        RequestConfig requestConfig = {
+            &readSession,
+            pdu
+        };
 
-        AsyncSNMP *request = new AsyncSNMP( &readSession, SNMPpp::PDU::kGet );
-        request->setUID( key );
-        request->setOIDs( oids );
+        AsyncSNMP *request = new AsyncSNMP( key, requestConfig );
 
-        connect( request, &AsyncSNMP::rows, this, [&]( QString root, QMap<SNMPpp::OID, QJsonObject> rows )
+        connect( request, &AsyncSNMP::finished, this, [&]( QString root, QMap<SNMPpp::OID, QJsonObject> rows )
         {
             QJsonObject fullConfig = pConfigs->get();
             QJsonObject config = fullConfig[ root ].toObject();
@@ -327,7 +400,10 @@ void SNMPConnection::updateConfigs()
 
             emit settingsChanged();
         } );
-        connect( request, &AsyncSNMP::finished, this, &SNMPConnection::handleSNMPFinished );
+
+        connect( request, &AsyncSNMP::finished, this, &SNMPConnection::pushNextRequest);
+        connect( request, &AsyncSNMP::gotError, this, &SNMPConnection::snmpError );
+
         proceed( request );
 
     }
@@ -347,6 +423,39 @@ void SNMPConnection::sendConfigs()
 void SNMPConnection::sendConfigsChangedEvent()
 {
     emit settingsChanged();
+}
+
+void SNMPConnection::exportTable( QString file, QList<QString> headers, QList<QString> rows, QString separator )
+{
+    QStringList buffer;
+
+    if ( rows.count() % headers.count() != 0 ) return;
+    int columns = headers.count();
+    int rowsCount = rows.count() / headers.count();
+
+    for ( int index = 0; index < headers.count(); index++ )
+    {
+        buffer << headers[ index ] << (index == (headers.count() - 1) ? "\n" : separator);
+    }
+
+    for ( int index = 0; index < rows.count(); index++ )
+    {
+        buffer << rows[ index ];
+
+        if ( (index + 1) % columns ) buffer << separator;
+        else buffer << "\n";
+    }
+
+    QFile tableFile( file );
+
+    if ( !tableFile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
+    {
+        emit error_occured( Callback::New( tableFile.errorString(), Callback::Warning ) );
+        return;
+    }
+
+    tableFile.write( buffer.join("").toUtf8() );
+    tableFile.close();
 }
 
 QString SNMPConnection::dateToReadable( QString date )
@@ -404,15 +513,52 @@ void SNMPConnection::updateConnection( bool sync )
             Field authProtocol = Field::FromJSON( configs[ "stSNMPSAuthAlgo" ].toObject() );
             Field privProtocol = Field::FromJSON( configs[ "stSNMPSPrivAlgo" ].toObject() );
 
+            int methodIndex = authMethod.value.toInt();
+            int authIndex = authProtocol.value.toInt();
+            int privIndex = privProtocol.value.toInt();
+
+            std::string _authMethod =
+                  methodIndex == 0 ? "noAuthNoPriv"
+                : methodIndex == 1 ? "authNoPriv" : "authPriv";
+
+            std::string _authProtocol = authIndex == 1 ? "MD5" : "SHA1";
+            std::string _privProtocol = privIndex == 2 ? "AES" : "DES";
+
+            /**
+             * Fix bug with auth and priv password
+             * By cleaning usm users
+             */
+            usmUser* actUser = usm_get_userList();
+            while ( actUser != NULL ) {
+                usmUser* dummy = actUser->next;
+                // usm_remove_user( actUser );
+                // usm_free_user( actUser );
+                //
+                usm_set_user_password(
+                    actUser,
+                    "userSetAuthPass",
+                    (char *) authPassword.value.toString().toStdString().c_str() );
+
+                usm_set_user_password(
+                    actUser,
+                    "userSetPrivPass",
+                    (char *) privPassword.value.toString().toStdString().c_str() );
+
+                actUser = dummy;
+            }
+            // usm_create_user_from_session( readSession );
+            usm_create_user();
+
             SNMPpp::openSessionV3(
                 readSession,
                 address.toStdString(),
                 user.value.toString().toStdString(),
-                authPassword.value.toString().toStdString(),
-                privPassword.value.toString().toStdString(),
-                authMethod.model[ authMethod.value.toString() ].toString().toStdString(),
-                authProtocol.model[ authProtocol.value.toString() ].toString().toStdString(),
-                privProtocol.model[ privProtocol.value.toString() ].toString().toStdString()
+                authPassword.value.toString().toStdString().c_str(),
+                privPassword.value.toString().toStdString().c_str(),
+                _authMethod,
+                _authProtocol,
+                _privProtocol,
+                50
             );
 
             writeSession = readSession;
@@ -428,15 +574,17 @@ void SNMPConnection::updateConnection( bool sync )
         if ( sync )
         {
             QEventLoop loop;
-            AsyncSNMP *request = new AsyncSNMP( &readSession, SNMPpp::PDU::kGet );
+            SNMPpp::PDU pdu( SNMPpp::PDU::kGet );
+            pdu.addNullVar( parser.ToOID( "psFWRevision.0" ) );
 
-            QList< SNMPpp::OID > oids;
+            RequestConfig config = {
+                &readSession,
+                pdu
+            };
+            AsyncSNMP *request = new AsyncSNMP( "initSession", config);
 
-            request->setUID( "initSession" );
-            request->setOIDs( { parser.ToOID( "stSNMPVersion.0" ) } );
-
-            connect( request, &AsyncSNMP::rows, this, &SNMPConnection::handleSNMPRequest);
-            connect( request, &AsyncSNMP::rows, this, &SNMPConnection::validateConnection);
+            connect( request, &AsyncSNMP::finished, this, &SNMPConnection::handleSNMPRequest );
+            connect( request, &AsyncSNMP::finished, this, &SNMPConnection::validateConnection);
             connect( request, &AsyncSNMP::finished, &loop, &QEventLoop::quit );
 
             QThread::currentThread()->msleep(3000);
@@ -446,7 +594,7 @@ void SNMPConnection::updateConnection( bool sync )
             return;
         }
 
-        getOIDs( "initSession", { "stSNMPVersion.0" } );
+        getOIDs( "initSession", { "psFWRevision.0" } );
     }
     catch ( const std::exception &e )
     {
@@ -475,6 +623,7 @@ void SNMPConnection::dropConnection( bool sendNotify )
         if ( _currentVersion == SNMP_VERSION )
         {
             SNMPpp::closeSession( readSession );
+            readSession = NULL;
             writeSession = NULL;
             return;
         }

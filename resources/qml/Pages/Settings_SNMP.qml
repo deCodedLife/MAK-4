@@ -31,6 +31,18 @@ Page
         }
 
         SNMP.setMultiple( changes )
+        delayedConnectionCheck.start()
+    }
+
+    Timer
+    {
+        id: delayedConnectionCheck
+        interval: 10000
+        repeat: false
+        running: false
+        onTriggered: {
+            SNMP.getOIDs( "initSession", [ "psFWRevision.0" ] )
+        }
     }
 
     function updateConfig( field, value ) {
@@ -71,6 +83,19 @@ Page
                 configuration[ "stSNMPVersion" ]
             ]
             onFieldUpdated: ( field, value ) => updateConfig( field, value )
+        }
+
+        Text {
+            Layout.maximumWidth: 1200
+            Layout.alignment: Qt.AlignHCenter| Qt.AlignTop
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.topMargin: 10
+            Layout.leftMargin: 10
+            text: "* Длина имени и пароля должна быть от 8 до 10 символов 0-1, a-z, A-z"
+            font.italic: true
+            font.pointSize: Globals.h5
+            color: Globals.grayAccent
         }
 
         RowLayout {

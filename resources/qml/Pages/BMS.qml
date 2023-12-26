@@ -35,7 +35,7 @@ Page
         function onGotRowsContent( root: string, data: object )
         {
             if ( root !== columnOID ) return
-            tablesCount = Object.keys( data[ columnOID ] ).length
+            tablesCount = data[ columnOID ].length
         }
     }
 

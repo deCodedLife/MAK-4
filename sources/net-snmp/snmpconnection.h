@@ -55,6 +55,7 @@ public:
     Q_INVOKABLE void updateConfigs();
     Q_INVOKABLE void sendConfigs();
     Q_INVOKABLE void sendConfigsChangedEvent();
+    Q_INVOKABLE void exportTable( QString file, QList<QString> headers, QList<QString> rows, QString separator );
 
     Q_INVOKABLE QString dateToReadable( QString );
     Q_INVOKABLE QJsonArray getGroup( QString );
@@ -66,11 +67,13 @@ public slots:
     Q_INVOKABLE void dropConnection( bool = true );
     void proceed( AsyncSNMP* );
     void handleSNMPRequest( QString, QMap<SNMPpp::OID, QJsonObject> );
-    void handleSNMPFinished( int );
+    void snmpError( int );
+    void pushNextRequest();
     void validateConnection( QString, QMap<SNMPpp::OID, QJsonObject> );
 
 private:
     void initFields();
+    void PDUAddString( SNMPpp::PDU*, QString key, QJsonObject );
     void parseBulk( variable_list *vars, SNMPpp::OID root, QJsonArray *items );
     QVariant getFieldValue( QString );
 
@@ -81,6 +84,7 @@ private:
     Configs *pConfigs;
     States _state;
     int _currentVersion;
+    int _retryAttempts {0};
     MibParser parser;
 
     bool isBusy;

@@ -59,7 +59,7 @@ Page
             SNMP.setOID( buttonOID, 1 )
             return
         }
-        SNMP.setOID( buttonOID, 2 )
+        SNMP.setOID( buttonOID, 0 )
         state = "stopped"
     }
 
@@ -85,7 +85,7 @@ Page
                 headers: [
                     TableHeaderM { title: "№ Теста"; expand: false },
                     TableHeaderM { title: "Время теста"; expand: false },
-                    TableHeaderM { title: "Результат теста"; expand: false },
+                    TableHeaderM { title: "Результат"; expand: false },
                     TableHeaderM { title: "Длительность\n(мин)"; expand: false },
                     TableHeaderM { title: "Емкость\nАч"; expand: false },
                     TableHeaderM { title: "Конечное\nнапряжение, В"; expand: false },
@@ -103,7 +103,7 @@ Page
                         return `${dateTime[0]}\n${dateTime[1]}`
                     }, "str" ),
                     "psShortTestResult": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.parseErrors, "str" ),
-                    "psShortTestLength": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.secondsToMinutes ),
+                    "psShortTestLength": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.toTime ),
                     "psShortTestCapacity": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByThousand ),
                     "psShortTestFinalVoltage": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByHundred ),
                     "psShortTestGroup1": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.parseErrors, "str" ),

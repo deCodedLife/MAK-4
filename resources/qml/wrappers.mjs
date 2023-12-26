@@ -50,6 +50,11 @@ function escapePrecision( value ) {
     return parseInt( parseFloat( value ).toPrecision(12) )
 }
 
+export function toTime( value )
+{
+    return new Date( value * 1000 ).toISOString().slice( 11, 19 );
+}
+
 export function byHundredZeroOne( value, reverse = false )
 {
     return reverse
@@ -131,7 +136,7 @@ export function parseErrors ( value ) {
     if ( value === "success" ) return "Успешно"
     if ( value === "user-braked" ) return "Остановлено"
     if ( value === "low-current" ) return "Низкое\nнапряжение"
-    if ( value === "go-charge" ) return "Идёт заряд"
+    if ( value === "go-charge" ) return "Заряд"
     if ( value === "battery-off" ) return "Батарея выкл"
     if ( value === "timeout" ) return "Таймаут"
     if ( value === "mesure-error" ) return "Ошибка\nизмерения"
@@ -163,6 +168,11 @@ export function parseErrors ( value ) {
     if ( value === "begin" ) return "Начало"
     if ( value === "happened" ) return "Произошло"
     if ( value === "empty" ) return "Пусто"
+
+    if ( value === "normal" ) return "Норма"
+    if ( value === "under" ) return "Понижена"
+    if ( value === "over" ) return "Повышена"
+    if ( value === "disabled" ) return "Отключен"
 
     return value
 }

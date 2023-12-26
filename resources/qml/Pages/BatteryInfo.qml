@@ -40,7 +40,7 @@ Page
             PropertyChanges {
                 target: root
                 actionButtonIcon: "qrc:/images/icons/start.svg"
-                actionButtonTitle: "Начать ВЗ"
+                actionButtonTitle: "Начать выравнивающий заряд"
             }
         },
         State {
@@ -48,7 +48,7 @@ Page
             PropertyChanges {
                 target: root
                 actionButtonIcon: "qrc:/images/icons/stop.svg"
-                actionButtonTitle: "Закончить ВЗ"
+                actionButtonTitle: "Закончить выравнивающий заряд"
             }
         }
     ]
@@ -59,7 +59,7 @@ Page
             SNMP.setOID( buttonOID, 1 )
             return
         }
-        SNMP.setOID( buttonOID, 2 )
+        SNMP.setOID( buttonOID, 0 )
         state = "stopped"
     }
 
@@ -106,8 +106,8 @@ Page
 
                 rows: {
                     "psGroupNumber": new Wrappers.RowItem(),
-                    "psGroupCurrent": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByThousand ),
                     "psGroupVoltage": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByHundred ),
+                    "psGroupCurrent": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByThousand ),
                     "psGroupFuseStatus": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.parseErrors, "str" ),
                     "psGroupStatus": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.parseErrors, "str" )
                 }
