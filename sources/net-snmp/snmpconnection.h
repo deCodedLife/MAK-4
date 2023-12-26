@@ -73,6 +73,7 @@ public slots:
 
 private:
     void initFields();
+    void PDUAddString( SNMPpp::PDU*, QString key, QJsonObject );
     void parseBulk( variable_list *vars, SNMPpp::OID root, QJsonArray *items );
     QVariant getFieldValue( QString );
 

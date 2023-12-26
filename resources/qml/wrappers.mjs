@@ -169,6 +169,11 @@ export function parseErrors ( value ) {
     if ( value === "happened" ) return "Произошло"
     if ( value === "empty" ) return "Пусто"
 
+    if ( value === "normal" ) return "Норма"
+    if ( value === "under" ) return "Понижена"
+    if ( value === "over" ) return "Повышена"
+    if ( value === "disabled" ) return "Отключен"
+
     return value
 }
 
