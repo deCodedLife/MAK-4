@@ -57,5 +57,8 @@ TextField
     Component.onCompleted: {
         pBackground.fillColor = Globals.backgroundColor
         if ( parent.objectName === "stMonitoringPassword" ) maximumLength = 6
+        if ( parent.objectName.split( "stSNMPAdministrator" ).length > 1 ) maximumLength = 10
+        if ( parent.objectName.split( "stSNMPEngineer" ).length > 1 ) maximumLength = 10
+        if ( parent.objectName.split( "stSNMPOperator" ).length > 1 ) maximumLength = 10
     }
 }

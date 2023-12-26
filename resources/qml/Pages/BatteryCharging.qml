@@ -137,7 +137,7 @@ Page
                 headers: [
                     TableHeaderM { title: "№ разряда"; expand: false },
                     TableHeaderM { title: "Время начала"; expand: false },
-                    TableHeaderM { title: "Результат теста"; expand: false },
+                    TableHeaderM { title: "Результат"; expand: false },
                     TableHeaderM { title: "Длительность\n(мин)"; expand: false },
                     TableHeaderM { title: "Емкость\nАч"; expand: false },
                     TableHeaderM { title: "Конечное\nнапряжение, В"; expand: false },
@@ -155,7 +155,7 @@ Page
                         return `${dateTime[0]}\n${dateTime[1]}`
                     }, "str" ),
                     "psDischargeResult": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.parseErrors, "str" ),
-                    "psDischargeLength": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.secondsToMinutes ),
+                    "psDischargeLength": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.toTime ),
                     "psDischargeCapacity": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByThousand ),
                     "psDischargeFinalVoltage": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.divideByHundred ),
                     "psDischargeGroup1": new Wrappers.RowItem( Wrappers.RowTypes.TEXT, Wrappers.parseErrors, "str" ),

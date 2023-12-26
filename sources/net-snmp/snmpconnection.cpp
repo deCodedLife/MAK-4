@@ -97,6 +97,9 @@ void SNMPConnection::handleSNMPRequest( QString root, QMap<SNMPpp::OID, QJsonObj
         QJsonObject row = rows[ oid ];
 
         row[ "field" ] = oidName;
+        if ( row[ "str" ].toString().split( "No Such Object avilible on this agent" ).length() >= 2 ) {
+            row[ "str" ] = "Недоступно";
+        }
 
         if ( fields.contains( oidName ) )
         {
@@ -145,9 +148,10 @@ void SNMPConnection::validateConnection( QString root, QMap<SNMPpp::OID, QJsonOb
 {
     if ( root == "initSession" )
     {
-        SNMPpp::OID snmpVersionOID = parser.ToOID( "stSNMPVersion.0" );
+        SNMPpp::OID snmpVersionOID = parser.ToOID( "psFWRevision.0" );
         int snmpVersion = rows[ snmpVersionOID ][ "num" ].toInt();
-        if ( snmpVersion != 1 && snmpVersion != 3 ) return;
+        if ( rows[ snmpVersionOID][ "num" ].isNull() ) return;
+        if ( snmpVersion < 400 && snmpVersion > 499 ) return;
     }
 
     if ( _state != Disconnected ) return;
@@ -214,25 +218,39 @@ void SNMPConnection::setMultiple( QJsonObject fields )
         oid_object obj = parser.MIB_OBJECTS[ key ];
         SNMPpp::OID oid( parser.ToOID( key + ".0" ) );
 
+        if ( !fields.contains( key ) ) continue;
+
 
         if ( key == "stSNMPAdministratorName" || key == "stSNMPAdministratorAuthPassword" || key == "stSNMPAdministratorPrivPassword" )
         {
+            PDUAddString( &pdu, "stSNMPAdministratorName", fields );
             PDUAddString( &pdu, "stSNMPAdministratorAuthPassword", fields );
             PDUAddString( &pdu, "stSNMPAdministratorPrivPassword", fields );
+            fields.remove( "stSNMPAdministratorName" );
+            fields.remove( "stSNMPAdministratorAuthPassword" );
+            fields.remove( "stSNMPAdministratorPrivPassword" );
             hasAuthData = true;
         }
 
         if ( key == "stSNMPEngineerName" || key == "stSNMPEngineerAuthPassword" || key == "stSNMPEngineerPrivPassword" )
         {
+            PDUAddString( &pdu, "stSNMPEngineerName", fields );
             PDUAddString( &pdu, "stSNMPEngineerAuthPassword", fields );
             PDUAddString( &pdu, "stSNMPEngineerPrivPassword", fields );
+            fields.remove( "stSNMPEngineerName" );
+            fields.remove( "stSNMPEngineerAuthPassword" );
+            fields.remove( "stSNMPEngineerPrivPassword" );
             hasAuthData = true;
         }
 
         if ( key == "stSNMPOperatorName" || key == "stSNMPOperatorAuthPassword" || key == "stSNMPOperatorPrivPassword" )
         {
+            PDUAddString( &pdu, "stSNMPOperatorName", fields );
             PDUAddString( &pdu, "stSNMPOperatorAuthPassword", fields );
             PDUAddString( &pdu, "stSNMPOperatorPrivPassword", fields );
+            fields.remove( "stSNMPOperatorName" );
+            fields.remove( "stSNMPOperatorAuthPassword" );
+            fields.remove( "stSNMPOperatorPrivPassword" );
             hasAuthData = true;
         }
 
@@ -242,26 +260,29 @@ void SNMPConnection::setMultiple( QJsonObject fields )
             PDUAddString( &pdu, "stSNMPSPrivAlgo", fields );
         }
 
-        switch ( obj.type ) {
-        case TYPE_INTEGER:
-            pdu.addIntegerVar( oid, value.toInt() );
-            break;
-        case TYPE_GAUGE:
-            pdu.addGaugeVar( oid, value.toUInt() );
-            break;
-        case TYPE_NULL:
-            pdu.addNullVar( oid );
-            break;
-        case TYPE_OCTETSTR: case TYPE_NETADDR: case TYPE_IPADDR: case TYPE_NSAPADDRESS:
-            pdu.addOctetStringVar(
-                oid,
-                (unsigned char *) value.toString().toStdString().c_str(),
-                value.toString().toStdString().size() );
-            break;
-        default:
-            if ( value.isNull() ) pdu.addNullVar( oid );
-            else pdu.addIntegerVar( oid, value.toInt() );
-            break;
+        if ( !hasAuthData )
+        {
+            switch ( obj.type ) {
+            case TYPE_INTEGER:
+                pdu.addIntegerVar( oid, value.toInt() );
+                break;
+            case TYPE_GAUGE:
+                pdu.addGaugeVar( oid, value.toUInt() );
+                break;
+            case TYPE_NULL:
+                pdu.addNullVar( oid );
+                break;
+            case TYPE_OCTETSTR: case TYPE_NETADDR: case TYPE_IPADDR: case TYPE_NSAPADDRESS:
+                pdu.addOctetStringVar(
+                    oid,
+                    (unsigned char *) value.toString().toStdString().c_str(),
+                    value.toString().toStdString().size() );
+                break;
+            default:
+                if ( value.isNull() ) pdu.addNullVar( oid );
+                else pdu.addIntegerVar( oid, value.toInt() );
+                break;
+            }
         }
 
         try
@@ -291,7 +312,7 @@ void SNMPConnection::setMultiple( QJsonObject fields )
     emit notify( 0, "Все настройки успешно записаны", 3000 );
     emit settingsChanged();
 
-    getOIDs( "initSession", { "stSNMPVersion.0" } );
+    getOIDs( "initSession", { "psFWRevision.0" } );
 }
 
 void SNMPConnection::updateConfigs()
@@ -534,7 +555,7 @@ void SNMPConnection::updateConnection( bool sync )
         {
             QEventLoop loop;
             SNMPpp::PDU pdu( SNMPpp::PDU::kGet );
-            pdu.addNullVar( parser.ToOID( "stSNMPVersion.0" ) );
+            pdu.addNullVar( parser.ToOID( "psFWRevision.0" ) );
 
             RequestConfig config = {
                 &readSession,
@@ -553,7 +574,7 @@ void SNMPConnection::updateConnection( bool sync )
             return;
         }
 
-        getOIDs( "initSession", { "stSNMPVersion.0" } );
+        getOIDs( "initSession", { "psFWRevision.0" } );
     }
     catch ( const std::exception &e )
     {
