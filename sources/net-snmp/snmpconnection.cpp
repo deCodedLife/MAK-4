@@ -303,7 +303,7 @@ void SNMPConnection::setMultiple( QJsonObject fields )
 
         try
         {
-            // pdu = SNMPpp::set( writeSession, pdu );
+            pdu = SNMPpp::set( writeSession, pdu );
         }
         catch( const std::exception &e )
         {
