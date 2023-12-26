@@ -82,6 +82,7 @@ Rectangle
 
                     id: customItem
                     property var fields: {
+                        1: "CustomText.qml",
                         2: "CustomField.qml",
                         3: "CustomField.qml",
                         4: "CustomDropDown.qml",

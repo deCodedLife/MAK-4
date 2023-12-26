@@ -73,6 +73,19 @@ Page
             onFieldUpdated: ( field, value ) => updateConfig( field, value )
         }
 
+        Text {
+            Layout.maximumWidth: 1200
+            Layout.alignment: Qt.AlignHCenter| Qt.AlignTop
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.topMargin: 10
+            Layout.leftMargin: 10
+            text: "* Длина имени и пароля должна быть от 8 до 10 символов 0-1, a-z, A-z"
+            font.italic: true
+            font.pointSize: Globals.h5
+            color: Globals.grayAccent
+        }
+
         RowLayout {
             Layout.maximumWidth: 1200
             Layout.alignment: Qt.AlignHCenter| Qt.AlignTop
