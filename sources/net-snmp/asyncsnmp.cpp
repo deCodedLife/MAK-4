@@ -116,7 +116,7 @@ bool AsyncRequest( RequestConfig request, std::vector<Reply> *reply )
     /**
      * Free memory
      */
-    if ( !pdu.empty() ) pdu.free();
+    // if ( !pdu.empty() ) pdu.free();
     if ( !request.pdu.empty() ) request.pdu.free();
 
     return true;
@@ -184,7 +184,15 @@ void buffered( const RequestConfig request, int buffIndex, SNMPpp::PDU *pdu )
     *pdu = SNMPpp::PDU( request.pdu.getType() );
 
     int indexStart = buffIndex * request.deviceBuffer;
-    int indexEnd = std::min( ( buffIndex + 1 ) * request.deviceBuffer, (int) pduElements.size() );
+    int indexEnd = (buffIndex + 1) * request.deviceBuffer;
+
+    /**
+     * Windows fix. std::min is redefined
+     */
+    if ( indexEnd > pduElements.size() )
+    {
+        indexEnd = pduElements.size();
+    }
 
     /**
      * Stop condition. If start >= end that means
