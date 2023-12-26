@@ -161,9 +161,9 @@ QJsonObject Configs::Default()
     mainSettings[ "port" ] = Field::ToJSON( { FieldInput, PORT, "Порт" } );
     mainSettings[ "stSNMPAdministratorName" ] = Field::ToJSON( { FieldInput, USER, "Имя" } );
     mainSettings[ "authMethod" ] = Field::ToJSON( { FieldCombobox, AUTH_METHOD, "Уровень", {
-        { "0", "Протокол шифрования none\nПротокол приватности none" },
-        { "1", "Протокол шифрования любой\nПротокол приватности любой" },
-        { "2", "Протокол шифрования любой\nПротокол приватности none" } } } );
+        { "0", "no auth, no priv" },
+        { "1", "auth, no priv" },
+        { "2", "auth and priv" } } } );
     mainSettings[ "stSNMPSAuthAlgo" ] = Field::ToJSON( { FieldCombobox, AUTH_PROTOCOL, "Протокол аутентификации", { { "2", "SHA1" }, { "1", "MD5" } } } );
     mainSettings[ "stSNMPSPrivAlgo" ] = Field::ToJSON( { FieldCombobox, PRIV_PROTOCOL, "Протокол приватноси", { { "1", "DES" }, { "2", "AES" } } } );
     mainSettings[ "stSNMPAdministratorAuthPassword" ] = Field::ToJSON( { FieldPassword, AUTH_PASSWORD, "Пароль аутентификации" } );
@@ -290,7 +290,7 @@ QJsonObject Configs::Default()
     QJsonObject configurationSettings;
     configurationSettings[ "stBatteryGroupsNumber" ] = Field::ToJSON( { FieldCounter, 0, "Количество групп батареи", {}, 0, 4 } );
     configurationSettings[ "stLoadFusesNumber" ] = Field::ToJSON( { FieldCounter, 1, "Количество аппаратов нагрузки", {}, 1, 52 } );
-    configurationSettings[ "stLVDsNumber" ] = Field::ToJSON( { FieldCombobox, "Нет", "Kоличество контакторов", { { "0", "Нет" }, { "1", "Только BLVD" }, { "2", "2-BLVD и LLVD1" }, { "3", "3-BLVD, LLVD1 и LLVD2" } } } );
+    configurationSettings[ "stLVDsNumber" ] = Field::ToJSON( { FieldCombobox, "Нет", "Kоличество контакторов", { { "0", "Нет" }, { "1", "Только BLVD" }, { "2", "BLVD и LLVD1" }, { "3", "BLVD, LLVD1 и LLVD2" } } } );
     configurationSettings[ "stVBVNumber" ] = Field::ToJSON( { FieldCounter, 1, "Kоличество ВБВ", {}, 1, 180 } );
 
 
@@ -316,7 +316,7 @@ QJsonObject Configs::Default()
     errors["102"] = "Идет батарейный тест";
 
     for ( int index = 1; index <= 4; index++ )
-        errors[ QString::number( index + 102) ] = "Отключен аппарат защиты батереи группы " + QString::number( index );
+        errors[ QString::number( index + 102) ] = "Отключен аппарат защиты батареи группы " + QString::number( index );
 
     for ( int index = 1; index <= 4; index++ )
         errors[ QString::number( index + 110) ] = "Авария моноблока группы " + QString::number( index ) + " батареи (с УПКБ)";
@@ -406,10 +406,10 @@ QJsonObject Configs::Default()
         masksList.append( {{ preffix + "BatteryFloat", Field::ToJSON( { FieldCheckbox, 0, "Батарея в режиме содержания" } ) }} );
         masksList.append( {{ preffix + "BatteryEqualize", Field::ToJSON( { FieldCheckbox, 0, "Батарея в режиме выравнивающего заряда" } ) }} );
         masksList.append( {{ preffix + "BatteryTest", Field::ToJSON( { FieldCheckbox, 0, "Идет батарейный тест" } ) }} );
-        masksList.append( {{ preffix + "BatteryFuse1Off", Field::ToJSON( { FieldCheckbox, 0, "Отключен аппарат защиты батереи группы 1" } ) }} );
-        masksList.append( {{ preffix + "BatteryFuse2Off", Field::ToJSON( { FieldCheckbox, 0, "Отключен аппарат защиты батереи группы 2" } ) }} );
-        masksList.append( {{ preffix + "BatteryFuse3Off", Field::ToJSON( { FieldCheckbox, 0, "Отключен аппарат защиты батереи группы 3" } ) }} );
-        masksList.append( {{ preffix + "BatteryFuse4Off", Field::ToJSON( { FieldCheckbox, 0, "Отключен аппарат защиты батереи группы 4" } ) }} );
+        masksList.append( {{ preffix + "BatteryFuse1Off", Field::ToJSON( { FieldCheckbox, 0, "Отключен аппарат защиты батареи группы 1" } ) }} );
+        masksList.append( {{ preffix + "BatteryFuse2Off", Field::ToJSON( { FieldCheckbox, 0, "Отключен аппарат защиты батареи группы 2" } ) }} );
+        masksList.append( {{ preffix + "BatteryFuse3Off", Field::ToJSON( { FieldCheckbox, 0, "Отключен аппарат защиты батареи группы 3" } ) }} );
+        masksList.append( {{ preffix + "BatteryFuse4Off", Field::ToJSON( { FieldCheckbox, 0, "Отключен аппарат защиты батареи группы 4" } ) }} );
         masksList.append( {{ preffix + "BatteryBlockElGr1Alarm", Field::ToJSON( { FieldCheckbox, 0, "Авария моноблока группы 1 батареи (с УПКБ)" } ) }} );
         masksList.append( {{ preffix + "BatteryBlockElGr2Alarm", Field::ToJSON( { FieldCheckbox, 0, "Авария моноблока группы 2 батареи (с УПКБ)" } ) }} );
         masksList.append( {{ preffix + "BatteryBlockElGr3Alarm", Field::ToJSON( { FieldCheckbox, 0, "Авария моноблока группы 3 батареи (с УПКБ)" } ) }} );

@@ -154,7 +154,8 @@ Rectangle
                 id: gridLayout
                 clip: true
 
-                width: contentLayout.width
+                width: parent.width
+                Layout.preferredWidth: parent.width
                 Layout.alignment: Qt.AlignTop
                 Layout.topMargin: header != "" ? 10 : 0
                 Layout.bottomMargin: 20

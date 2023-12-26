@@ -67,7 +67,8 @@ public slots:
     Q_INVOKABLE void dropConnection( bool = true );
     void proceed( AsyncSNMP* );
     void handleSNMPRequest( QString, QMap<SNMPpp::OID, QJsonObject> );
-    void handleSNMPFinished( int );
+    void snmpError( int );
+    void pushNextRequest();
     void validateConnection( QString, QMap<SNMPpp::OID, QJsonObject> );
 
 private:

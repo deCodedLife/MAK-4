@@ -40,7 +40,7 @@ Page
             PropertyChanges {
                 target: root
                 actionButtonIcon: "qrc:/images/icons/start.svg"
-                actionButtonTitle: "Начать ВЗ"
+                actionButtonTitle: "Начать выравнивающий заряд"
             }
         },
         State {
@@ -48,7 +48,7 @@ Page
             PropertyChanges {
                 target: root
                 actionButtonIcon: "qrc:/images/icons/stop.svg"
-                actionButtonTitle: "Закончить ВЗ"
+                actionButtonTitle: "Закончить выравнивающий заряд"
             }
         }
     ]
@@ -59,7 +59,7 @@ Page
             SNMP.setOID( buttonOID, 1 )
             return
         }
-        SNMP.setOID( buttonOID, 2 )
+        SNMP.setOID( buttonOID, 0 )
         state = "stopped"
     }
 

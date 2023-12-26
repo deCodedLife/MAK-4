@@ -59,7 +59,7 @@ Page
             SNMP.setOID( buttonOID, 1 )
             return
         }
-        SNMP.setOID( buttonOID, 2 )
+        SNMP.setOID( buttonOID, 0 )
         state = "stopped"
     }
 
