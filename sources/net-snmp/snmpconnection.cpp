@@ -490,10 +490,23 @@ void SNMPConnection::updateConnection( bool sync )
              */
             usmUser* actUser = usm_get_userList();
             while ( actUser != NULL ) {
-                usmUser* dummy = actUser;
-                usm_remove_user( actUser );
-                actUser = dummy->next;
+                usmUser* dummy = actUser->next;
+                // usm_remove_user( actUser );
+                // usm_free_user( actUser );
+                //
+                usm_set_user_password(
+                    actUser,
+                    "userSetAuthPass",
+                    (char *) authPassword.value.toString().toStdString().c_str() );
+
+                usm_set_user_password(
+                    actUser,
+                    "userSetPrivPass",
+                    (char *) privPassword.value.toString().toStdString().c_str() );
+
+                actUser = dummy;
             }
+            // usm_create_user_from_session( readSession );
             usm_create_user();
 
             SNMPpp::openSessionV3(
