@@ -84,6 +84,7 @@ private:
     Configs *pConfigs;
     States _state;
     int _currentVersion;
+    int _retryAttempts {0};
     MibParser parser;
 
     bool isBusy;
