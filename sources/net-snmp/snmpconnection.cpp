@@ -150,12 +150,21 @@ void SNMPConnection::validateConnection( QString root, QMap<SNMPpp::OID, QJsonOb
     {
         SNMPpp::OID snmpVersionOID = parser.ToOID( "psFWRevision.0" );
         int snmpVersion = rows[ snmpVersionOID ][ "num" ].toInt();
-        if ( rows[ snmpVersionOID][ "num" ].isNull() ) return;
+        if ( rows[ snmpVersionOID][ "num" ].isNull() )
+        {
+            if ( _retryAttempts <= 5 )
+            {
+                _retryAttempts++;
+                getOIDs( "initSession", { "psFWRevision.0" } );
+            }
+            return;
+        }
         if ( snmpVersion < 400 && snmpVersion > 499 ) return;
     }
 
     if ( _state != Disconnected ) return;
 
+    _retryAttempts = 0;
     emit notify( 0, "Подключено", 3000 );
     _state = Connected;
     emit stateChanged( _state );
@@ -203,8 +212,9 @@ void SNMPConnection::PDUAddString( SNMPpp::PDU *pdu, QString key, QJsonObject fi
 
 void SNMPConnection::setMultiple( QJsonObject fields )
 {
+    QJsonObject _fields = fields;
     QJsonObject settings = pConfigs->get();
-    QJsonObject connectionsSettings = settings[ "main" ].toObject();
+    QJsonObject connectionsSettings = settings[ "snmp" ].toObject();
     bool snmpSettings = false;
 
     for( QString key : fields.keys() )
@@ -218,7 +228,8 @@ void SNMPConnection::setMultiple( QJsonObject fields )
         oid_object obj = parser.MIB_OBJECTS[ key ];
         SNMPpp::OID oid( parser.ToOID( key + ".0" ) );
 
-        if ( !fields.contains( key ) ) continue;
+        if ( !_fields.contains( key ) )
+            continue;
 
         if ( connectionsSettings.contains( key ) )
         {
@@ -231,9 +242,9 @@ void SNMPConnection::setMultiple( QJsonObject fields )
             PDUAddString( &pdu, "stSNMPAdministratorName", fields );
             PDUAddString( &pdu, "stSNMPAdministratorAuthPassword", fields );
             PDUAddString( &pdu, "stSNMPAdministratorPrivPassword", fields );
-            fields.remove( "stSNMPAdministratorName" );
-            fields.remove( "stSNMPAdministratorAuthPassword" );
-            fields.remove( "stSNMPAdministratorPrivPassword" );
+            _fields.remove( "stSNMPAdministratorName" );
+            _fields.remove( "stSNMPAdministratorAuthPassword" );
+            _fields.remove( "stSNMPAdministratorPrivPassword" );
             hasAuthData = true;
         }
 
@@ -242,9 +253,9 @@ void SNMPConnection::setMultiple( QJsonObject fields )
             PDUAddString( &pdu, "stSNMPEngineerName", fields );
             PDUAddString( &pdu, "stSNMPEngineerAuthPassword", fields );
             PDUAddString( &pdu, "stSNMPEngineerPrivPassword", fields );
-            fields.remove( "stSNMPEngineerName" );
-            fields.remove( "stSNMPEngineerAuthPassword" );
-            fields.remove( "stSNMPEngineerPrivPassword" );
+            _fields.remove( "stSNMPEngineerName" );
+            _fields.remove( "stSNMPEngineerAuthPassword" );
+            _fields.remove( "stSNMPEngineerPrivPassword" );
             hasAuthData = true;
         }
 
@@ -253,9 +264,9 @@ void SNMPConnection::setMultiple( QJsonObject fields )
             PDUAddString( &pdu, "stSNMPOperatorName", fields );
             PDUAddString( &pdu, "stSNMPOperatorAuthPassword", fields );
             PDUAddString( &pdu, "stSNMPOperatorPrivPassword", fields );
-            fields.remove( "stSNMPOperatorName" );
-            fields.remove( "stSNMPOperatorAuthPassword" );
-            fields.remove( "stSNMPOperatorPrivPassword" );
+            _fields.remove( "stSNMPOperatorName" );
+            _fields.remove( "stSNMPOperatorAuthPassword" );
+            _fields.remove( "stSNMPOperatorPrivPassword" );
             hasAuthData = true;
         }
 
@@ -292,7 +303,7 @@ void SNMPConnection::setMultiple( QJsonObject fields )
 
         try
         {
-            pdu = SNMPpp::set( writeSession, pdu );
+            // pdu = SNMPpp::set( writeSession, pdu );
         }
         catch( const std::exception &e )
         {
@@ -546,7 +557,8 @@ void SNMPConnection::updateConnection( bool sync )
                 privPassword.value.toString().toStdString().c_str(),
                 _authMethod,
                 _authProtocol,
-                _privProtocol
+                _privProtocol,
+                50
             );
 
             writeSession = readSession;

@@ -37,10 +37,12 @@ Page
     Timer
     {
         id: delayedConnectionCheck
-        interval: 5000
+        interval: 10000
         repeat: false
         running: false
-        onTriggered: SNMP.getOIDs( "initSession", [ "psFWRevision.0" ] )
+        onTriggered: {
+            SNMP.getOIDs( "initSession", [ "psFWRevision.0" ] )
+        }
     }
 
     function updateConfig( field, value ) {
