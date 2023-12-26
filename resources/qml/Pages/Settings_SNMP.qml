@@ -31,6 +31,16 @@ Page
         }
 
         SNMP.setMultiple( changes )
+        delayedConnectionCheck.start()
+    }
+
+    Timer
+    {
+        id: delayedConnectionCheck
+        interval: 5000
+        repeat: false
+        running: false
+        onTriggered: SNMP.getOIDs( "initSession", [ "psFWRevision.0" ] )
     }
 
     function updateConfig( field, value ) {

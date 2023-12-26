@@ -205,7 +205,7 @@ void SNMPConnection::setMultiple( QJsonObject fields )
 {
     QJsonObject settings = pConfigs->get();
     QJsonObject connectionsSettings = settings[ "main" ].toObject();
-
+    bool snmpSettings = false;
 
     for( QString key : fields.keys() )
     {
@@ -219,6 +219,11 @@ void SNMPConnection::setMultiple( QJsonObject fields )
         SNMPpp::OID oid( parser.ToOID( key + ".0" ) );
 
         if ( !fields.contains( key ) ) continue;
+
+        if ( connectionsSettings.contains( key ) )
+        {
+            snmpSettings = true;
+        }
 
 
         if ( key == "stSNMPAdministratorName" || key == "stSNMPAdministratorAuthPassword" || key == "stSNMPAdministratorPrivPassword" )
@@ -312,7 +317,10 @@ void SNMPConnection::setMultiple( QJsonObject fields )
     emit notify( 0, "Все настройки успешно записаны", 3000 );
     emit settingsChanged();
 
-    getOIDs( "initSession", { "psFWRevision.0" } );
+    if( !snmpSettings )
+    {
+        getOIDs( "initSession", { "psFWRevision.0" } );
+    }
 }
 
 void SNMPConnection::updateConfigs()
