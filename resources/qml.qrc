@@ -90,5 +90,9 @@
         <file>qml/Components/Notifications.qml</file>
         <file>qml/Components/CustomCheckbox.qml</file>
         <file>qml/Components/JournalTable.qml</file>
+        <file>qml/Pages/Settings_TestsAB.qml</file>
+        <file>qml/Components/CustomDateTime.qml</file>
+        <file>images/icons/go_back.svg</file>
+        <file>images/icons/go_forward.svg</file>
     </qresource>
 </RCC>

@@ -115,6 +115,10 @@ export function getFieldValue( field, value ) {
     // else return parseFloat( value ).toFixed(1)
 }
 
+export function windowsEncoding( text ) {
+    return Wraper.windowsStringParser( text )
+}
+
 export function parseErrors ( value ) {
     value = value.split( "(" )[0]
 

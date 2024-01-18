@@ -11,6 +11,8 @@ import "Components"
 
 ApplicationWindow
 {
+    id: root
+
     width: 1024
     height: 860
 
@@ -80,4 +82,6 @@ ApplicationWindow
             Layout.alignment: Qt.AlignRight | Qt.AlignBottom
         }
     }
+
+    Component.onCompleted: Globals.rootObject = pageLoader
 }
