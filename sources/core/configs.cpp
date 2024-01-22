@@ -221,7 +221,7 @@ QJsonObject Configs::Default()
      * @brief overallSettings
      */
     QJsonObject overallSettings;
-    overallSettings[ "psTimeZone" ] = Field::ToJSON( { FieldCounter, 12, "Время", {}, -48, 52 } );
+    overallSettings[ "psTimeZone" ] = Field::ToJSON( { FieldDateTime, 0, "Часовой пояс", {} } );
     overallSettings[ "psBuzzerEnable" ] = Field::ToJSON( { FieldSwitch, 0, "Звук включен" } );
 
     /**
@@ -273,13 +273,13 @@ QJsonObject Configs::Default()
      */
     QJsonObject testsAB;
     testsAB[ "stEndTestVoltage" ] = Field::ToJSON( { FieldCounter, 0, "Напряжение окончания теста, В", {}, 0 } );
-    testsAB[ "stFixedLoadCurEnable" ] = Field::ToJSON( { FieldSwitch, 0, "Поддерживать заданный тока разряда", {}, 0 } );
+    testsAB[ "stFixedLoadCurEnable" ] = Field::ToJSON( { FieldSwitch, 0, "Поддерживать заданный ток разряда", {}, 0 } );
     testsAB[ "stFixedLoadCur" ] = Field::ToJSON( { FieldCounter, 5, "Ток разряда, А", {}, 5, 5000 } );
-    testsAB[ "stDischCur" ] = Field::ToJSON( { FieldCounter, 0, "Минимально допустимый ток разряда, % от C10", {}, 0, 5 } );
+    testsAB[ "stDischCur" ] = Field::ToJSON( { FieldCounter, 0, "Минимально допустимый ток разряда, %С₁₀", {}, 0, 100 } );
 
     testsAB[ "stPeriodTestEnable" ] = Field::ToJSON( { FieldSwitch, 0, "Запускать переодично", {}, 0 } );
     testsAB[ "stTestPeriod" ] = Field::ToJSON( { FieldCounter, 0, "Период теста, месяцев", {}, 0 } );
-    testsAB[ "stTestStartTime" ] = Field::ToJSON( { FieldDateTime, "01012001000000", "Начать первый тест", {}, 0 } ); // x2
+    testsAB[ "stTestStartTime" ] = Field::ToJSON( { FieldDateTime, "01012001000000", "Начать первый тест", {}, 0 } );
 
     testsAB[ "stShortTestVoltage" ] = Field::ToJSON( { FieldCounter, 0, "Напряжение короткого теста, В", {}, 0 } );
     testsAB[ "stShortTestTimer" ] = Field::ToJSON( { FieldCounter, 0, "Длительность короткого теста, мин", {}, 0 } );

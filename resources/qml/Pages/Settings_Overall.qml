@@ -67,7 +67,7 @@ Page
                 onFieldUpdated: ( field, value ) => updateConfig( field, value )
             }
 
-            Item{}
+            Item{ Layout.fillWidth: true }
         }
     }
 }

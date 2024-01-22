@@ -100,6 +100,7 @@ Item
             horizontalAlignment: Text.AlignLeft
 
             text: control.text
+            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             color: Globals.textColor
 
             font.bold: true

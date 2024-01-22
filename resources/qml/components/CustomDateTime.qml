@@ -9,6 +9,7 @@ Item
 {
     id: root
 
+    property string placeholder: parent.placeholder ?? ""
     property date content: {
         if ( !parent.value ) return new Date( Date.now() )
 
@@ -21,6 +22,7 @@ Item
         parsedDate.setHours( parseInt( splited.slice( 8, 10 ).join('') ) )
         parsedDate.setMinutes( parseInt( splited.slice( 10, 12 ).join('') ) )
         parsedDate.setSeconds( parseInt( splited.slice( 12, 14 ).join('') ) )
+
 
         return parsedDate
     }
@@ -70,12 +72,28 @@ Item
             color: Material.textFieldFilledContainerColor
             radius: 5
 
-            Text {
+            ColumnLayout {
                 anchors.fill: parent
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                font.pointSize: Globals.h5
-                text: `${day}-${month}-${year}`
+                anchors.margins: 10
+                spacing: 5
+
+                Text {
+                    id: placeholderText
+                    Layout.fillWidth: true
+                    wrapMode: Text.WordWrap
+                    enabled: placeholder !== ""
+                    visible: placeholder !== ""
+                    text: placeholder
+                    font.pointSize: Globals.h6 - 1
+                }
+
+                Text {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.alignment: Qt.AlignVCenter
+                    font.pointSize: Globals.h5
+                    text: `${day}-${month}-${year}`
+                }
             }
 
             MouseArea {
@@ -407,7 +425,7 @@ Item
     Popup {
         id: timePopup
 
-        width: 340
+        width: 350
         height: timeWrapper.implicitHeight + 20
         closePolicy: Popup.CloseOnPressOutside
 
@@ -422,7 +440,7 @@ Item
             ColumnLayout {
                 id: timeWrapper
                 anchors.fill: parent
-                anchors.margins: 15
+                anchors.margins: 5
 
                 RowLayout {
                     Layout.fillWidth: true
@@ -431,10 +449,11 @@ Item
                     Layout.rightMargin: 10
 
                     TextField {
+                        Layout.fillWidth: true
                         id: firstTime
                         placeholderText: "Часы"
                         text: hours
-                        validator: IntValidator { bottom: 0; top: 12 }
+                        validator: IntValidator { bottom: 0; top: 24 }
                         color: acceptableInput ? Globals.grayAccent : Globals.errorColor
                         implicitWidth: 74
                         horizontalAlignment: TextField.AlignHCenter
@@ -445,9 +464,7 @@ Item
                         }
                         Component.onCompleted: {
                             value = parseInt( text )
-                            if ( value > 12 ) timeStatePicker.timeState = "pm"
-                            let textValue = value > 12 ? value - 12 : value
-                            text = textValue < 10 ? `0${textValue}` : textValue
+                            text = value < 10 ? `0${value}` : value
                         }
                     }
 
@@ -457,8 +474,9 @@ Item
                     }
 
                     TextField {
+                        Layout.fillWidth: true
                         id: secondTime
-                        placeholderText: "Мин"
+                        placeholderText: "Минуты"
                         text: minutes
                         validator: IntValidator { bottom: 0; top: 60 }
                         color: acceptableInput ? Globals.grayAccent : Globals.errorColor
@@ -478,9 +496,10 @@ Item
                     }
 
                     TextField {
+                        Layout.fillWidth: true
                         id: thirdTime
                         text: seconds
-                        placeholderText: "Сек"
+                        placeholderText: "Секунды"
                         validator: IntValidator { bottom: 0; top: 60 }
                         color: acceptableInput ? Globals.grayAccent : Globals.errorColor
                         implicitWidth: 74
@@ -491,60 +510,6 @@ Item
                             value = parseInt( text )
                         }
                         Component.onCompleted: value = parseInt( text )
-                    }
-
-                    Rectangle {
-                        id: timeStatePicker
-                        Layout.preferredHeight: firstTime.height
-                        Layout.preferredWidth: 32
-                        radius: 5
-                        clip: true
-
-                        property string timeState: "am"
-
-                        ColumnLayout {
-                            anchors.fill: parent
-                            spacing: 5
-
-                            Rectangle {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                radius: 5
-                                color: timeStatePicker.timeState === "am" ? Material.accentColor : Globals.grayScale
-                                Text {
-                                    anchors.fill: parent
-                                    horizontalAlignment: Text.AlignHCenter
-                                    verticalAlignment: Text.AlignVCenter
-                                    text: "AM"
-                                    color: timeStatePicker.timeState === "am" ? "white" : Globals.grayAccent
-                                }
-                                MouseArea {
-                                    anchors.fill: parent
-                                    onClicked: timeStatePicker.timeState = "am"
-                                }
-                            }
-
-                            Rectangle {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                radius: 5
-                                color: timeStatePicker.timeState === "pm" ? Material.accentColor : Globals.grayScale
-                                Text {
-                                    anchors.fill: parent
-                                    horizontalAlignment: Text.AlignHCenter
-                                    verticalAlignment: Text.AlignVCenter
-                                    text: "PM"
-                                    color: timeStatePicker.timeState === "pm" ? "white" : Globals.grayAccent
-                                }
-                                MouseArea {
-                                    anchors.fill: parent
-                                    onClicked: timeStatePicker.timeState = "pm"
-                                }
-                            }
-                        }
-
-
-
                     }
                 }
 
@@ -562,11 +527,7 @@ Item
                         text: "Ok"
                         flat: true
                         onClicked: {
-                            let hours = firstTime.value
-                            if ( timeStatePicker.timeState === "pm" )
-                                hours = hours + 12
-
-                            content.setHours( hours )
+                            content.setHours( firstTime.value )
                             content.setMinutes( secondTime.value )
                             content.setSeconds( thirdTime.value )
 

@@ -57,7 +57,7 @@ Page
                     configuration[ "updateDelay" ],
                 ]
                 buttons: [
-                    { highlited: true, color: Globals.accentColor, text: "Соединить", callback: () => { SNMP.updateConnection() } },
+                    { highlited: true, color: Globals.accentColor, text: "Соединить", callback: () => { SNMP.updateConnection(); SNMP.getOIDs( "test", [ "psBatterySummCurrent" ] ) } },
                     { highlited: true, color: Globals.errorColor, text: "Отключить", callback: () => { SNMP.dropConnection() } }
                 ]
                 onFieldUpdated: ( field, value ) => updateConfigs( field, value )

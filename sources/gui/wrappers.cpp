@@ -172,6 +172,7 @@ Wrappers::Wrappers(QObject *parent)
 QString Wrappers::windowsStringParser( QString input )
 {
     // Get HEX values
+    int keysCount = 0;
     QList<QString> keys = input.split( " " );
 
     QString outputText = "";
@@ -182,7 +183,10 @@ QString Wrappers::windowsStringParser( QString input )
     {
         if ( !winCodec.contains( key ) ) continue;
         stream << winCodec[ key ];
+        keysCount++;
     }
+
+    if ( keysCount == 0 ) return input;
 
     return outputText;
 }
