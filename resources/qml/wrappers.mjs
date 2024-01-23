@@ -148,7 +148,7 @@ export function parseErrors ( value ) {
 
     if ( value === "discharge" ) return "Разряжается"
     if ( value === "charge" ) return "Заряжается"
-    if ( value === "floating" ) return "Плавает"
+    if ( value === "floating" ) return "Содержание"
     if ( value === "fast-charge" ) return "Быстрая зарядка"
     if ( value === "equalizing-charge" ) return "Зарядка эквалайзер"
     if ( value === "low" ) return "Низкий заряд"

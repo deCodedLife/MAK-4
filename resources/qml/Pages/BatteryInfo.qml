@@ -84,11 +84,11 @@ Page
 
                 headers: [
                     TableHeaderM {
-                        title: "Название"
+                        title: "Ток, А"
                         expand: true
                     },
                     TableHeaderM {
-                        title: "Значение"
+                        title: "Состояние"
                         expand: false
                     }
                 ]
