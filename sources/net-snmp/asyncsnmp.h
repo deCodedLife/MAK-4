@@ -2,6 +2,7 @@
 
 #include <tobject.h>
 #include <QRunnable>
+//#include <string>
 
 #include <SNMPpp/PDU.hpp>
 #include <SNMPpp/Get.hpp>
@@ -37,6 +38,7 @@ typedef struct
 } Reply;
 
 
+
 /**
  * SNMP requests functions
  */
@@ -47,6 +49,7 @@ bool AsyncSet( RequestConfig request );
 bool AsyncGet( RequestConfig request, std::vector<Reply> *reply );
 bool AsyncGetBulk( RequestConfig request, std::vector<Reply> *reply );
 bool AsyncRequest( RequestConfig request, std::vector<Reply> *reply );
+void ParseCodec( const std::string data, QString *buff );
 
 
 /**

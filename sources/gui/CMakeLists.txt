@@ -4,7 +4,6 @@ LIST ( SORT GUI_SOURCES )
 add_library(
     GUI STATIC
     ${GUI_SOURCES}
-    wrappers.h wrappers.cpp
 )
 
 target_link_libraries(

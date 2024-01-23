@@ -80,10 +80,17 @@ Page
 
             FieldsTable {
                 Layout.alignment: Qt.AlignTop
+                activeColumns: 2
 
                 headers: [
-                    TableHeaderM { title: "Суммарный ток батареи, А"; expand: true },
-                    TableHeaderM { title: "Состояние батареи"; expand: true }
+                    TableHeaderM {
+                        title: "Название"
+                        expand: true
+                    },
+                    TableHeaderM {
+                        title: "Значение"
+                        expand: false
+                    }
                 ]
 
                 fields: [

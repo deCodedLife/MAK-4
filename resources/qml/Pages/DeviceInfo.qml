@@ -49,7 +49,7 @@ Page
                 new Wrappers.ContentItem( null, "Время" ),
 
                 new Wrappers.ContentItem( "psSerial", "", Wrappers.RowTypes.TEXT, "str" ),
-                new Wrappers.ContentItem( "psDescription", "", Wrappers.RowTypes.TEXT, "str", (text) => Wrapper.windowsStringParser( text ) ),
+                new Wrappers.ContentItem( "psDescription", "", Wrappers.RowTypes.TEXT, "str" ),
                 new Wrappers.ContentItem( "psFWRevision", "", Wrappers.RowTypes.TEXT, "num", Wrappers.parseVersion ),
                 new Wrappers.ContentItem( "psTime", "", Wrappers.RowTypes.TEXT, "str", (value) =>
                 {

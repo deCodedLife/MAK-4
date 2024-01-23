@@ -27,6 +27,57 @@ ApplicationWindow
     Material.accent: Material.Blue
     Material.containerStyle: Material.Filled
 
+    Connections {
+        target: SNMP
+
+        function onStartUpdate() {
+            writeModal.open()
+        }
+
+        function onFinishUpdate() {
+            writeModal.close()
+        }
+    }
+
+    Popup {
+        id: writeModal
+        modal: true
+        width: 400
+        height: 200
+        anchors.centerIn: parent
+
+        closePolicy: Popup.NoAutoClose
+        contentItem: Rectangle {
+            radius: 10
+
+            anchors.fill: parent
+            anchors.margins: 10
+            color: "white"
+
+            ColumnLayout {
+                anchors.fill: parent
+                spacing: 10
+
+                Text {
+                    Layout.fillWidth: true
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    text: "Запись данных"
+                    font.pointSize: Globals.h3
+                }
+
+                Text {
+                    Layout.fillWidth: true
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    text: "Дождитесь конца записи данных на контроллер"
+                    font.pointSize: Globals.h5
+                    color: Globals.grayAccent
+                }
+
+                Item{ Layout.fillHeight: true }
+            }
+        }
+    }
+
     FileDialog {
         id: fileDialog
         nameFilters: ["MAK-4 settings files (*.m4ss)"]

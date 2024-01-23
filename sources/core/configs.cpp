@@ -221,7 +221,8 @@ QJsonObject Configs::Default()
      * @brief overallSettings
      */
     QJsonObject overallSettings;
-    overallSettings[ "psTimeZone" ] = Field::ToJSON( { FieldDateTime, 0, "Часовой пояс", {} } );
+    overallSettings[ "psTimeZone" ] = Field::ToJSON( { FieldCounter, 12, "Часовой пояс", {}, -48, 52 } );
+    overallSettings[ "psTime" ] = Field::ToJSON( { FieldDateTime, 0, "Дата и время", {} } );
     overallSettings[ "psBuzzerEnable" ] = Field::ToJSON( { FieldSwitch, 0, "Звук включен" } );
 
     /**

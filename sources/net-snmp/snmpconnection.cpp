@@ -159,7 +159,7 @@ void SNMPConnection::validateConnection( QString root, QMap<SNMPpp::OID, QJsonOb
             }
             return;
         }
-        if ( snmpVersion < 400 && snmpVersion > 499 ) return;
+        if ( snmpVersion < 400 || snmpVersion > 499 ) return;
     }
 
     if ( _state != Disconnected ) return;
@@ -212,10 +212,14 @@ void SNMPConnection::PDUAddString( SNMPpp::PDU *pdu, QString key, QJsonObject fi
 
 void SNMPConnection::setMultiple( QJsonObject fields )
 {
+    emit startUpdate();
+
     QJsonObject _fields = fields;
     QJsonObject settings = pConfigs->get();
     QJsonObject connectionsSettings = settings[ "snmp" ].toObject();
     bool snmpSettings = false;
+
+    if ( writeSession == NULL ) return;
 
     for( QString key : fields.keys() )
     {
@@ -319,6 +323,7 @@ void SNMPConnection::setMultiple( QJsonObject fields )
             }
 
             emit notify(-1, "Не удалось записать объект " + objectName, 3000 );
+            emit finishUpdate();
             return;
         }
 
@@ -332,6 +337,8 @@ void SNMPConnection::setMultiple( QJsonObject fields )
     {
         getOIDs( "initSession", { "psFWRevision.0" } );
     }
+
+    emit finishUpdate();
 }
 
 void SNMPConnection::updateConfigs()
