@@ -146,6 +146,7 @@ void SNMPConnection::snmpError( int code )
 
 void SNMPConnection::validateConnection( QString root, QMap<SNMPpp::OID, QJsonObject> rows )
 {
+    if ( rows.empty() ) return;
     if ( root == "initSession" )
     {
         SNMPpp::OID snmpVersionOID = parser.ToOID( "psFWRevision.0" );
@@ -538,6 +539,7 @@ void SNMPConnection::updateConnection( bool sync )
             usmUser* actUser = usm_get_userList();
             while ( actUser != NULL ) {
                 usmUser* dummy = actUser->next;
+                // if ( !dummy ) break;
                 // usm_remove_user( actUser );
                 // usm_free_user( actUser );
                 //
@@ -554,7 +556,8 @@ void SNMPConnection::updateConnection( bool sync )
                 actUser = dummy;
             }
             // usm_create_user_from_session( readSession );
-            usm_create_user();
+            if ( usm_get_userList() == NULL )
+                usm_create_user();
 
             SNMPpp::openSessionV3(
                 readSession,
