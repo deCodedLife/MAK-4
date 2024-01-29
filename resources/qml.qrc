@@ -95,4 +95,7 @@
         <file>images/icons/go_back.svg</file>
         <file>images/icons/go_forward.svg</file>
     </qresource>
+    <qresource prefix="/mibs">
+        <file>default.mib</file>
+    </qresource>
 </RCC>
