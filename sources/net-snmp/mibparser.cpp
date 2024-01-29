@@ -59,9 +59,9 @@ MibParser::MibParser(QString file_path, QObject *parent)
     root = SNMPpp::OID( "1.3.6.1.4.1.36032" );
     std::string mib_path = QDir::currentPath().toStdString() + "/mibs";
 
-    add_mibdir( mib_path.c_str() );
-    snmp_set_save_descriptions(1);
-    netsnmp_set_mib_directory( mib_path.c_str() );
+    // add_mibdir( mib_path.c_str() );
+    // snmp_set_save_descriptions(1);
+    // netsnmp_set_mib_directory( mib_path.c_str() );
 
     netsnmp_init_mib();
     netsnmp_init_mib_internals();
