@@ -95,7 +95,73 @@
         <file>images/icons/go_back.svg</file>
         <file>images/icons/go_forward.svg</file>
     </qresource>
-    <qresource prefix="/mibs">
-        <file>default.mib</file>
+    <qresource prefix="/snmp">
+        <file>mibs/.DS_Store</file>
+        <file>mibs/AGENTX-MIB.txt</file>
+        <file>mibs/BRIDGE-MIB.txt</file>
+        <file>mibs/default.mib</file>
+        <file>mibs/DISMAN-EVENT-MIB.txt</file>
+        <file>mibs/DISMAN-SCHEDULE-MIB.txt</file>
+        <file>mibs/DISMAN-SCRIPT-MIB.txt</file>
+        <file>mibs/EtherLike-MIB.txt</file>
+        <file>mibs/HCNUM-TC.txt</file>
+        <file>mibs/HOST-RESOURCES-MIB.txt</file>
+        <file>mibs/HOST-RESOURCES-TYPES.txt</file>
+        <file>mibs/IANA-ADDRESS-FAMILY-NUMBERS-MIB.txt</file>
+        <file>mibs/IANAifType-MIB.txt</file>
+        <file>mibs/IANA-LANGUAGE-MIB.txt</file>
+        <file>mibs/IANA-RTPROTO-MIB.txt</file>
+        <file>mibs/IF-INVERTED-STACK-MIB.txt</file>
+        <file>mibs/IF-MIB.txt</file>
+        <file>mibs/INET-ADDRESS-MIB.txt</file>
+        <file>mibs/IP-FORWARD-MIB.txt</file>
+        <file>mibs/IP-MIB.txt</file>
+        <file>mibs/IPV6-FLOW-LABEL-MIB.txt</file>
+        <file>mibs/IPV6-ICMP-MIB.txt</file>
+        <file>mibs/IPV6-MIB.txt</file>
+        <file>mibs/IPV6-TC.txt</file>
+        <file>mibs/IPV6-TCP-MIB.txt</file>
+        <file>mibs/IPV6-UDP-MIB.txt</file>
+        <file>mibs/NET-SNMP-AGENT-MIB.txt</file>
+        <file>mibs/NET-SNMP-EXAMPLES-MIB.txt</file>
+        <file>mibs/NET-SNMP-EXTEND-MIB.txt</file>
+        <file>mibs/NET-SNMP-MIB.txt</file>
+        <file>mibs/NET-SNMP-PASS-MIB.txt</file>
+        <file>mibs/NET-SNMP-TC.txt</file>
+        <file>mibs/NET-SNMP-VACM-MIB.txt</file>
+        <file>mibs/NOTIFICATION-LOG-MIB.txt</file>
+        <file>mibs/RFC1155-SMI.txt</file>
+        <file>mibs/RFC1213-MIB.txt</file>
+        <file>mibs/RFC-1215.txt</file>
+        <file>mibs/RMON-MIB.txt</file>
+        <file>mibs/SCTP-MIB.txt</file>
+        <file>mibs/SMUX-MIB.txt</file>
+        <file>mibs/SNMP-COMMUNITY-MIB.txt</file>
+        <file>mibs/SNMP-FRAMEWORK-MIB.txt</file>
+        <file>mibs/SNMP-MPD-MIB.txt</file>
+        <file>mibs/SNMP-NOTIFICATION-MIB.txt</file>
+        <file>mibs/SNMP-PROXY-MIB.txt</file>
+        <file>mibs/SNMP-TARGET-MIB.txt</file>
+        <file>mibs/SNMP-TLS-TM-MIB.txt</file>
+        <file>mibs/SNMP-TSM-MIB.txt</file>
+        <file>mibs/SNMP-USER-BASED-SM-MIB.txt</file>
+        <file>mibs/SNMP-USM-AES-MIB.txt</file>
+        <file>mibs/SNMP-USM-DH-OBJECTS-MIB.txt</file>
+        <file>mibs/SNMP-USM-HMAC-SHA2-MIB.txt</file>
+        <file>mibs/SNMPv2-CONF.txt</file>
+        <file>mibs/SNMPv2-MIB.txt</file>
+        <file>mibs/SNMPv2-SMI.txt</file>
+        <file>mibs/SNMPv2-TC.txt</file>
+        <file>mibs/SNMPv2-TM.txt</file>
+        <file>mibs/SNMP-VIEW-BASED-ACM-MIB.txt</file>
+        <file>mibs/TCP-MIB.txt</file>
+        <file>mibs/TRANSPORT-ADDRESS-MIB.txt</file>
+        <file>mibs/TUNNEL-MIB.txt</file>
+        <file>mibs/UCD-DEMO-MIB.txt</file>
+        <file>mibs/UCD-DISKIO-MIB.txt</file>
+        <file>mibs/UCD-DLMOD-MIB.txt</file>
+        <file>mibs/UCD-IPFWACC-MIB.txt</file>
+        <file>mibs/UCD-SNMP-MIB.txt</file>
+        <file>mibs/UDP-MIB.txt</file>
     </qresource>
 </RCC>

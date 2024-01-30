@@ -61,6 +61,7 @@ if ( APPLE )
 else ( WIN32 )
 
     set_target_properties( MAK-4 PROPERTIES WIN32_EXECUTABLE TRUE )
+    set_target_properties( MAK-4 PROPERTIES LINK_FLAGS "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\" /SUBSYSTEM:WINDOWS" )
 
 endif()
 

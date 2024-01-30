@@ -7,6 +7,9 @@
 #include <QDir>
 #include <QFile>
 #include <QMap>
+#include <QFileInfo>
+#include <QResource>
+#include <QDirIterator>
 #include <QJsonArray>
 #include <QStringBuilder>
 #include <SNMPpp/Varlist.hpp>
