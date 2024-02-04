@@ -18,7 +18,7 @@ Page
     onActionButtonTriggered: SNMP.setMultiple( configuration )
 
     function updateConfig( field, value ) {
-        if ( field === "psTime" ) return
+        // if ( field === "psTime" ) return
         let newConfig = ConfigManager.current
         configuration[ field ][ "value" ] = Wrappers.getFieldValue( configuration[ field ], value )
         newConfig[ "overall" ] = configuration
