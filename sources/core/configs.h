@@ -4,7 +4,7 @@
 
 // 0 - SNMP 2, 1 - SNMP3
 #define SNMP_VERSION 3
-#define HOST "185.51.21.124"//185.51.21.124
+#define HOST "192.168.0.250"
 #define PORT "161"
 #define USER "user000001"
 #define AUTH_METHOD 2
