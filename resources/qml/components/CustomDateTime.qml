@@ -10,8 +10,10 @@ Item
     id: root
 
     property string placeholder: parent.placeholder ?? ""
-    property date content: {
-        if ( !parent.value ) return new Date( Date.now() )
+    property date content
+
+    Component.onCompleted: {
+        if ( !parent.value ) content = new Date( Date.now() )
 
         let parsedDate = new Date()
         let splited = parent.value.split('')
@@ -24,7 +26,7 @@ Item
         parsedDate.setSeconds( parseInt( splited.slice( 12, 14 ).join('') ) )
 
 
-        return parsedDate
+        content = parsedDate
     }
 
     property string day: {
@@ -383,7 +385,10 @@ Item
 
                                 onClicked: (date) => {
                                     datePicker.selectedTime = date.getTime()
-                                    datePicker.selectedDate = new Date( datePicker.selectedTime )
+                                    datePicker.selectedDate = new Date( date.getTime() )
+                                    root.content.setDate( datePicker.selectedDate.getDate() )
+                                    root.content.setFullYear( datePicker.selectedDate.getFullYear() )
+                                    root.content.setMonth( datePicker.selectedDate.getMonth() )
                                     changeContent()
                                 }
                             }

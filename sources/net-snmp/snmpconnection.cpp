@@ -219,7 +219,10 @@ void SNMPConnection::setMultiple( QJsonObject fields )
     QJsonObject connectionsSettings = settings[ "snmp" ].toObject();
     bool snmpSettings = false;
 
-    if ( writeSession == NULL ) return;
+    if ( writeSession == NULL ) {
+        emit notify(-1, "Нет соединения с устройством", 3000 );
+        return;
+    }
     emit startUpdate();
 
     for( QString key : fields.keys() )
