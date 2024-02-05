@@ -213,7 +213,6 @@ void SNMPConnection::PDUAddString( SNMPpp::PDU *pdu, QString key, QJsonObject fi
 
 void SNMPConnection::setMultiple( QJsonObject fields )
 {
-    emit startUpdate();
 
     QJsonObject _fields = fields;
     QJsonObject settings = pConfigs->get();
@@ -221,6 +220,7 @@ void SNMPConnection::setMultiple( QJsonObject fields )
     bool snmpSettings = false;
 
     if ( writeSession == NULL ) return;
+    emit startUpdate();
 
     for( QString key : fields.keys() )
     {
