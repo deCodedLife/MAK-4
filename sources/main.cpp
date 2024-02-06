@@ -14,8 +14,12 @@
 
 int main( int argc, char *argv[] )
 {
+    setlocale(LC_ALL, ".utf8");
+
     QGuiApplication app( argc, argv );
     QQmlApplicationEngine engine;
+
+
 
     qint32 fontId = QFontDatabase::addApplicationFont( "://fonts/Roboto.ttf" );
     QStringList fontList = QFontDatabase::applicationFontFamilies( fontId );

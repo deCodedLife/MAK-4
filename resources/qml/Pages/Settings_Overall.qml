@@ -18,6 +18,7 @@ Page
     onActionButtonTriggered: SNMP.setMultiple( configuration )
 
     function updateConfig( field, value ) {
+        // if ( field === "psTime" ) return
         let newConfig = ConfigManager.current
         configuration[ field ][ "value" ] = Wrappers.getFieldValue( configuration[ field ], value )
         newConfig[ "overall" ] = configuration
@@ -61,13 +62,14 @@ Page
                     timezone[ "wrapper" ] = Wrappers.divideByFour
                     _fields.push( timezone )
 
+                    _fields.push( configuration[ "psTime" ] )
                     _fields.push( configuration[ "psBuzzerEnable" ] )
                     return _fields
                 }
                 onFieldUpdated: ( field, value ) => updateConfig( field, value )
             }
 
-            Item{}
+            Item{ Layout.fillWidth: true }
         }
     }
 }

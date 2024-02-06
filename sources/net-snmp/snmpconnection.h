@@ -31,6 +31,8 @@ class SNMPConnection : public TObject
 
 signals:
     void stateChanged( States );
+    void startUpdate();
+    void finishUpdate();
 
     void settingsChanged();
     void gotTablesCount( QString, int );

@@ -162,7 +162,10 @@ Page
                 highlighted: true
                 text: "Назад"
                 Material.accent: Globals.secondaryColor
-                onClicked: journalTable.currentPage--
+                onClicked: {
+                    if ( journalTable.currentPage == 1 ) return
+                    journalTable.currentPage--
+                }
             }
 
             Button {

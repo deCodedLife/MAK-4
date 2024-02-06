@@ -57,11 +57,33 @@ MibParser::MibParser(QString file_path, QObject *parent)
     : TObject{parent}
 {
     root = SNMPpp::OID( "1.3.6.1.4.1.36032" );
-    std::string mib_path = QDir::currentPath().toStdString() + "/mibs";
 
-    add_mibdir( mib_path.c_str() );
+    QString mib_path = QDir::currentPath() + "/mibs";
+#ifdef WIN32
+    mib_path = "C:/mibs";
+
+    foreach( QFileInfo drive, QDir::drives() )
+    {
+        mib_path = drive.absolutePath() + "mibs";
+        break;
+    }
+#endif
+
+    if ( !QDir( mib_path ).exists() ) QDir().mkdir( mib_path );
+
+    QDirIterator it( ":/snmp/mibs", QDirIterator::Subdirectories );
+
+    while ( it.hasNext() ) {
+        QString mibResoursePath = it.next();
+        QString fileName = mibResoursePath.split( "/" ).last();
+        if ( QFile( mib_path + "/" + fileName ).exists() ) continue;
+        QFile rccFile( mibResoursePath );
+        rccFile.copy( mib_path + "/" + fileName );
+    }
+
+    add_mibdir( mib_path.toStdString().c_str() );
     snmp_set_save_descriptions(1);
-    netsnmp_set_mib_directory( mib_path.c_str() );
+    netsnmp_set_mib_directory(  mib_path.toStdString().c_str() );
 
     netsnmp_init_mib();
     netsnmp_init_mib_internals();
@@ -69,7 +91,7 @@ MibParser::MibParser(QString file_path, QObject *parent)
     mib_path += "/";
     mib_path += MIB_PATH;
 
-    const struct tree *nodes = read_mib( mib_path.c_str() );
+    const struct tree *nodes = read_mib( mib_path.toStdString().c_str() );
 
     if ( nodes == nullptr ) {
         emit error_occured( Callback::New( "Can't read default mib file", Callback::Error ) );

@@ -43,10 +43,10 @@ Page
             ]
 
             fields: [
-                new Wrappers.ContentItem( null, "Серийный номер источника питания" ),
+                new Wrappers.ContentItem( null, "Серийный номер" ),
                 new Wrappers.ContentItem( null, "Описание источника питания" ),
                 new Wrappers.ContentItem( null, "Версия ПО контроллера" ),
-                new Wrappers.ContentItem( null, "Время UTC" ),
+                new Wrappers.ContentItem( null, "Время" ),
 
                 new Wrappers.ContentItem( "psSerial", "", Wrappers.RowTypes.TEXT, "str" ),
                 new Wrappers.ContentItem( "psDescription", "", Wrappers.RowTypes.TEXT, "str" ),

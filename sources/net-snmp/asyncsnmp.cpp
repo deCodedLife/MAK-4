@@ -1,6 +1,171 @@
 #include "asyncsnmp.h"
 
 
+static const QMap<char, QString> WinCodec {
+    { '\x80', "Ђ" },
+    { '\x81', "Ѓ" },
+    { '\x82', "‚" },
+    { '\x83', "ѓ" },
+    { '\x84', "„" },
+    { '\x85', "…" },
+    { '\x86', "†" },
+    { '\x87', "‡" },
+    { '\x88', "€" },
+    { '\x89', "‰" },
+    { '\x8A', "Љ" },
+    { '\x8B', "‹" },
+    { '\x8C', "Њ" },
+    { '\x8D', "Ќ" },
+    { '\x8E', "Ћ" },
+    { '\x8F', "Џ" },
+    { '\x90', "ђ" },
+    { '\x91', "‘" },
+    { '\x92', "’" },
+    { '\x93', "“" },
+    { '\x94', "”" },
+    { '\x95', "•" },
+    { '\x96', "–" },
+    { '\x97', "—" },
+    { '\x98', " " },
+    { '\x99', "™" },
+    { '\x9A', "љ" },
+    { '\x9B', "›" },
+    { '\x9C', "њ" },
+    { '\x9D', "ќ" },
+    { '\x9E', "ћ" },
+    { '\x9F', "џ" },
+    { '\xA0', " " },
+    { '\xA1', "Ў" },
+    { '\xA2', "ў" },
+    { '\xA3', "Ћ" },
+    { '\xA4', "¤" },
+    { '\xA5', "Ґ" },
+    { '\xA6', "¦" },
+    { '\xA7', "§" },
+    { '\xA8', "Ё" },
+    { '\xA9', "©" },
+    { '\xAA', "Є" },
+    { '\xAB', "«" },
+    { '\xAC', "¬" },
+    { '\xAD', " " },
+    { '\xAE', "®" },
+    { '\xAF', "Ї" },
+    { '\xB0', "°" },
+    { '\xB1', "±" },
+    { '\xB2', "І" },
+    { '\xB3', "і" },
+    { '\xB4', "ґ" },
+    { '\xB5', "µ" },
+    { '\xB6', "¶" },
+    { '\xB7', "·" },
+    { '\xB8', "ё" },
+    { '\xB9', "№" },
+    { '\xBA', "є" },
+    { '\xBB', "»" },
+    { '\xBC', "ј" },
+    { '\xBD', "Ѕ" },
+    { '\xBE', "ѕ" },
+    { '\xBF', "ї" },
+    { '\xC0', "А" },
+    { '\xC1', "Б" },
+    { '\xC2', "В" },
+    { '\xC3', "Г" },
+    { '\xC4', "Д" },
+    { '\xC5', "Е" },
+    { '\xC6', "Ж" },
+    { '\xC7', "З" },
+    { '\xC8', "И" },
+    { '\xC9', "Й" },
+    { '\xCA', "К" },
+    { '\xCB', "Л" },
+    { '\xCC', "М" },
+    { '\xCD', "Н" },
+    { '\xCE', "О" },
+    { '\xCF', "П" },
+    { '\xD0', "Р" },
+    { '\xD1', "С" },
+    { '\xD2', "Т" },
+    { '\xD3', "У" },
+    { '\xD4', "Ф" },
+    { '\xD5', "Х" },
+    { '\xD6', "Ц" },
+    { '\xD7', "Ч" },
+    { '\xD8', "Ш" },
+    { '\xD9', "Щ" },
+    { '\xDA', "Ъ" },
+    { '\xDB', "Ы" },
+    { '\xDC', "Ь" },
+    { '\xDD', "Э" },
+    { '\xDE', "Ю" },
+    { '\xDF', "Я" },
+    { '\xE0', "а" },
+    { '\xE1', "б" },
+    { '\xE2', "в" },
+    { '\xE3', "г" },
+    { '\xE4', "д" },
+    { '\xE5', "е" },
+    { '\xE6', "ж" },
+    { '\xE7', "з" },
+    { '\xE8', "и" },
+    { '\xE9', "й" },
+    { '\xEA', "к" },
+    { '\xEB', "л" },
+    { '\xEC', "м" },
+    { '\xED', "н" },
+    { '\xEE', "о" },
+    { '\xEF', "п" },
+    { '\xF0', "р" },
+    { '\xF1', "с" },
+    { '\xF2', "т" },
+    { '\xF3', "у" },
+    { '\xF4', "ф" },
+    { '\xF5', "х" },
+    { '\xF6', "ц" },
+    { '\xF7', "ч" },
+    { '\xF8', "ш" },
+    { '\xF9', "щ" },
+    { '\xFA', "ъ" },
+    { '\xFB', "ы" },
+    { '\xFC', "ь" },
+    { '\xFD', "э" },
+    { '\xFE', "ю" },
+    { '\xFF', "я" },
+    { '\x20', " " },
+    { '\x21', "!" },
+    { '\x22', "'" },
+    { '\x23', "#" },
+    { '\x24', "$" },
+    { '\x25', "%" },
+    { '\x26', "&" },
+    { '\x27', "'" },
+    { '\x28', "(" },
+    { '\x29', ")" },
+    { '\x2A', "*" },
+    { '\x2B', "+" },
+    { '\x2C', "," },
+    { '\x2D', "-" },
+    { '\x2E', "." },
+    { '\x2F', "/" },
+    { '\x30', "0" },
+    { '\x31', "1" },
+    { '\x32', "2" },
+    { '\x33', "3" },
+    { '\x34', "4" },
+    { '\x35', "5" },
+    { '\x36', "6" },
+    { '\x37', "7" },
+    { '\x38', "8" },
+    { '\x39', "9" },
+    { '\x3A', ":" },
+    { '\x3B', ";" },
+    { '\x3C', "<" },
+    { '\x3D', "=" },
+    { '\x3E', ">" },
+    { '\x3F', "?" },
+    { '\x0A', "\n" },
+    { '\x09', "\t" }
+};
+
 /**
  * Proceed async request to device
  * Supports only kSet, kGet and kGetBulk requests
@@ -146,7 +311,10 @@ void parsePDU( const SNMPpp::PDU request, std::vector<Reply> *reply, SNMPpp::OID
         }
 
         Reply field;
-        QString strData = QString::fromStdString( request.varlist().asString( currentOID ) );
+
+
+        QString strData;
+        ParseCodec( request.varlist().asString( currentOID ), &strData );
 
         field.oid = currentOID;
         field.numValue = (int) (iter->second->val.integer ? *iter->second->val.integer : 0);
@@ -157,14 +325,11 @@ void parsePDU( const SNMPpp::PDU request, std::vector<Reply> *reply, SNMPpp::OID
             iter->second->type == TYPE_IPADDR ||
             iter->second->type == TYPE_NSAPADDRESS
         ) {
-            QStringList rawData = strData.split( "STRING: \"" );
+            strData = strData.replace( "STRING: ", "" );
+            strData = strData.replace( "'", "" );
 
-            if ( rawData.length() != 0 && rawData.length() != 1 )
-            {
-                QString data = rawData.last();
-                data.truncate( data.lastIndexOf( QChar('"') ) );
-                field.strValue = data.toStdString();
-            }
+            field.strValue = strData.toStdString();
+
         }
 
         reply->push_back( field );
@@ -413,3 +578,20 @@ void AsyncSNMP::run()
     buffer.clear();
     emit finished( uniqueRequestID, reply );
 } // void AsyncSNMP::run()
+
+void ParseCodec( const std::string data, QString *buff )
+{
+    QTextStream converted( buff );
+
+    for ( char c : data )
+    {
+        if ( !WinCodec.contains( c ) )
+        {
+            std::string byte;
+            byte += c;
+            converted << QString::fromStdString( byte );
+            continue;
+        };
+        converted << WinCodec[ c ];
+    }
+}

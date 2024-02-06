@@ -11,6 +11,8 @@ import "Components"
 
 ApplicationWindow
 {
+    id: root
+
     width: 1024
     height: 860
 
@@ -18,12 +20,63 @@ ApplicationWindow
     minimumHeight: 400
 
     visible: true
-    title: "MAK-4 0.1.9 beta " + (Globals.windowSuffix != "" ? `[${Globals.windowSuffix}]` : "")
+    title: "MAK-4 1.1.3 " + (Globals.windowSuffix != "" ? `[${Globals.windowSuffix}]` : "")
 
     color: Globals.accentColor
     Material.theme: Material.Light
     Material.accent: Material.Blue
     Material.containerStyle: Material.Filled
+
+    Connections {
+        target: SNMP
+
+        function onStartUpdate() {
+            writeModal.open()
+        }
+
+        function onFinishUpdate() {
+            writeModal.close()
+        }
+    }
+
+    Popup {
+        id: writeModal
+        modal: true
+        width: 400
+        height: 200
+        anchors.centerIn: parent
+
+        closePolicy: Popup.NoAutoClose
+        contentItem: Rectangle {
+            radius: 10
+
+            anchors.fill: parent
+            anchors.margins: 10
+            color: "white"
+
+            ColumnLayout {
+                anchors.fill: parent
+                spacing: 10
+
+                Text {
+                    Layout.fillWidth: true
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    text: "Запись данных"
+                    font.pointSize: Globals.h3
+                }
+
+                Text {
+                    Layout.fillWidth: true
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    text: "Дождитесь конца записи данных на контроллер"
+                    font.pointSize: Globals.h5
+                    color: Globals.grayAccent
+                }
+
+                Item{ Layout.fillHeight: true }
+            }
+        }
+    }
 
     FileDialog {
         id: fileDialog
@@ -80,4 +133,6 @@ ApplicationWindow
             Layout.alignment: Qt.AlignRight | Qt.AlignBottom
         }
     }
+
+    Component.onCompleted: Globals.rootObject = pageLoader
 }

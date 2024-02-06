@@ -165,7 +165,7 @@ QJsonObject Configs::Default()
         { "1", "auth, no priv" },
         { "2", "auth and priv" } } } );
     mainSettings[ "stSNMPSAuthAlgo" ] = Field::ToJSON( { FieldCombobox, AUTH_PROTOCOL, "Протокол аутентификации", { { "2", "SHA1" }, { "1", "MD5" } } } );
-    mainSettings[ "stSNMPSPrivAlgo" ] = Field::ToJSON( { FieldCombobox, PRIV_PROTOCOL, "Протокол приватноси", { { "1", "DES" }, { "2", "AES" } } } );
+    mainSettings[ "stSNMPSPrivAlgo" ] = Field::ToJSON( { FieldCombobox, PRIV_PROTOCOL, "Протокол приватности", { { "1", "DES" }, { "2", "AES" } } } );
     mainSettings[ "stSNMPAdministratorAuthPassword" ] = Field::ToJSON( { FieldPassword, AUTH_PASSWORD, "Пароль аутентификации" } );
     mainSettings[ "stSNMPAdministratorPrivPassword" ] = Field::ToJSON( { FieldPassword, PRIV_PASSWORD, "Пароль приватности" } );
 
@@ -195,8 +195,8 @@ QJsonObject Configs::Default()
     snmpSettings[ "stSNMPSAuthAlgo" ] = Field::ToJSON( { FieldCombobox, AUTH_PROTOCOL, "Протокол аутентификации", { { "0", "Нет" }, { "1", "MD5" }, { "2", "SHA1" } } } );
     snmpSettings[ "stSNMPSPrivAlgo" ] = Field::ToJSON( { FieldCombobox, PRIV_PROTOCOL, "Протокол приватности", { { "0", "Нет" }, { "1", "DES" }, { "2", "AES128" } } } );
 
-    snmpSettings[ "stSNMPReadComunity" ] = Field::ToJSON( { FieldPassword, "*****", "Коммьюнити для чтения" } );
-    snmpSettings[ "stSNMPWriteComunity" ] = Field::ToJSON( { FieldPassword, "*****", "Коммьюнити для записи" } );
+    snmpSettings[ "stSNMPReadComunity" ] = Field::ToJSON( { FieldPassword, "*****", "Community для чтения" } );
+    snmpSettings[ "stSNMPWriteComunity" ] = Field::ToJSON( { FieldPassword, "*****", "Community для записи" } );
 
     for ( int index = 1; index < 4; index++ )
     {
@@ -222,6 +222,7 @@ QJsonObject Configs::Default()
      */
     QJsonObject overallSettings;
     overallSettings[ "psTimeZone" ] = Field::ToJSON( { FieldCounter, 12, "Часовой пояс", {}, -48, 52 } );
+    overallSettings[ "psTime" ] = Field::ToJSON( { FieldDateTime, 0, "Дата и время", {} } );
     overallSettings[ "psBuzzerEnable" ] = Field::ToJSON( { FieldSwitch, 0, "Звук включен" } );
 
     /**
@@ -259,13 +260,36 @@ QJsonObject Configs::Default()
     batterySettings[ "stBoostVoltage" ] = Field::ToJSON( { FieldCounter, 6690, "Напряжение ускоренного заряда, В", {}, 0 } );
     batterySettings[ "stBoostEnable" ] = Field::ToJSON( { FieldSwitch, 0, "Ускоренный заряд" } );
     batterySettings[ "stEqualizeVoltage" ] = Field::ToJSON( { FieldCounter, 6900, "Напряжение выравнивающего заряда, В", {}, 0 } );
-    batterySettings[ "stEndTestVoltage" ] = Field::ToJSON( { FieldCounter, 5400, "Напряжение окончания теста, В", {}, 0 } );
     batterySettings[ "stCriticalLowVoltage" ] = Field::ToJSON( { FieldCounter, 5100, "Напряжение глубокого разряда, В", {}, 0 } );
     batterySettings[ "stTermocompensationEnable" ] = Field::ToJSON( { FieldSwitch, 1, "Термокомпенсация" } );
+    batterySettings[ "stFastChTime" ] = Field::ToJSON( { FieldCounter, 0, "Длительность ускоренного заряда, ч", {}} );
     batterySettings[ "stTermocompensationCoefficient" ] = Field::ToJSON( { FieldCounter, 35, "Коэффициент термокомпенсации, мВ/эл/°C", {}, 1 } );
     batterySettings[ "stChargeCurrentLimit" ] = Field::ToJSON( { FieldCounter, 10, "Ограничение тока заряда, C10", {}, 0 } );
     batterySettings[ "stGroupCapacity" ] = Field::ToJSON( { FieldCounter, 100, "Ёмкость группы, Ач", {}, 0 } );
-    batterySettings[ "stEqualizeTime" ] = Field::ToJSON( { FieldCounter, 1, "Время выравнивающего заряда, ч", {}, 1, 24 } );
+    batterySettings[ "stEqualizeTime" ] = Field::ToJSON( { FieldCounter, 1, "Длительность выравнивающего заряда, ч", {}, 1, 24 } );
+
+
+    /**
+     * @brief testsAB
+     */
+    QJsonObject testsAB;
+    testsAB[ "stEndTestVoltage" ] = Field::ToJSON( { FieldCounter, 0, "Напряжение окончания теста, В", {}, 0 } );
+    testsAB[ "stFixedLoadCurEnable" ] = Field::ToJSON( { FieldSwitch, 0, "Поддерживать заданный ток разряда", {}, 0 } );
+    testsAB[ "stFixedLoadCur" ] = Field::ToJSON( { FieldCounter, 5, "Ток разряда, А", {}, 5, 5000 } );
+    testsAB[ "stDischCur" ] = Field::ToJSON( { FieldCounter, 0, "Минимально допустимый ток разряда, %С₁₀", {}, 0, 100 } );
+
+    testsAB[ "stPeriodTestEnable" ] = Field::ToJSON( { FieldSwitch, 0, "Запускать переодично", {}, 0 } );
+    testsAB[ "stTestPeriod" ] = Field::ToJSON( { FieldCounter, 0, "Период теста, месяцев", {}, 0 } );
+    testsAB[ "stTestStartTime" ] = Field::ToJSON( { FieldDateTime, "01012001000000", "Начать первый тест", {}, 0 } );
+
+    testsAB[ "stShortTestVoltage" ] = Field::ToJSON( { FieldCounter, 0, "Напряжение короткого теста, В", {}, 0 } );
+    testsAB[ "stShortTestTimer" ] = Field::ToJSON( { FieldCounter, 0, "Длительность короткого теста, мин", {}, 0 } );
+
+    testsAB[ "stShortTestEnable" ] = Field::ToJSON( { FieldSwitch, 0, "Запускать переодично", {}, 0 } );
+    testsAB[ "stShortTestPeriod" ] = Field::ToJSON( { FieldCounter, 0, "Период, дни", {}, 0 } );
+    testsAB[ "stShortTestStartTime" ] = Field::ToJSON( { FieldDateTime, "01012001000000", "Начать первый тест", {}, 0 } );
+
+
 
     /**
      * @brief temperatureSettings
@@ -366,6 +390,7 @@ QJsonObject Configs::Default()
 
     data[ "main" ] = mainSettings;
     data[ "snmp" ] = snmpSettings;
+    data[ "tests" ] = testsAB;
     data[ "power" ] = powerSettings;
     data[ "overall" ] = overallSettings;
     data[ "network" ] = networkSettings;

@@ -24,6 +24,27 @@ Item
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
+                ScrollBar.vertical: ScrollBar {
+                    id: control
+                    height: 10
+                    policy: ScrollBar.AsNeeded
+                    property Rectangle contentReference: contentItem
+                    visible: list.height < list.contentHeight
+
+                    Component.onCompleted: {
+                        contentReference.radius = 5
+                        contentReference.opacity = .6
+                    }
+
+                    background: Rectangle {
+                        implicitWidth: control.interactive ? 16 : 4
+                        implicitHeight: control.interactive ? 16 : 4
+                        color: "transparent"
+                        opacity: .6
+                        visible: control.interactive
+                    }
+                }
+
                 clip: true
                 model: LeftMenuG.currentMenu
                 boundsMovement: Flickable.StopAtBounds

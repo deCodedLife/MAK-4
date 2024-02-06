@@ -146,6 +146,7 @@ void SNMPConnection::snmpError( int code )
 
 void SNMPConnection::validateConnection( QString root, QMap<SNMPpp::OID, QJsonObject> rows )
 {
+    if ( rows.empty() ) return;
     if ( root == "initSession" )
     {
         SNMPpp::OID snmpVersionOID = parser.ToOID( "psFWRevision.0" );
@@ -159,7 +160,7 @@ void SNMPConnection::validateConnection( QString root, QMap<SNMPpp::OID, QJsonOb
             }
             return;
         }
-        if ( snmpVersion < 400 && snmpVersion > 499 ) return;
+        if ( snmpVersion < 400 || snmpVersion > 499 ) return;
     }
 
     if ( _state != Disconnected ) return;
@@ -216,6 +217,12 @@ void SNMPConnection::setMultiple( QJsonObject fields )
     QJsonObject settings = pConfigs->get();
     QJsonObject connectionsSettings = settings[ "snmp" ].toObject();
     bool snmpSettings = false;
+
+    if ( writeSession == NULL ) {
+        emit notify(-1, "Нет соединения с устройством", 3000 );
+        return;
+    }
+    emit startUpdate();
 
     for( QString key : fields.keys() )
     {
@@ -319,6 +326,7 @@ void SNMPConnection::setMultiple( QJsonObject fields )
             }
 
             emit notify(-1, "Не удалось записать объект " + objectName, 3000 );
+            emit finishUpdate();
             return;
         }
 
@@ -332,6 +340,8 @@ void SNMPConnection::setMultiple( QJsonObject fields )
     {
         getOIDs( "initSession", { "psFWRevision.0" } );
     }
+
+    emit finishUpdate();
 }
 
 void SNMPConnection::updateConfigs()
@@ -531,6 +541,8 @@ void SNMPConnection::updateConnection( bool sync )
             usmUser* actUser = usm_get_userList();
             while ( actUser != NULL ) {
                 usmUser* dummy = actUser->next;
+
+                // if ( !dummy ) break;
                 // usm_remove_user( actUser );
                 // usm_free_user( actUser );
                 //
@@ -547,7 +559,9 @@ void SNMPConnection::updateConnection( bool sync )
                 actUser = dummy;
             }
             // usm_create_user_from_session( readSession );
-            usm_create_user();
+
+            if ( usm_get_userList() == NULL )
+                usm_create_user();
 
             SNMPpp::openSessionV3(
                 readSession,

@@ -61,6 +61,7 @@ if ( APPLE )
 else ( WIN32 )
 
     set_target_properties( MAK-4 PROPERTIES WIN32_EXECUTABLE TRUE )
+    set_target_properties( MAK-4 PROPERTIES LINK_FLAGS "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\" /SUBSYSTEM:WINDOWS" )
 
 endif()
 
@@ -83,5 +84,5 @@ target_include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/sources/gui
 )
 
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/mibs)
-configure_files( ${CMAKE_CURRENT_SOURCE_DIR}/mibs ${CMAKE_BINARY_DIR}/mibs )
+# file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/mibs)
+# configure_files( ${CMAKE_CURRENT_SOURCE_DIR}/mibs ${CMAKE_BINARY_DIR}/mibs )

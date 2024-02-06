@@ -43,6 +43,7 @@ QtObject
         MenuItemM { title: "Маски аварий"; page: "Pages/Settings_Masks.qml" },
         MenuItemM { title: "Общее"; page: "Pages/Settings_Overall.qml" },
         MenuItemM { title: "Батарея"; page: "Pages/Settings_Battery.qml" },
+        MenuItemM { title: "Тесты АБ"; page: "Pages/Settings_TestsAB.qml" },
         MenuItemM { title: "Контакторы"; page: "Pages/Settings_Contactors.qml" },
         MenuItemM { title: "Сеть"; page: "Pages/Settings_Power.qml" },
         MenuItemM { title: "Температура"; page: "Pages/Settings_Temperature.qml" },

@@ -79,6 +79,43 @@ Page
                 }
             }
 
+            Text {
+                text: "Распределительные шкафы"
+                Layout.topMargin: 10
+                Layout.alignment: Qt.AlignHCenter
+                font.pointSize: Globals.h4
+            }
+
+            TableComponent {
+                Layout.alignment: Qt.AlignTop
+                tableOID: "psAmperemeterTable"
+
+                headers: [
+                    TableHeaderM {
+                        title: "№ шкафа"
+                        expand: true
+                    },
+                    TableHeaderM {
+                        title: "Ток шкафа, А"
+                        expand: true
+                    },
+                    TableHeaderM {
+                        title: "Состояние амперметра"
+                        expand: true
+                    }
+                ]
+
+                rows: {
+                    "psAmperemeterNumber": new Wrappers.RowItem(),
+                    "psAmperemeterCurrent": new Wrappers.RowItem(),
+                    "psAmperemeterStatus": new Wrappers.RowItem(
+                                Wrappers.RowTypes.DESCRIPTION,
+                                (value) => parseInt( value.toString() ) === 0 ? "Норма" : "Нет связи",
+                                "num"
+                    )
+                }
+            }
+
         }
     }
 }

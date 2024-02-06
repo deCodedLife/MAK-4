@@ -93,6 +93,7 @@ Page
                         boostVoltage[ "wrapper" ] = Wrappers.divideByHundred
                         _fields.push( boostVoltage )
                         _fields.push( configuration[ "stBoostEnable" ] )
+                        _fields.push( configuration[ "stFastChTime" ] )
                         return _fields
                     }
 
@@ -117,9 +118,6 @@ Page
                 CardComponent {
                     fields: {
                         let _fields = []
-                        let endTestVoltage = configuration[ "stEndTestVoltage" ]
-                        endTestVoltage[ "wrapper" ] = Wrappers.divideByHundred
-                        _fields.push( endTestVoltage )
                         _fields.push( configuration[ "stGroupCapacity" ] )
                         return _fields
                     }
