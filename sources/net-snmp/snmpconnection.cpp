@@ -213,7 +213,6 @@ void SNMPConnection::PDUAddString( SNMPpp::PDU *pdu, QString key, QJsonObject fi
 
 void SNMPConnection::setMultiple( QJsonObject fields )
 {
-
     QJsonObject _fields = fields;
     QJsonObject settings = pConfigs->get();
     QJsonObject connectionsSettings = settings[ "snmp" ].toObject();
@@ -311,7 +310,7 @@ void SNMPConnection::setMultiple( QJsonObject fields )
 
         try
         {
-            pdu = SNMPpp::set( writeSession, pdu );
+            // pdu = SNMPpp::set( writeSession, pdu );
         }
         catch( const std::exception &e )
         {
@@ -542,6 +541,7 @@ void SNMPConnection::updateConnection( bool sync )
             usmUser* actUser = usm_get_userList();
             while ( actUser != NULL ) {
                 usmUser* dummy = actUser->next;
+
                 // if ( !dummy ) break;
                 // usm_remove_user( actUser );
                 // usm_free_user( actUser );
@@ -559,6 +559,7 @@ void SNMPConnection::updateConnection( bool sync )
                 actUser = dummy;
             }
             // usm_create_user_from_session( readSession );
+
             if ( usm_get_userList() == NULL )
                 usm_create_user();
 
